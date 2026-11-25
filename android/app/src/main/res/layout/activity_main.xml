@@ -9,14 +9,14 @@
     android:paddingEnd="32dp"
     android:paddingBottom="24dp">
 
-    <!-- The top bar: the mark, the wordmark, the language the lens answers in,
-         and the way into Settings. The mark is the launcher's own tile, not a
-         redraw of it, so the wordmark is read beside the thing the app is on
-         the home screen. It follows the theme: the paper plate in the day
-         theme, the charcoal one (drawable-night) when the page is dark, so it
-         stays a small icon rather than a light left on. The language sits here
-         rather than behind the gear: it is the setting people change most, and
-         home should say what the next read will come out as. -->
+    <!-- The top bar: the mark, the wordmark and the way into Settings. The mark
+         is the launcher's own tile, not a redraw of it, so the wordmark is read
+         beside the thing the app is on the home screen. It follows the theme:
+         the paper plate in the day theme, the charcoal one (drawable-night) when
+         the page is dark, so it stays a small icon rather than a light left on.
+         The language is not repeated here: one switch owns it, in the tour's
+         corner and in Settings, and a second copy on this page was two places to
+         change one setting — and a way for them to disagree. -->
     <LinearLayout
         android:id="@+id/headerRow"
         android:layout_width="match_parent"
@@ -42,26 +42,6 @@
             android:textColor="@color/screen_ink"
             android:textFontWeight="500"
             android:textSize="25sp" />
-
-        <!-- The target language, as the welcome page shows it: the name alone on
-             a ghost chip, because an arrow beside a word at this size is noise. -->
-        <TextView
-            android:id="@+id/langPill"
-            android:layout_width="wrap_content"
-            android:layout_height="28dp"
-            android:layout_marginStart="12dp"
-            android:background="@drawable/btn_ghost"
-            android:clickable="true"
-            android:ellipsize="end"
-            android:focusable="true"
-            android:fontFamily="@font/lucid_sans"
-            android:gravity="center"
-            android:maxLines="1"
-            android:maxWidth="112dp"
-            android:paddingStart="12dp"
-            android:paddingEnd="12dp"
-            android:textColor="@color/screen_muted"
-            android:textSize="10.5sp" />
 
         <View
             android:layout_width="0dp"
