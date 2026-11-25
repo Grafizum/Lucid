@@ -122,6 +122,15 @@ class LensService : Service() {
         private const val BURST_GAP_MS = 120L
 
         /**
+         * A read of a moving picture holding fewer letters than this is looked
+         * at again even when it is not empty: a caption caught while it fades
+         * in, or between two words, comes back as a fragment rather than as
+         * nothing, and a fragment of a caption is exactly what a person calls
+         * "missing a letter".
+         */
+        private const val BURST_THIN_GLYPHS = 8
+
+        /**
          * How many reads in a row the screenshot API has to refuse before the
          * Screen capture row is brought back. One refusal is a hiccup; a phone
          * that keeps refusing needs the old way to be offered.
@@ -2355,7 +2364,8 @@ class LensService : Service() {
             // own screenshot, the lens is over a picture all the same — that is
             // the path older phones read a reel through.
             val moving = fullScreen || frameSource == "media-projection"
-            if (outcome.empty && moving && gen == readGen) {
+            val thin = outcome.source.count { it.isLetterOrDigit() } < BURST_THIN_GLYPHS
+            if (moving && gen == readGen && (outcome.empty || thin)) {
                 val reads = arrayListOf(outcome)
                 hideForFrame()
                 try {

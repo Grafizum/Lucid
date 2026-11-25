@@ -24,7 +24,6 @@ import org.json.JSONArray
 import java.net.HttpURLConnection
 import java.net.URL
 import java.net.URLEncoder
-import java.util.Locale
 import java.util.concurrent.TimeUnit
 
 data class Outcome(
@@ -61,14 +60,15 @@ fun agreedOutcome(readings: List<Outcome>): Outcome {
         return readings.firstOrNull { it.error != null } ?: readings.firstOrNull() ?: Outcome(empty = true)
     }
 
-    fun signature(outcome: Outcome) =
-        outcome.source.lowercase(Locale.ROOT).filter { it.isLetterOrDigit() }
-
-    val signatures = usable.map(::signature)
     var best = usable.first()
     var bestVotes = -1
     for ((index, reading) in usable.withIndex()) {
-        val votes = signatures.count { it == signatures[index] }
+        // A frame backs a read when either one holds the other's words: the
+        // same caption seen with a glyph more or less of it on screen. Asking
+        // for an exact match treated two looks at one line as two lines.
+        val votes = usable.count { other ->
+            other === reading || sameWords(other.source, reading.source)
+        }
         val longer = reading.source.count { it.isLetterOrDigit() } >
             best.source.count { it.isLetterOrDigit() }
         if (votes > bestVotes || (votes == bestVotes && longer)) {
@@ -464,37 +464,11 @@ class VisionTranslator(private val context: Context) {
     private fun box(rect: Rect) = UnderLens.Box(rect.left, rect.top, rect.right, rect.bottom)
 
     /**
-     * Chat screens carry timestamps, delivery ticks and edge artifacts that read
-     * as noise once translated. Drop the trailing ones from each line; fall back
-     * to the raw text if that leaves nothing usable.
+     * The phone's own chrome — timestamps, delivery ticks, retry rows — read as
+     * noise once translated. The rule for taking it out without taking a word
+     * with it lives in [tidyRead].
      */
-    fun tidy(raw: String): String {
-        val ticks = Regex("""[\s\u00a0]*[\u2713\u2714]{1,3}[\s\u00a0]*$""")
-        val clock = Regex("""[\s\u00a0]*\b\d{1,2}[:.]\d{2}[\s\u00a0]*(?:[AaPp]\.?[Mm]\.?)?[\s\u00a0]*$""")
-        val leadingClock = Regex("""^[\s\u00a0]*\b\d{1,2}[:.]\d{2}[\s\u00a0]*(?:[AaPp]\.?[Mm]\.?)?[\s\u00a0]*""")
-        // Chat bubbles often sit next to a retry row that is not part of the message.
-        val retry = Regex("""[\s\u00a0]*(?:Tap to retry|Retry)[\s\u00a0]*$""", RegexOption.IGNORE_CASE)
-        val stray = Regex("""[\s\u00a0]*[/\\|\u00b7]+[\s\u00a0]*$""")
-        // Web pages carry citation markers such as [1] or [12] inline.
-        val citations = Regex("""\[\d{1,3}]""")
-
-        val lines = raw.lines()
-            .map { line ->
-                line.replace(citations, "")
-                    .replace(ticks, "")
-                    .replace(clock, "")
-                    .replace(ticks, "")
-                    .replace(retry, "")
-                    .replace(leadingClock, "")
-                    .replace(stray, "")
-                    .replace(Regex("""[\s\u00a0]{2,}"""), " ")
-                    .trim()
-            }
-            .filter { it.isNotEmpty() }
-
-        val cleaned = lines.joinToString("\n").trim()
-        return if (cleaned.length >= 2) cleaned else raw.trim()
-    }
+    fun tidy(raw: String): String = tidyRead(raw)
 
     private suspend fun translateOnDevice(text: String, source: String, target: String): String =
         withContext(Dispatchers.Default) {
