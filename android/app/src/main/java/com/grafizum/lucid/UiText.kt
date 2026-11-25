@@ -1,13 +1,21 @@
 package com.grafizum.lucid
 
 import android.content.Context
+import android.view.View
+import android.view.ViewGroup
+import android.widget.TextView
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File
 import java.net.HttpURLConnection
+import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.atomic.AtomicInteger
+import java.util.concurrent.atomic.AtomicReference
 import java.net.URL
 import java.net.URLEncoder
 import java.util.concurrent.TimeUnit
@@ -40,7 +48,7 @@ object UiText {
      * a pack translated from the old ones would be missing whatever is new. The
      * arrow comes back and the language is fetched again.
      */
-    internal const val VERSION = 1
+    internal const val VERSION = 2
 
     private val english = linkedMapOf(
         "tour.1.title" to "Swipe to start the lens",
@@ -62,17 +70,236 @@ object UiText {
         "tour.next" to "Next",
         "tour.setup" to "Set up",
         "tour.start" to "Start the lens",
-        "exit.title" to "Leave the tour?",
-        "exit.body" to "The two switches can still be set up from the home page — the card there says what is missing. The tour will not come back on its own.",
-        "exit.stay" to "Stay",
-        "exit.leave" to "Leave",
+
+        // Lines that are built with a value in them. The line is the source and
+        // the pack keeps it whole, so a value is dropped in after translation
+        // rather than translated with the sentence.
+        "appLang.onPhone" to "%s is on this phone — the app reads in it.",
+        "appLang.notOnPhone" to "Not on this phone — tap the arrow to fetch %s.",
+        "appLang.fetching" to "Fetching %s…",
+        "appLang.progress" to "Fetching %s… %d/%d",
+        "appLang.done" to "%d lines in %s, and the app reads in it now.",
+        "appLang.failed" to "Couldn't reach the translation service. Try again on Wi-Fi.",
     )
+
+    /**
+     * Every other word the app says, written as the app says it.
+     *
+     * These are the pages themselves — home, Settings, the history, the sheets —
+     * copied out of the layouts and the code that fills them. The English IS the
+     * key: a pack answers this list line for line, so a page that changes keeps
+     * reading in English until its new line is added here, and nothing ever has
+     * to keep a second name for a sentence.
+     */
+    private val lines = listOf(
+        "Translation history",
+        "Clear all",
+        "What the lens has read, newest first. Kept on this phone, twenty at most. Swipe a read left to delete it.",
+        "Nothing translated yet.\nPoint the lens at some text and every read lands here.",
+        "Reads whatever the lens sits over — WhatsApp, a browser, any app — and translates it in place.",
+        "THE LENS",
+        "Auto-translate",
+        "Reads when the lens stops",
+        "On",
+        "Engine",
+        "Best quality — sent online to translate",
+        "Online",
+        "Offline only",
+        "No read ever leaves the phone",
+        "Off",
+        "PAGES",
+        "Offline models",
+        "Downloaded language packs",
+        "What the lens has read, kept on this phone",
+        "Shipped with Grafizum.com",
+        "Languages on this phone",
+        "Add a language once and the lens reads it with nothing leaving the phone.",
+        "ON THIS PHONE",
+        "MORE LANGUAGES",
+        "No language matches that.",
+        "Settings",
+        "APP LANGUAGE",
+        "App language",
+        "See the tour in this language",
+        "TRANSLATE INTO",
+        "Translate into",
+        "What every read comes out as — answered online, nothing to download",
+        "APPEARANCE",
+        "System",
+        "Light",
+        "Dark",
+        "Follows your phone's setting",
+        "WHAT THE LENS NEEDS",
+        "Translation can't start yet — the first two below are what it runs on.",
+        "ALL OF THESE ARE NEEDED TO TRANSLATE",
+        "Float over other apps",
+        "Off by default — lets the lens sit on top",
+        "Allow",
+        "Read text on screen",
+        "Off by default — lets the lens read text",
+        "Screen capture",
+        "Off by default — lets the lens read photos and video",
+        "OPTIONAL — THE LENS WORKS WITHOUT IT",
+        "Quick button",
+        "Adds Lucid to the shade's quick buttons",
+        "Add",
+        "Open the lens when the app opens",
+        "The lens needs Float over other apps and Read text on screen before a switch here can do anything. Both are just above.",
+        "Search apps",
+        "No app matches that name.",
+        "Ten apps at most — type a name to reach any other app.",
+        "Tap the lens to begin",
+        "Welcome to Lucid",
+        "Point it at anything on your screen and it reads it where it stands.",
+        "What Text access does",
+        "Lucid reads the words that sit under its lens so it can translate them. It reads only what is under the lens, never the rest of the screen, and keeps no copy.",
+        "With ENGINE set to Online, those words are sent to an online translation service, with the rest of that screen as context, to be translated. With On-device, nothing leaves the phone.",
+        "I agree",
+        "Not now",
+        "Clear the reads?",
+        "The reads kept on this phone go — the lines, the answers, where and when. Nothing was uploaded, so there is no other copy and this cannot be undone.",
+        "Keep them",
+        "Text access",
+        "Before the switch, what it does",
+        "Leave the tour?",
+        "The two switches can still be set up from the home page — the card there says what is missing. The tour will not come back on its own.",
+        "Stay",
+        "Leave",
+        "Got it",
+        "Permission needed",
+        "The lens needs Text access",
+        "Without it the lens still opens, but it reads nothing.",
+        "Display over other apps",
+        "Tap this to reach its switch",
+        "Start now",
+        "Settings › Accessibility › Lucid",
+        "Greyed out? Open App info › ⋮ › Allow restricted settings first.",
+        "Open settings",
+        "READ",
+        "TRANSLATED",
+        "WHAT THE LENS READ",
+        "One-time setup",
+        "Allow, swipe, read",
+        "Two permissions, one swipe, and the lens is on. Nothing is recorded and no frame is saved.",
+        "Lets the lens sit on top of any app",
+        "Reads the text under the lens",
+        "Later",
+        "READY",
+        "Detected",
+        "Read the whole sentence",
+        "Copy",
+        "READING",
+        "ORIGINAL",
+        "Speak",
+
+        // Lines a page writes into a view after it is built. They are here so
+        // the same walk over the views answers them, and where a line carries a
+        // value it is asked for with [line].
+        "Reads the moment the lens stops moving",
+        "Only reads when you let go of the lens",
+        "On-device",
+        "Offline models — nothing leaves the phone",
+        "On — nothing leaves the phone, whatever the engine",
+        "Stop the lens",
+        "1 read kept on this phone",
+        "%d reads kept on this phone",
+        "No packs downloaded yet",
+        "1 pack downloaded",
+        "%d packs downloaded",
+        "Light, wherever the phone goes",
+        "Dark, wherever the phone goes",
+        "Allowed",
+        "On — the lens can sit over any app",
+        "Ready — steps 1 and 2 are on, so the lens can translate anywhere it can read.",
+        "One step is on and one is off. Translation can't start until both are on.",
+        "Translation can't start yet — steps 1 and 2 are what it runs on.",
+        "Read and agree",
+        "On — the lens can read the text under it",
+        "On — the lens can read photos, video and hidden text",
+        "Kept on — Android asks to share the screen each session",
+        "Needed on this phone — images are read through the screen share",
+        "Added",
+        "In the shade — one tap turns the lens on",
+        "Screen capture is on — the whole screen, every app.",
+        "Screen access declined. Text access alone still works everywhere it can read.",
+        "Appearance",
+        "What the lens needs",
+        "EVERY LANGUAGE IS ON THIS PHONE",
+        "Adding…",
+        "Adding %s",
+        "Add %s",
+        "Couldn't add %s — check the connection.",
+        "Remove %s?",
+        "The pack is downloaded again the next time an offline read needs it.",
+        "Keep",
+        "Remove",
+        "Couldn't remove %s.",
+        "%s removed",
+        "Cleared — nothing is left on this phone",
+        "Copied the original",
+        "Read removed",
+        "TODAY",
+        "YESTERDAY",
+        "The one read kept on this phone goes — the line, the answer, where and when. Nothing was uploaded, so there is no other copy and this cannot be undone.",
+        "All %d reads kept on this phone go — the lines, the answers, where and when. Nothing was uploaded, so there is no other copy and this cannot be undone.",
+        "Translating into %s",
+        "This is the default for every app. If you pick a language on the lens while it sits over an app, that app keeps its own choice — a chat read into German, a browser into English — and every other app still uses this one.",
+        "Two languages, two jobs. This one is the app itself — its tour, its buttons, its own words. English is written in; every other language is translated once by the same online engine the lens uses and then kept on this phone, which is what the arrow downloads. The card below it is the other question: the language a read comes out as, answered online every time, so nothing is ever downloaded for it.",
+        "The page's own light. System follows the phone, so the app changes when the phone does; Light and Dark hold the app where you put it. The lens, its card and the sheets it opens keep their own dressing either way — they have to read over whatever is underneath them.",
+        "These live in Android's own screens; Lucid can open them but never flips them for you. Steps 1 and 2 are the ground translation stands on, and without both the lens cannot start: float over other apps lets it sit on top of what you are reading, and read text on screen is what lets it see the words under it. A step 3 appears only where the phone will not give a screenshot any other way, and lasts one session. Anything past the optional line can stay off — the quick button is only the tile in the shade.",
+        "Turn one on and the lens comes up over that app whenever it reaches the front — a chat, a game, a page you read every morning. Off is the app left alone. A switch only brings the lens up: nothing is read until you drag it onto something, and it still closes when you clear it. An app you have read into its own language shows a small cross on its row — tap it to forget that app's language and take the page's default back. Nothing else moves.",
+
+        // The first-run guide: the sheet that sends someone to Android's own
+        // switch, and says out loud which row to look for once they are there.
+        "The lens needs to sit on top",
+        "One screen to pick",
+        "Android keeps \u201CDisplay over other apps\u201D off. Without it the lens cannot float over a chat or a browser, so it does nothing at all.",
+        "Android keeps Text access off. Without it the lens still opens, but it reads nothing — every read comes back empty.",
+        "Android asks which part of the screen to share. The lens needs the whole screen to read anything sitting on top of other apps.",
+        "Accessibility",
+        "Start recording or casting",
+        "Entire screen",
+        "%s · Off",
+        "So the lens sees every app, not one",
+        "\u2191 tap Lucid, then switch it on",
+        "\u2191 tap it, then turn it on",
+        "then this one \u2191",
+        "Settings \u203A Apps \u203A Special access \u203A Display over other apps",
+        "Settings \u203A Accessibility \u203A %s \u203A %s",
+        "Pick Entire screen, then Start now — a single app will not do.",
+        "Continue",
+        "Couldn't open Accessibility settings — find Lucid in Settings › Accessibility.",
+        "On phone",
+        "%s is on the phone. Tap to remove it.",
+
+        // What the lens says back while it is on screen.
+        "Screen access was denied.",
+        "Couldn't start screen capture.",
+        "Lens paused — long-press to wake it",
+        "Lens on",
+        "Lucid needs the draw-over-other-apps permission.",
+        "Lens is paused — long-press to wake it",
+        "Lens off",
+        "Translating %s into %s",
+        "Copied",
+        "Pinned — press ✕ to close",
+        "Unpinned",
+        "Voice is still starting — try again in a moment.",
+        "No %s voice on this phone. Add one in Settings › Text-to-speech.",
+        "The voice could not read this one.",
+    )
+
+    /**
+     * Everything a pack has to carry: the tour's lines by name, and the pages'
+     * lines by the words they are.
+     */
+    private val source: Map<String, String> = english + lines.associateWith { it }
 
     /** Packs already read from disk, so a page of words does not read the file twice. */
     private val cache = HashMap<String, Map<String, String>>()
 
     /** How many lines are in the list a language has to translate. */
-    val size: Int get() = english.size
+    val size: Int get() = source.size
 
     /**
      * One line of the app, in the language in force. English is the floor: a
@@ -82,20 +309,72 @@ object UiText {
     fun t(context: Context, key: String): String =
         pack(context, Prefs.uiLanguage(context))[key] ?: english[key] ?: key
 
+    /** [t], with the values the line was written to hold. */
+    fun t(context: Context, key: String, vararg values: Any): String =
+        String.format(t(context, key), *values)
+
+    /**
+     * A sentence the page built itself, in the language in force: news about a
+     * download, a count of packs, the word on a button that changes as it is
+     * pressed. Written in English where it is used, answered by the pack when
+     * the language has one, and left alone otherwise.
+     */
+    fun line(context: Context, english: String): String =
+        pack(context, Prefs.uiLanguage(context))[english] ?: english
+
+    /** [line], with the values the sentence was written to hold. */
+    fun line(context: Context, english: String, vararg values: Any): String =
+        String.format(line(context, english), *values)
+
     /** The English side of one line, for the picker's previews and for tests. */
     fun plain(key: String): String = english[key] ?: key
+
+    /** Whether every line the pages are written in is unique, so a pack can be keyed by it. */
+    internal fun linesAreUnique(): Boolean = lines.size == lines.distinct().size
+
+    /** Whether a pack would carry [line] — the source of truth for one sentence. */
+    internal fun carries(line: String): Boolean = source.containsKey(line)
+
+    /**
+     * Puts the app's own words on the screen into the language in force.
+     *
+     * The pages are written in English — in the layouts, and in the code that
+     * fills them — and a pack is keyed by that English, so this walks the views
+     * once and swaps every line it has a translation for. A line the pack does
+     * not know is left exactly as written: English is the floor, and a page
+     * added tomorrow reads in English until its words are added to [lines].
+     * Called after a page is filled, and again after anything that rewrites it.
+     */
+    fun apply(context: Context, root: View) {
+        val pack = pack(context, Prefs.uiLanguage(context))
+        if (pack.isEmpty()) return
+        translate(root, pack)
+    }
+
+    private fun translate(view: View, pack: Map<String, String>) {
+        if (view is TextView) {
+            view.text?.toString()?.let { pack[it]?.let { words -> view.text = words } }
+            view.hint?.toString()?.let { pack[it]?.let { words -> view.hint = words } }
+        }
+        if (view is ViewGroup) {
+            for (index in 0 until view.childCount) translate(view.getChildAt(index), pack)
+        }
+    }
 
     /** Whether this language is already on the phone. English is built in. */
     fun has(context: Context, code: String): Boolean =
         code == "en" || pack(context, code).isNotEmpty()
 
     /**
-     * Translates the whole list into [code] and keeps it, or answers why not.
+     * Settles every line into [code] and keeps the answer, or says why not.
      *
-     * One line at a time, on purpose: the engine merges sentences sent together
-     * and the list would come back with its lines joined. A language that cannot
-     * be answered stops the download — half a pack is worse than none, because
-     * the app would read in two languages at once.
+     * A line per request, on purpose: the engine merges sentences sent together
+     * and the list would come back with its lines joined. Three of those requests
+     * are in flight at once, which is the difference between a page set arriving
+     * in twenty seconds and in three minutes; a beat between each keeps the
+     * public endpoint from reading the download as a burst. A language that
+     * cannot be answered stops the whole thing — half a pack is worse than none,
+     * because the app would read in two languages at once.
      */
     suspend fun download(
         context: Context,
@@ -103,24 +382,42 @@ object UiText {
         onProgress: (done: Int, total: Int) -> Unit = { _, _ -> },
     ): Result<Int> = withContext(Dispatchers.IO) {
         if (code == "en") return@withContext Result.success(0)
-        val out = LinkedHashMap<String, String>()
-        var done = 0
-        for ((key, line) in english) {
-            withContext(Dispatchers.Main) { onProgress(done, english.size) }
-            val translated = ask(line, code)
-                ?: return@withContext Result.failure(IllegalStateException("no answer for $key"))
-            out[key] = translated
-            done++
-            // A beat between lines: the endpoint is a public one and a burst of
-            // requests is how a download starts answering 429.
-            delay(120)
+        val entries = source.entries.toList()
+        val out = ConcurrentHashMap<String, String>()
+        val next = AtomicInteger(0)
+        val done = AtomicInteger(0)
+        val lost = AtomicReference<Throwable?>(null)
+        coroutineScope {
+            repeat(WORKERS) {
+                launch {
+                    while (true) {
+                        if (lost.get() != null) break
+                        val index = next.getAndIncrement()
+                        if (index >= entries.size) break
+                        val (key, line) = entries[index]
+                        val translated = ask(line, code)
+                        if (translated == null) {
+                            lost.compareAndSet(null, IllegalStateException("no answer for $key"))
+                            break
+                        }
+                        out[key] = translated
+                        withContext(Dispatchers.Main) { onProgress(done.incrementAndGet(), entries.size) }
+                        delay(GAP_MS)
+                    }
+                }
+            }
         }
-        withContext(Dispatchers.Main) { onProgress(done, english.size) }
+        lost.get()?.let { return@withContext Result.failure(it) }
+        withContext(Dispatchers.Main) { onProgress(done.get(), entries.size) }
         val saved = runCatching { write(context, code, out) }
         if (saved.isFailure) return@withContext Result.failure(saved.exceptionOrNull()!!)
         cache.remove(code)
         Result.success(out.size)
     }
+
+    /** Requests in flight at once, and the breath taken between two of them. */
+    private const val WORKERS = 3
+    private const val GAP_MS = 100L
 
     /** Forgets a pack — the arrow's way back after a bad download. */
     fun remove(context: Context, code: String) {

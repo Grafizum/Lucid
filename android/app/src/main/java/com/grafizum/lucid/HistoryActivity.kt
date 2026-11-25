@@ -108,6 +108,8 @@ class HistoryActivity : AppCompatActivity() {
 
         // Newest first, so the page opens where the person left off.
         if (toTop) findViewById<ScrollView>(R.id.historyScroll).scrollTo(0, 0)
+
+        UiText.apply(this, findViewById(R.id.historyRoot))
     }
 
     /** Wiping the log is one tap and a question, not an undo: there is no copy
@@ -127,9 +129,10 @@ class HistoryActivity : AppCompatActivity() {
         dialog.window?.setDimAmount(0.42f)
 
         dialog.findViewById<TextView>(R.id.clearBody).text = when (count) {
-            1 -> "The one read kept on this phone goes — the line, the answer, where and when. Nothing was uploaded, so there is no other copy and this cannot be undone."
-            else -> "All $count reads kept on this phone go — the lines, the answers, where and when. Nothing was uploaded, so there is no other copy and this cannot be undone."
+            1 -> UiText.line(this, "The one read kept on this phone goes — the line, the answer, where and when. Nothing was uploaded, so there is no other copy and this cannot be undone.")
+            else -> UiText.line(this, "All %d reads kept on this phone go — the lines, the answers, where and when. Nothing was uploaded, so there is no other copy and this cannot be undone.", count)
         }
+        dialog.window?.decorView?.let { UiText.apply(this, it) }
 
         val keep = dialog.findViewById<View>(R.id.clearKeep)
         val confirm = dialog.findViewById<View>(R.id.clearConfirm)
@@ -138,7 +141,7 @@ class HistoryActivity : AppCompatActivity() {
         confirm.setOnClickListener {
             Prefs.clearHistory(this)
             dialog.dismiss()
-            Toast.makeText(this, "Cleared — nothing is left on this phone", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, UiText.line(this, "Cleared — nothing is left on this phone"), Toast.LENGTH_SHORT).show()
             paint()
         }
         dialog.show()
@@ -201,7 +204,7 @@ class HistoryActivity : AppCompatActivity() {
         card.setOnLongClickListener {
             val clipboard = getSystemService(ClipboardManager::class.java)
             clipboard?.setPrimaryClip(ClipData.newPlainText("Lucid", read.source))
-            Toast.makeText(this, "Copied the original", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, UiText.line(this, "Copied the original"), Toast.LENGTH_SHORT).show()
             true
         }
         return card
@@ -257,7 +260,7 @@ class HistoryActivity : AppCompatActivity() {
                     } else {
                         if (travel <= -threshold) {
                             Prefs.removeRead(this, read)
-                            Toast.makeText(this, "Read removed", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(this, UiText.line(this, "Read removed"), Toast.LENGTH_SHORT).show()
                             paint(toTop = false)
                         } else {
                             view.animate()
@@ -315,8 +318,8 @@ class HistoryActivity : AppCompatActivity() {
         val now = System.currentTimeMillis()
         val key = dayKey(at)
         return when (key) {
-            dayKey(now) -> "TODAY"
-            dayKey(now - 24L * 60 * 60 * 1000) -> "YESTERDAY"
+            dayKey(now) -> UiText.line(this, "TODAY")
+            dayKey(now - 24L * 60 * 60 * 1000) -> UiText.line(this, "YESTERDAY")
             else -> DateUtils.getRelativeTimeSpanString(
                 at,
                 now,
