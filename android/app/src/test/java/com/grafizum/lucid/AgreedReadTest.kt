@@ -62,6 +62,22 @@ class AgreedReadTest {
     }
 
     @Test
+    fun aFrameThatClippedTheStartOfAWordDoesNotBecomeTheAnswer() {
+        // Two frames of one caption rarely match to the letter: the pan, the
+        // fade, the player's own smoothing catch a glyph differently. The read
+        // that held the whole line is the answer, not the one that lost a
+        // letter off its first word.
+        val agreed = agreedOutcome(
+            listOf(
+                read("he world is watching"),
+                read("The world is watching"),
+                read("The world is watching"),
+            ),
+        )
+        assertEquals("The world is watching", agreed.source)
+    }
+
+    @Test
     fun aSingleReadIsItsOwnAnswer() {
         assertEquals("one line", agreedOutcome(listOf(read("one line"))).source)
     }
