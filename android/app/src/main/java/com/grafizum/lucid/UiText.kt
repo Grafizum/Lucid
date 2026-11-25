@@ -40,7 +40,7 @@ object UiText {
      * a pack translated from the old ones would be missing whatever is new. The
      * arrow comes back and the language is fetched again.
      */
-    private const val VERSION = 1
+    internal const val VERSION = 1
 
     private val english = linkedMapOf(
         "tour.1.title" to "Swipe to start the lens",
@@ -126,6 +126,38 @@ object UiText {
     fun remove(context: Context, code: String) {
         cache.remove(code)
         runCatching { file(context, code).delete() }
+    }
+
+    /**
+     * Deletes the packs this version can no longer read.
+     *
+     * Uninstalling Lucid already takes every pack with it: these files and the
+     * ML Kit models both live in the app's own storage, which Android deletes
+     * with the package. What uninstall cannot reach is a pack the app retires
+     * itself — bumping [VERSION] makes every pack on the phone unreadable, and
+     * without this the files would sit there, counted against the person's
+     * storage, for as long as the app stays installed. A `.part` left behind by
+     * a download the phone cut short is the same dead weight. Runs as the app
+     * starts, before any screen can read a pack.
+     */
+    fun sweep(context: Context) {
+        for (name in sweep(dir(context))) cache.remove(name.removeSuffix(".json"))
+    }
+
+    /**
+     * Deletes every file in [dir] that cannot be read, and answers the names it
+     * took. Split from the context so a plain JVM test can hand it a folder.
+     */
+    internal fun sweep(dir: File): List<String> {
+        val files = dir.listFiles() ?: return emptyList()
+        val taken = ArrayList<String>()
+        for (file in files) {
+            val readable = file.name.endsWith(".json") && runCatching {
+                JSONObject(file.readText()).optInt("v", 0) == VERSION
+            }.getOrDefault(false)
+            if (!readable && file.delete()) taken.add(file.name)
+        }
+        return taken
     }
 
     /* ── the file ────────────────────────────────────────────────────── */
