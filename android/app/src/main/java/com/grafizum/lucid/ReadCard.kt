@@ -32,7 +32,7 @@ object ReadCard {
 
         val translated = read.translated.trim()
         detail.findViewById<TextView>(R.id.detailLabel).text =
-            if (translated.isEmpty()) "READ" else "TRANSLATED"
+            if (translated.isEmpty()) UiText.line(activity, "READ") else UiText.line(activity, "TRANSLATED")
         detail.findViewById<TextView>(R.id.detailTranslation).apply {
             text = translated
             visibility = if (translated.isEmpty()) View.GONE else View.VISIBLE
@@ -58,6 +58,7 @@ object ReadCard {
             stamp(activity, read.at),
         ).joinToString("   ·   ")
 
+        UiText.apply(activity, detail)
         return detail
     }
 

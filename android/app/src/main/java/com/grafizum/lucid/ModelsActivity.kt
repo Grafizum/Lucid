@@ -154,18 +154,21 @@ class ModelsActivity : AppCompatActivity() {
 
         when {
             rest.isNotEmpty() -> {
-                addLabel.text = "MORE LANGUAGES"
+                addLabel.text = UiText.line(this, "MORE LANGUAGES")
                 addRow.visibility = View.VISIBLE
                 rest.forEach { addList.addView(row(it)) }
             }
             // Nothing left to add, and nothing was asked for: the whole list is
             // already here, and that is worth saying once.
             query.isBlank() && onPhone.isNotEmpty() -> {
-                addLabel.text = "EVERY LANGUAGE IS ON THIS PHONE"
+                addLabel.text = UiText.line(this, "EVERY LANGUAGE IS ON THIS PHONE")
                 addRow.visibility = View.VISIBLE
             }
             else -> addRow.visibility = View.GONE
         }
+
+        // The page is written in English first; the pack answers what it can.
+        UiText.apply(this, findViewById(R.id.modelsRoot))
     }
 
     /** One language: its code in a soft tile, its two names, and its state. */
@@ -237,9 +240,9 @@ class ModelsActivity : AppCompatActivity() {
 
         val pill = TextView(this).apply {
             text = when {
-                busy -> "Adding…"
-                here -> "✓ On phone"
-                else -> "Add"
+                busy -> UiText.line(this@ModelsActivity, "Adding…")
+                here -> "✓ " + UiText.line(this@ModelsActivity, "On phone")
+                else -> UiText.line(this@ModelsActivity, "Add")
             }
             gravity = Gravity.CENTER
             typeface = sans()
@@ -262,9 +265,9 @@ class ModelsActivity : AppCompatActivity() {
             isClickable = true
             isFocusable = true
             contentDescription = when {
-                busy -> "Adding ${lang.label}"
-                here -> "${lang.label} is on the phone. Tap to remove it."
-                else -> "Add ${lang.label}"
+                busy -> UiText.line(this@ModelsActivity, "Adding %s", lang.label)
+                here -> UiText.line(this@ModelsActivity, "%s is on the phone. Tap to remove it.", lang.label)
+                else -> UiText.line(this@ModelsActivity, "Add %s", lang.label)
             }
         }
         pill.setOnClickListener {
@@ -304,7 +307,7 @@ class ModelsActivity : AppCompatActivity() {
             .addOnFailureListener {
                 adding.remove(lang.code)
                 draw()
-                toast("Couldn't add ${lang.label} — check the connection.")
+                toast(UiText.line(this, "Couldn't add %s — check the connection.", lang.label))
             }
     }
 
@@ -320,7 +323,7 @@ class ModelsActivity : AppCompatActivity() {
 
         sheet.addView(
             TextView(this).apply {
-                text = "Remove ${lang.label}?"
+                text = UiText.line(this@ModelsActivity, "Remove %s?", lang.label)
                 setTextColor(color(R.color.screen_ink))
                 textSize = 18f
                 letterSpacing = -0.015f
@@ -329,7 +332,7 @@ class ModelsActivity : AppCompatActivity() {
         )
         sheet.addView(
             TextView(this).apply {
-                text = "The pack is downloaded again the next time an offline read needs it."
+                text = UiText.line(this@ModelsActivity, "The pack is downloaded again the next time an offline read needs it.")
                 setTextColor(color(R.color.screen_muted))
                 textSize = 11.5f
                 setLineSpacing(0f, 1.42f)
@@ -343,13 +346,13 @@ class ModelsActivity : AppCompatActivity() {
             gravity = Gravity.CENTER_VERTICAL
         }
         buttons.addView(
-            pillButton("Keep", solid = false).apply {
+            pillButton(UiText.line(this, "Keep"), solid = false).apply {
                 setOnClickListener { dialog.dismiss() }
             },
             LinearLayout.LayoutParams(0, dp(42), 1f),
         )
         buttons.addView(
-            pillButton("Remove", solid = true).apply {
+            pillButton(UiText.line(this, "Remove"), solid = true).apply {
                 setOnClickListener {
                     dialog.dismiss()
                     remove(lang)
@@ -376,9 +379,9 @@ class ModelsActivity : AppCompatActivity() {
             .addOnSuccessListener {
                 onPhone.remove(lang.code)
                 draw()
-                toast("${lang.label} removed")
+                toast(UiText.line(this, "%s removed", lang.label))
             }
-            .addOnFailureListener { toast("Couldn't remove ${lang.label}.") }
+            .addOnFailureListener { toast(UiText.line(this, "Couldn't remove %s.", lang.label)) }
     }
 
     private fun pillButton(label: String, solid: Boolean): TextView = TextView(this).apply {

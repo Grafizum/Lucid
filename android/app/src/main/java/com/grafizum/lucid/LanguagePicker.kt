@@ -50,7 +50,9 @@ object LanguagePicker {
 
         column.addView(
             TextView(context).apply {
-                text = title
+                // The heading is one of the app's own words, so it is read from
+                // the pack like every other line.
+                text = UiText.line(context, title)
                 setTextColor(faint)
                 textSize = 9.5f
                 letterSpacing = 0.18f

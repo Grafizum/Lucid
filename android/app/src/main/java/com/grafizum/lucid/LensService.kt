@@ -688,7 +688,7 @@ class LensService : Service() {
         } catch (err: Exception) {
             null
         } ?: run {
-            toast("Screen access was denied.")
+            toast(UiText.line(this, "Screen access was denied."))
             return
         }
 
@@ -711,7 +711,7 @@ class LensService : Service() {
         capturer = capture
 
         if (!ok) {
-            toast("Couldn't start screen capture.")
+            toast(UiText.line(this, "Couldn't start screen capture."))
             publish(false)
             return
         }
@@ -759,7 +759,9 @@ class LensService : Service() {
         hideSight()
 
         bubble?.animate()?.alpha(if (dormant) 0.3f else 1f)?.setDuration(160)?.start()
-        toast(if (dormant) "Lens paused \u2014 long-press to wake it" else "Lens on")
+        toast(
+            UiText.line(this, if (dormant) "Lens paused — long-press to wake it" else "Lens on"),
+        )
     }
 
     /**
@@ -806,7 +808,7 @@ class LensService : Service() {
         }
 
         if (!Settings.canDrawOverlays(this)) {
-            toast("Lucid needs the draw-over-other-apps permission.")
+            toast(UiText.line(this, "Lucid needs the draw-over-other-apps permission."))
             shutdown()
             return
         }
@@ -1086,7 +1088,7 @@ class LensService : Service() {
                         // options, and a press anywhere outside puts them away
                         // again with the pick saved.
                         if (dormant) {
-                            toast("Lens is paused \u2014 long-press to wake it")
+                            toast(UiText.line(this, "Lens is paused — long-press to wake it"))
                         } else {
                             showLanguageSheet(pickTarget = true, save = true)
                         }
@@ -1689,7 +1691,7 @@ class LensService : Service() {
 
     /** The cross: the lens leaves the screen, and the session goes with it. */
     private fun closeLens() {
-        toast("Lens off")
+        toast(UiText.line(this, "Lens off"))
         shutdown()
     }
 
@@ -2494,6 +2496,7 @@ class LensService : Service() {
         val content = LayoutInflater.from(lensContext()).inflate(R.layout.overlay_card, holder, false)
         holder.addView(content)
         holder.elevation = dp(20).toFloat()
+        UiText.apply(content.context, content)
 
         cardStatus = content.findViewById(R.id.statusText)
         cardBody = content.findViewById(R.id.bodyText)
@@ -2689,7 +2692,7 @@ class LensService : Service() {
                 // a chat and a browser can hold different languages at once.
                 // With no app known it is the app's own answer that moves.
                 Prefs.setTargetFor(this, readPackage, lang.code)
-                toast("Translating ${appName(readPackage)} into ${lang.label}")
+                toast(UiText.line(this, "Translating %s into %s", appName(readPackage), lang.label))
                 return@build
             }
             if (!pickTarget) {
@@ -3109,6 +3112,7 @@ class LensService : Service() {
         val holder = FrameLayout(this)
         val content = LayoutInflater.from(lensContext()).inflate(R.layout.overlay_reader, holder, false)
         holder.addView(content)
+        UiText.apply(content.context, content)
 
         content.findViewById<TextView>(R.id.readerText).text = full
         val original = content.findViewById<TextView>(R.id.readerOriginal)
@@ -3278,7 +3282,7 @@ class LensService : Service() {
         clipboard.setPrimaryClip(ClipData.newPlainText("Lucid", text))
         cardCopy?.text = "Copied"
         cardCopy?.setTextColor(lensColor(R.color.card_accent))
-        toast("Copied")
+        toast(UiText.line(this, "Copied"))
     }
 
     /* ── holding the card, and hearing it ───────────────────────────── */
@@ -3297,7 +3301,9 @@ class LensService : Service() {
             lensColor(if (on) R.color.card_accent else R.color.card_faint),
         )
         cardPin?.contentDescription = if (on) "Unpin the card" else "Pin the card"
-        if (!quiet) toast(if (on) "Pinned — press ✕ to close" else "Unpinned")
+        if (!quiet) {
+            toast(UiText.line(this, if (on) "Pinned — press ✕ to close" else "Unpinned"))
+        }
     }
 
     /**
@@ -3318,7 +3324,7 @@ class LensService : Service() {
         if (tts == null) prepareSpeech()
         val engine = tts ?: return
         if (!ttsReady) {
-            toast("Voice is still starting — try again in a moment.")
+            toast(UiText.line(this, "Voice is still starting — try again in a moment."))
             return
         }
         val locale = Locale.forLanguageTag(cardSpeechLang)
@@ -3327,15 +3333,18 @@ class LensService : Service() {
             available == TextToSpeech.LANG_NOT_SUPPORTED
         ) {
             toast(
-                "No ${Languages.label(cardSpeechLang)} voice on this phone. " +
-                    "Add one in Settings › Text-to-speech.",
+                UiText.line(
+                    this,
+                    "No %s voice on this phone. Add one in Settings › Text-to-speech.",
+                    Languages.label(cardSpeechLang),
+                ),
             )
             return
         }
         engine.language = locale
         val started = engine.speak(words, TextToSpeech.QUEUE_FLUSH, null, UTTERANCE_CARD)
         if (started == TextToSpeech.ERROR) {
-            toast("The voice could not read this one.")
+            toast(UiText.line(this, "The voice could not read this one."))
             return
         }
         setSpeaking(true)

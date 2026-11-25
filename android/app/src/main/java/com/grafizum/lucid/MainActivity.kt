@@ -160,8 +160,8 @@ class MainActivity : AppCompatActivity() {
         startBtn = findViewById(R.id.startBtn)
         stopX = findViewById(R.id.stopX)
         stopXBtn = findViewById(R.id.stopXBtn)
-        startBtn.startLabel = "Start the lens"
-        startBtn.stopLabel = "Stop the lens"
+        startBtn.startLabel = UiText.t(this, "tour.start")
+        startBtn.stopLabel = UiText.line(this, "Stop the lens")
 
         // Settings, in the corner: the page where everything the app can be
         // told lives — the switches Android asks for, the language every read is
@@ -461,7 +461,7 @@ class MainActivity : AppCompatActivity() {
             Ask.OVERLAY -> "Tap this to reach its switch"
             // Named the way this phone's own list names it: the drawn row is
             // meant to be recognised in Settings, not merely looked at.
-            Ask.TEXT -> "${SetupNudge.sectionName(this)} \u00B7 Off"
+            Ask.TEXT -> UiText.line(this, "%s · Off", SetupNudge.sectionName(this))
             Ask.CAPTURE -> "So the lens sees every app, not one"
         }
         dialog.findViewById<TextView>(R.id.guideCaption).text = when (ask) {
@@ -471,7 +471,12 @@ class MainActivity : AppCompatActivity() {
         }
         dialog.findViewById<TextView>(R.id.guidePath).text = when (ask) {
             Ask.OVERLAY -> "Settings \u203A Apps \u203A Special access \u203A Display over other apps"
-            Ask.TEXT -> "Settings \u203A Accessibility \u203A ${SetupNudge.sectionName(this)} \u203A ${getString(R.string.a11y_label)}"
+            Ask.TEXT -> UiText.line(
+                this,
+                "Settings › Accessibility › %s › %s",
+                SetupNudge.sectionName(this),
+                getString(R.string.a11y_label),
+            )
             Ask.CAPTURE -> "Pick Entire screen, then Start now \u2014 a single app will not do."
         }
         val note = dialog.findViewById<TextView>(R.id.guideNote)
@@ -490,9 +495,9 @@ class MainActivity : AppCompatActivity() {
         // not agreed yet is sent to the disclosure rather than promised a screen
         // they cannot reach in one tap.
         open.text = when {
-            ask == Ask.CAPTURE -> "Continue"
-            ask == Ask.TEXT && !Prefs.textConsent(this) -> "Read and agree"
-            else -> "Open settings"
+            ask == Ask.CAPTURE -> UiText.line(this, "Continue")
+            ask == Ask.TEXT && !Prefs.textConsent(this) -> UiText.line(this, "Read and agree")
+            else -> UiText.line(this, "Open settings")
         }
         Press.attachAll(open, later)
         open.setOnClickListener {
@@ -506,6 +511,7 @@ class MainActivity : AppCompatActivity() {
         later.setOnClickListener { dialog.dismiss() }
 
         dialog.setOnDismissListener { guidePulse?.cancel() }
+        dialog.window?.decorView?.let { UiText.apply(this, it) }
         dialog.show()
         pulse(dialog.findViewById(R.id.guideRing), dialog.findViewById(R.id.guidePillRing))
     }
@@ -580,12 +586,12 @@ class MainActivity : AppCompatActivity() {
             .addOnSuccessListener { models ->
                 val count = models.map { it.language }.distinct().size
                 modelsHint.text = when (count) {
-                    0 -> "No packs downloaded yet"
-                    1 -> "1 pack downloaded"
-                    else -> "$count packs downloaded"
+                    0 -> UiText.line(this, "No packs downloaded yet")
+                    1 -> UiText.line(this, "1 pack downloaded")
+                    else -> UiText.line(this, "%d packs downloaded", count)
                 }
             }
-            .addOnFailureListener { modelsHint.text = "Downloaded language packs" }
+            .addOnFailureListener { modelsHint.text = UiText.line(this, "Downloaded language packs") }
     }
 
     /**
@@ -714,9 +720,9 @@ class MainActivity : AppCompatActivity() {
         // worth the tap.
         val reads = Prefs.history(this).size
         historyHint.text = when (reads) {
-            0 -> "What the lens has read, kept on this phone"
-            1 -> "1 read kept on this phone"
-            else -> "$reads reads kept on this phone"
+            0 -> UiText.line(this, "What the lens has read, kept on this phone")
+            1 -> UiText.line(this, "1 read kept on this phone")
+            else -> UiText.line(this, "%d reads kept on this phone", reads)
         }
 
         applyAuto(Prefs.autoTranslate(this))
@@ -729,6 +735,9 @@ class MainActivity : AppCompatActivity() {
         startBtn.mode = if (running) SwipeToStart.Mode.STOP else SwipeToStart.Mode.START
         applyStopX(running)
 
+        // Everything above was written in English; this gives the page the
+        // language the person fetched, if there is one.
+        UiText.apply(this, findViewById(R.id.root))
     }
 
     /* ── the one-time setup ask ──────────────────────────────────────── */
@@ -791,6 +800,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         setupDialog = dialog
+        dialog.window?.decorView?.let { UiText.apply(this, it) }
         dialog.show()
         bindSetupDialog(dialog)
     }
