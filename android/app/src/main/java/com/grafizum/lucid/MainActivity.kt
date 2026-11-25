@@ -57,7 +57,6 @@ class MainActivity : AppCompatActivity() {
     private lateinit var startBtn: SwipeToStart
     private lateinit var stopX: FrameLayout
     private lateinit var stopXBtn: FrameLayout
-    private lateinit var langPill: TextView
     private lateinit var offlineBtn: TextView
     private lateinit var offlineHint: TextView
     private lateinit var modelsHint: TextView
@@ -161,12 +160,6 @@ class MainActivity : AppCompatActivity() {
         startBtn = findViewById(R.id.startBtn)
         stopX = findViewById(R.id.stopX)
         stopXBtn = findViewById(R.id.stopXBtn)
-        // The language the next read comes out as, beside the wordmark: the
-        // setting people change most should not need the gear to read it.
-        langPill = findViewById(R.id.langPill)
-        Press.attach(langPill)
-        langPill.setOnClickListener { pickLanguage() }
-
         startBtn.startLabel = "Start the lens"
         startBtn.stopLabel = "Stop the lens"
 
@@ -605,33 +598,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     /**
-     * The same picker the welcome page and Settings use. Picking here saves at
-     * once and repaints the pill, so the change is visible before the dialog is
-     * gone rather than on the next visit.
-     */
-    private fun pickLanguage() {
-        val dialog = Dialog(this)
-        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-        dialog.setContentView(
-            LanguagePicker.build(this, Prefs.uiLanguage(this)) { lang ->
-                // The word at the top left is the language of the app, so the
-                // whole app is redrawn in it — and the reads come out in it
-                // too, because a page answered in a language other than the
-                // one on screen would be a second, silent setting.
-                Prefs.setTargetLanguage(this, lang.code)
-                AppLanguage.choose(this, lang.code)
-                langPill.text = Languages.nativeShort(lang.code)
-                dialog.dismiss()
-            },
-        )
-        dialog.window?.setLayout(
-            (resources.displayMetrics.widthPixels * 0.86f).toInt(),
-            WindowManager.LayoutParams.WRAP_CONTENT,
-        )
-        dialog.show()
-    }
-
-    /**
      * The rating sheet, asked once and only after the lens has actually answered
      * several reads: a prompt on a first launch is a prompt nobody means.
      */
@@ -737,10 +703,6 @@ class MainActivity : AppCompatActivity() {
     /* ── state ───────────────────────────────────────────────────────── */
 
     private fun refresh() {
-        // The pill shows the app's own language, not the read target: that is
-        // the setting the person changes on this page, and the one the app is
-        // drawn in.
-        langPill.text = Languages.nativeShort(Prefs.uiLanguage(this))
         val canOverlay = Settings.canDrawOverlays(this)
         val textAccess = LensAccessibilityService.isEnabled(this)
         // A lens put away from the shade's button is not running *on screen*:

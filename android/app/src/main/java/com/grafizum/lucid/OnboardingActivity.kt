@@ -132,8 +132,9 @@ class OnboardingActivity : AppCompatActivity() {
         skip.text = words("tour.skip")
         back.text = words("tour.back")
 
-        // The language the tour is about. It is the lens's own setting, so the
-        // pick made here is the one the lens uses afterwards.
+        // The app's language, in the corner. The pick made here is the one the
+        // whole app is drawn in and the one a read comes out as — the same
+        // switch Settings has, not a second setting that can drift from it.
         bindLanguage()
         language.setOnClickListener { pickLanguage() }
 
@@ -348,20 +349,26 @@ class OnboardingActivity : AppCompatActivity() {
     }
 
     /**
-     * The chip's word: the language the lens reads into, in that language's own
+     * The chip's word: the language the app is drawn in, in that language's own
      * name — "日本語", not "Japanese" — and short enough for a chip.
      */
     private fun bindLanguage() {
-        language.text = Languages.nativeShort(Prefs.targetLanguage(this))
+        language.text = Languages.nativeShort(Prefs.uiLanguage(this))
     }
 
-    /** The same picker the main screen opens, from the same class. */
+    /**
+     * The app's language switch, opened from the chip: the pick is remembered and
+     * the tour is rebuilt in it, on the page it was left on. Reads come out in it
+     * too, because a page answered in a language other than the one on screen
+     * would be a second, silent setting.
+     */
     private fun pickLanguage() {
         val dialog = Dialog(this)
         dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
         dialog.setContentView(
-            LanguagePicker.build(this, Prefs.targetLanguage(this)) { lang ->
+            LanguagePicker.build(this, Prefs.uiLanguage(this), title = "APP LANGUAGE") { lang ->
                 Prefs.setTargetLanguage(this, lang.code)
+                AppLanguage.choose(this, lang.code)
                 bindLanguage()
                 dialog.dismiss()
             },
