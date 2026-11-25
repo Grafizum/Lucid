@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The lens itself, from the home screen: no page, no shade. Android shows
+     this on a long press of the icon. -->
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <shortcut
+        android:enabled="true"
+        android:icon="@drawable/ic_loop"
+        android:shortcutId="start_lens"
+        android:shortcutLongLabel="@string/shortcut_start_lens"
+        android:shortcutShortLabel="@string/shortcut_start_lens">
+        <intent
+            android:action="com.grafizum.lucid.action.START_LENS"
+            android:targetClass="com.grafizum.lucid.MainActivity"
+            android:targetPackage="com.grafizum.lucid" />
+    </shortcut>
+
+</shortcuts>

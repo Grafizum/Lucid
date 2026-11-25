@@ -1,0 +1,281 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Lucid — the way out, five shapes</title>
+<style>
+  @font-face{
+    font-family:"Lucid Sans";
+    src:url("fonts/PlusJakarta.ttf") format("truetype-variations");
+    font-weight:200 800; font-display:block;
+  }
+  @font-face{
+    font-family:"Geist";
+    src:url("fonts/Geist.woff2") format("woff2-variations");
+    font-weight:100 900; font-display:block;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{
+    background:radial-gradient(900px 500px at 50% -10%, rgba(252,248,241,.05), transparent 60%), #14130F;
+    color:#F8F2E7; font-family:"Lucid Sans",system-ui,sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .stage{width:1176px;margin:0 auto;padding:52px 28px 64px}
+
+  .head{margin-bottom:30px}
+  .eyebrow{display:inline-flex;align-items:center;gap:9px;font-family:"Geist",sans-serif;font-size:10px;
+    letter-spacing:.24em;text-transform:uppercase;color:#C2B9A6;padding:7px 13px;border-radius:999px;
+    background:rgba(252,248,241,.045);box-shadow:inset 0 0 0 1px rgba(252,248,241,.09)}
+  .eyebrow i{width:5px;height:5px;border-radius:50%;background:#B9825F;display:block}
+  .head h1{margin:16px 0 0;font-size:33px;line-height:1.06;letter-spacing:-.035em;font-weight:500;color:#FCF8F1}
+  .head h1 em{font-style:normal;color:#D3A582}
+  .head p{margin:11px 0 0;font-size:12.5px;line-height:1.65;color:#A9A08E;max-width:74ch}
+
+  .opt{display:flex;align-items:center;gap:34px;padding:26px 0;border-top:1px solid rgba(252,248,241,.07)}
+  .opt:first-of-type{border-top:0;padding-top:12px}
+  .copy{width:326px;flex:none}
+  .num{font-family:"Geist",sans-serif;font-size:10px;letter-spacing:.22em;color:#857B6C}
+  .name{margin:7px 0 0;font-size:19px;font-weight:500;letter-spacing:-.02em;color:#FCF8F1}
+  .why{margin:8px 0 0;font-size:11.5px;line-height:1.65;color:#A9A08E}
+  .tags{display:flex;gap:6px;margin-top:12px;flex-wrap:wrap}
+  .tag{font-family:"Geist",sans-serif;font-size:8.5px;letter-spacing:.13em;text-transform:uppercase;
+    color:#C2B9A6;padding:4px 9px;border-radius:999px;background:rgba(252,248,241,.05);
+    box-shadow:inset 0 0 0 1px rgba(252,248,241,.08)}
+  .tag.hot{color:#D3A582}
+
+  /* two panes per option: the edge at rest, then the same shape armed */
+  .panes{display:flex;gap:14px;flex:none}
+  .pane{width:372px;height:250px;position:relative;border-radius:14px;overflow:hidden;
+    box-shadow:inset 0 0 0 1px rgba(252,248,241,.08)}
+  .pane.light{background:#F8F2E7}
+  .pane.dark{background:#191814}
+  .cap{position:absolute;left:14px;top:11px;font-family:"Geist",sans-serif;font-size:8.5px;
+    letter-spacing:.2em;text-transform:uppercase;z-index:5}
+  .light .cap{color:rgba(25,24,20,.45)}
+  .dark .cap{color:rgba(252,248,241,.42)}
+
+  /* page under the mark so the edge is a real edge */
+  .line{position:absolute;height:9px;border-radius:5px}
+  .light .line{background:rgba(25,24,20,.085)}
+  .dark .line{background:rgba(252,248,241,.10)}
+  .gesture{position:absolute;left:50%;bottom:8px;transform:translateX(-50%);width:108px;height:4px;
+    border-radius:2px;z-index:4}
+  .light .gesture{background:rgba(25,24,20,.38)}
+  .dark .gesture{background:rgba(252,248,241,.35)}
+
+  .peek,.armed{position:absolute;left:50%;bottom:0;transform:translateX(-50%);display:block}
+  .peek{opacity:.9}
+  .rest-fill{fill:rgba(25,24,20,.18);stroke:rgba(25,24,20,.10);stroke-width:1}
+  .dark .rest-fill{fill:rgba(252,248,241,.16);stroke:rgba(252,248,241,.10)}
+
+  .armed{bottom:26px}
+  .armed .body{fill:rgba(25,24,20,.82);stroke:#F2FBF3E2;stroke-width:2.4}
+  .armed .x{stroke:#FBF3E2;stroke-width:2.6;stroke-linecap:round}
+  .armed .word{font-family:"Geist",sans-serif;font-size:9px;letter-spacing:.16em;fill:#FBF3E2;
+    text-transform:uppercase}
+  .lens{position:absolute;left:50%;bottom:96px;transform:translateX(-50%);width:44px;height:44px;
+    border-radius:50%;background:#16150F;box-shadow:0 0 0 1.6px rgba(252,248,241,.34),0 10px 22px -8px rgba(0,0,0,.8)}
+  .lens svg{position:absolute;inset:0;margin:auto;width:20px;height:20px;display:block}
+
+  .foot{margin-top:26px;padding-top:18px;border-top:1px solid rgba(252,248,241,.07);
+    font-size:11px;line-height:1.7;color:#857B6C;max-width:88ch}
+  .foot b{color:#C2B9A6;font-weight:500}
+</style>
+</head>
+<body>
+<div class="stage">
+
+  <div class="head">
+    <span class="eyebrow"><i></i>the way out</span>
+    <h1>Five shapes to <em>poke out of the bottom edge</em></h1>
+    <p>All five are centred, symmetrical, and sized in dp at a 390 dp device width. Left pane is the mark at
+      rest — the only thing on screen when nothing is happening. Right pane is the same shape once the lens is
+      pushed all the way down, with the cross and the word inside it, sitting clear of the gesture bar. Pick by
+      number or by name.</p>
+  </div>
+
+  <!-- 01 · half disc -->
+  <div class="opt">
+    <div class="copy">
+      <div class="num">01</div>
+      <h2 class="name">Half disc</h2>
+      <p class="why">The plainest geometry there is: a true semicircle whose flat side is the screen edge. It
+        reads as a button rather than an ornament, and there is nothing to decode. The safest of the five.</p>
+      <div class="tags"><span class="tag">96 × 48 dp</span><span class="tag">radius 48</span><span class="tag hot">semicircle</span></div>
+    </div>
+    <div class="panes">
+      <div class="pane light">
+        <span class="cap">at rest</span>
+        <div class="line" style="left:26px;right:96px;top:64px"></div>
+        <div class="line" style="left:26px;right:150px;top:86px"></div>
+        <div class="line" style="left:26px;right:60px;top:108px"></div>
+        <div class="gesture"></div>
+        <svg class="peek" width="96" height="48" viewBox="0 0 96 48"><path class="rest-fill" d="M0 48A48 48 0 0 1 96 48Z"/></svg>
+      </div>
+      <div class="pane dark">
+        <span class="cap">lens at the edge</span>
+        <div class="line" style="left:26px;right:96px;top:64px"></div>
+        <div class="line" style="left:26px;right:150px;top:86px"></div>
+        <div class="line" style="left:26px;right:60px;top:108px"></div>
+        <div class="gesture"></div>
+        <div class="lens"><svg viewBox="0 0 20 20" fill="none"><circle cx="9" cy="9" r="5.4" stroke="#F2FBF3E2" stroke-width="1.6"/><path d="M13 13l3.4 3.4" stroke="#F2FBF3E2" stroke-width="1.6" stroke-linecap="round"/></svg></div>
+        <svg class="armed" width="104" height="104" viewBox="0 0 104 104">
+          <path class="body" d="M4 104V56a48 48 0 0 1 96 0v48Z"/>
+          <path class="x" d="M42 42l20 20M62 42L42 62"/>
+          <text class="word" x="52" y="76" text-anchor="middle">delete</text>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <!-- 02 · drawer lip -->
+  <div class="opt">
+    <div class="copy">
+      <div class="num">02</div>
+      <h2 class="name">Drawer lip</h2>
+      <p class="why">A wide bar with rounded top corners, flush to the edge — the grabber language of sheets and
+        drawers. It gives away less of the page than any other option, and it is the one that looks most like
+        part of the system rather than something drawn on top of it.</p>
+      <div class="tags"><span class="tag">156 × 18 dp</span><span class="tag">radius 11</span><span class="tag hot">grabber</span></div>
+    </div>
+    <div class="panes">
+      <div class="pane light">
+        <span class="cap">at rest</span>
+        <div class="line" style="left:26px;right:96px;top:64px"></div>
+        <div class="line" style="left:26px;right:150px;top:86px"></div>
+        <div class="line" style="left:26px;right:60px;top:108px"></div>
+        <div class="gesture"></div>
+        <svg class="peek" width="156" height="18" viewBox="0 0 156 18"><path class="rest-fill" d="M0 18V11A11 11 0 0 1 11 0H145A11 11 0 0 1 156 11V18Z"/></svg>
+      </div>
+      <div class="pane dark">
+        <span class="cap">lens at the edge</span>
+        <div class="line" style="left:26px;right:96px;top:64px"></div>
+        <div class="line" style="left:26px;right:150px;top:86px"></div>
+        <div class="line" style="left:26px;right:60px;top:108px"></div>
+        <div class="gesture"></div>
+        <div class="lens"><svg viewBox="0 0 20 20" fill="none"><circle cx="9" cy="9" r="5.4" stroke="#F2FBF3E2" stroke-width="1.6"/><path d="M13 13l3.4 3.4" stroke="#F2FBF3E2" stroke-width="1.6" stroke-linecap="round"/></svg></div>
+        <svg class="armed" width="156" height="72" viewBox="0 0 156 72">
+          <path class="body" d="M0 72V26A26 26 0 0 1 26 0H130A26 26 0 0 1 156 26V72Z"/>
+          <path class="x" d="M68 20l20 20M88 20L68 40"/>
+          <text class="word" x="78" y="56" text-anchor="middle">delete</text>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <!-- 03 · dock tab -->
+  <div class="opt">
+    <div class="copy">
+      <div class="num">03</div>
+      <h2 class="name">Dock tab</h2>
+      <p class="why">A flared tab: narrow where it leaves the page, wide where it meets the edge, the way dock
+        strips and tab handles are drawn. The flare points the eye down and out, so it reads as “pull me down”
+        without an arrow.</p>
+      <div class="tags"><span class="tag">168 × 32 dp</span><span class="tag">flare 34°</span><span class="tag hot">directional</span></div>
+    </div>
+    <div class="panes">
+      <div class="pane light">
+        <span class="cap">at rest</span>
+        <div class="line" style="left:26px;right:96px;top:64px"></div>
+        <div class="line" style="left:26px;right:150px;top:86px"></div>
+        <div class="line" style="left:26px;right:60px;top:108px"></div>
+        <div class="gesture"></div>
+        <svg class="peek" width="168" height="32" viewBox="0 0 168 32"><path class="rest-fill" d="M0 32Q0 30 2 28L30 4Q34 0 40 0H128Q134 0 138 4L166 28Q168 30 168 32Z"/></svg>
+      </div>
+      <div class="pane dark">
+        <span class="cap">lens at the edge</span>
+        <div class="line" style="left:26px;right:96px;top:64px"></div>
+        <div class="line" style="left:26px;right:150px;top:86px"></div>
+        <div class="line" style="left:26px;right:60px;top:108px"></div>
+        <div class="gesture"></div>
+        <div class="lens"><svg viewBox="0 0 20 20" fill="none"><circle cx="9" cy="9" r="5.4" stroke="#F2FBF3E2" stroke-width="1.6"/><path d="M13 13l3.4 3.4" stroke="#F2FBF3E2" stroke-width="1.6" stroke-linecap="round"/></svg></div>
+        <svg class="armed" width="144" height="92" viewBox="0 0 144 92">
+          <path class="body" d="M0 92Q0 88 4 84L26 26Q32 12 46 12H98Q112 12 118 26L140 84Q144 88 144 92Z"/>
+          <path class="x" d="M62 38l20 20M82 38L62 58"/>
+          <text class="word" x="72" y="74" text-anchor="middle">delete</text>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <!-- 04 · peak -->
+  <div class="opt">
+    <div class="copy">
+      <div class="num">04</div>
+      <h2 class="name">Peak</h2>
+      <p class="why">Two slopes meeting in a rounded apex — the only one of the five that has a direction. It is
+        the most distinctive at rest, and the sharpest read at a glance; it also takes the least page, since
+        most of its area is below the edge.</p>
+      <div class="tags"><span class="tag">104 × 30 dp</span><span class="tag">apex r 10</span><span class="tag hot">chevron</span></div>
+    </div>
+    <div class="panes">
+      <div class="pane light">
+        <span class="cap">at rest</span>
+        <div class="line" style="left:26px;right:96px;top:64px"></div>
+        <div class="line" style="left:26px;right:150px;top:86px"></div>
+        <div class="line" style="left:26px;right:60px;top:108px"></div>
+        <div class="gesture"></div>
+        <svg class="peek" width="104" height="30" viewBox="0 0 104 30"><path class="rest-fill" d="M0 30L40 7Q46 2 52 0Q58 2 64 7L104 30Z"/></svg>
+      </div>
+      <div class="pane dark">
+        <span class="cap">lens at the edge</span>
+        <div class="line" style="left:26px;right:96px;top:64px"></div>
+        <div class="line" style="left:26px;right:150px;top:86px"></div>
+        <div class="line" style="left:26px;right:60px;top:108px"></div>
+        <div class="gesture"></div>
+        <div class="lens"><svg viewBox="0 0 20 20" fill="none"><circle cx="9" cy="9" r="5.4" stroke="#F2FBF3E2" stroke-width="1.6"/><path d="M13 13l3.4 3.4" stroke="#F2FBF3E2" stroke-width="1.6" stroke-linecap="round"/></svg></div>
+        <svg class="armed" width="116" height="84" viewBox="0 0 116 84">
+          <path class="body" d="M0 84L38 20Q46 6 58 6Q70 6 78 20L116 84Z"/>
+          <path class="x" d="M48 34l20 20M68 34L48 54"/>
+          <text class="word" x="58" y="70" text-anchor="middle">delete</text>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <!-- 05 · sheet handle -->
+  <div class="opt">
+    <div class="copy">
+      <div class="num">05</div>
+      <h2 class="name">Sheet handle</h2>
+      <p class="why">A tab with concave fillets where it meets the edge, so the screen itself curves into the
+        shape instead of the shape being dropped on it. The quietest and most “system” of the five — it looks
+        like a part of the glass.</p>
+      <div class="tags"><span class="tag">132 × 28 dp</span><span class="tag">fillets r 8</span><span class="tag hot">flush</span></div>
+    </div>
+    <div class="panes">
+      <div class="pane light">
+        <span class="cap">at rest</span>
+        <div class="line" style="left:26px;right:96px;top:64px"></div>
+        <div class="line" style="left:26px;right:150px;top:86px"></div>
+        <div class="line" style="left:26px;right:60px;top:108px"></div>
+        <div class="gesture"></div>
+        <svg class="peek" width="132" height="28" viewBox="0 0 132 28"><path class="rest-fill" d="M0 28A8 8 0 0 1 8 20V14A14 14 0 0 1 22 0H110A14 14 0 0 1 124 14V20A8 8 0 0 1 132 28Z"/></svg>
+      </div>
+      <div class="pane dark">
+        <span class="cap">lens at the edge</span>
+        <div class="line" style="left:26px;right:96px;top:64px"></div>
+        <div class="line" style="left:26px;right:150px;top:86px"></div>
+        <div class="line" style="left:26px;right:60px;top:108px"></div>
+        <div class="gesture"></div>
+        <div class="lens"><svg viewBox="0 0 20 20" fill="none"><circle cx="9" cy="9" r="5.4" stroke="#F2FBF3E2" stroke-width="1.6"/><path d="M13 13l3.4 3.4" stroke="#F2FBF3E2" stroke-width="1.6" stroke-linecap="round"/></svg></div>
+        <svg class="armed" width="140" height="80" viewBox="0 0 140 80">
+          <path class="body" d="M0 80A12 12 0 0 1 12 68V30A26 26 0 0 1 38 4H102A26 26 0 0 1 128 30V68A12 12 0 0 1 140 80Z"/>
+          <path class="x" d="M60 30l20 20M80 30L60 50"/>
+          <text class="word" x="70" y="66" text-anchor="middle">delete</text>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <div class="foot">
+    <b>Same in both panes:</b> the mark is centred on the edge, never wider than a thumb's reach, and it is
+    touch-transparent at rest — a read at the bottom of a page still reads. The armed shape sits 26 dp clear of
+    the bottom so the gesture bar cannot fall across it, and it grows 18% under the lens while you are over it.
+    <br><b>Sizes</b> are dp at 390 dp width; each silhouette is one path, so any of them scales to a taller
+    open state without redrawing. Reply with the number and I will build that one, both states.
+  </div>
+</div>
+</body>
+</html>

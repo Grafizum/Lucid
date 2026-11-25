@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="notif_channel">Relace lupy</string>
+    <string name="notif_title">Lupa je zapnutá</string>
+    <string name="notif_text">Klepněte lupou na libovolný text a přeloží ho.</string>
+    <string name="notif_stop">Vypnout</string>
+    <string name="a11y_label">Přístup k textu Lucid</string>
+    <string name="a11y_summary">Umožní lupě číst text pod ní</string>
+    <string name="a11y_description">Lucid čte text pod svou lupou, aby ho mohl přeložit. Čte pouze tento text, neuchovává kopii a nic nezaznamenává. S online modulem se slova pod lupou odesílají spolu se zbytkem obrazovky jako kontext do online překladové služby; s modulem v zařízení nic neopouští telefon.</string>
+    <string name="lens_close">Upusťte lupu sem pro vypnutí</string>
+    <string name="lens_delete">Smazat</string>
+    <string name="tile_label">Lupa Lucid</string>
+    <string name="tile_on">Lupa zapnuta</string>
+    <string name="tile_off">Lupa vypnuta</string>
+    <string name="picker_search">Hledat mezi %1$d jazyky</string>
+    <string name="picker_none">Žádný jazyk neodpovídá.</string>
+</resources>

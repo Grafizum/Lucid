@@ -1,0 +1,820 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Settings: the whole page the corner button opens.
+     Translate into at the top, then the switches Android asks for, then the
+     apps the lens opens over by itself. What has been read is not here: the
+     home page's Translation history row is its one door. Same paper as the
+     home page, so the gear leads somewhere that belongs to the app. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/settingsRoot"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/screen_canvas"
+    android:orientation="vertical"
+    android:paddingStart="24dp"
+    android:paddingTop="10dp"
+    android:paddingEnd="24dp"
+    android:paddingBottom="18dp">
+
+    <!-- One 44 dp row with the chevron drawn and centred, so the arrow and the
+         page's name sit on the same line on every page that goes back. The
+         8 dp start inset puts the arrow's box, and the name after it, on the
+         same 32 dp edge the home page's mark and wordmark sit on. The row is
+         44 dp but the home page's is 34 dp, so it starts 4 dp higher: that is
+         what lands the page's name on the line the wordmark is drawn on. -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="44dp"
+        android:layout_marginTop="20dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:id="@+id/settingsBack"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:layout_marginStart="-4dp"
+            android:clickable="true"
+            android:contentDescription="Back"
+            android:focusable="true"
+            android:padding="12dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/ic_back" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:fontFamily="@font/lucid_sans"
+            android:includeFontPadding="false"
+            android:letterSpacing="-0.01"
+            android:maxLines="1"
+            android:text="Settings"
+            android:textColor="@color/screen_ink"
+            android:textFontWeight="600"
+            android:textSize="13sp" />
+    </LinearLayout>
+
+    <ScrollView
+        android:id="@+id/settingsScroll"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:clipToPadding="false"
+        android:fillViewport="true"
+        android:paddingBottom="10dp"
+        android:scrollbars="none">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!-- ── the app's own language ──────────────────────────────── -->
+
+            <!-- Two languages live on this page and they are not the same
+                 question. This one is the app itself speaking; the card below
+                 is what a read comes out as. The chip is the language, the
+                 arrow is the download: the words are translated once over the
+                 network and kept on the phone, which is how the app can offer
+                 every language without carrying 240 page sets. -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="15dp"
+                    android:layout_height="15dp"
+                    android:layout_marginEnd="7dp"
+                    android:contentDescription="@null"
+                    android:importantForAccessibility="no"
+                    android:src="@drawable/ic_sec_app" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/lucid_sans"
+                    android:letterSpacing="0.18"
+                    android:text="APP LANGUAGE"
+                    android:textColor="@color/screen_faint"
+                    android:textSize="8.5sp" />
+
+                <TextView
+                    android:id="@+id/infoAppLang"
+                    style="@style/InfoMark" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/settingsAppLang"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:background="@drawable/card_bg"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingStart="15dp"
+                android:paddingTop="13dp"
+                android:paddingEnd="13dp"
+                android:paddingBottom="13dp">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/lucid_sans"
+                        android:text="App language"
+                        android:textColor="@color/screen_ink"
+                        android:textFontWeight="500"
+                        android:textSize="13sp" />
+
+                    <TextView
+                        android:id="@+id/settingsAppLangHint"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="1dp"
+                        android:fontFamily="@font/lucid_sans"
+                        android:text="The app's own words — English is built in"
+                        android:textColor="@color/screen_faint"
+                        android:textSize="10.5sp" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/settingsAppLangName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="28dp"
+                    android:layout_marginStart="8dp"
+                    android:background="@drawable/chip_accent_bg"
+                    android:ellipsize="end"
+                    android:fontFamily="@font/lucid_sans"
+                    android:gravity="center"
+                    android:maxLines="1"
+                    android:maxWidth="104dp"
+                    android:paddingStart="15dp"
+                    android:paddingEnd="15dp"
+                    android:text="English"
+                    android:textColor="@color/screen_accent_ink"
+                    android:textSize="11sp" />
+
+                <!-- The download itself: gone while English is in force, an
+                     arrow while the language is not on the phone, a tick once
+                     it is. -->
+                <ImageView
+                    android:id="@+id/settingsAppLangPack"
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:layout_marginStart="6dp"
+                    android:background="@drawable/btn_ghost"
+                    android:clickable="true"
+                    android:contentDescription="Download this language"
+                    android:focusable="true"
+                    android:padding="6dp"
+                    android:src="@drawable/ic_download" />
+            </LinearLayout>
+
+            <!-- The words only reach the tour today, so the tour is one tap from
+                 the switch that changes them: download, then look. -->
+            <TextView
+                android:id="@+id/settingsAppLangTour"
+                android:layout_width="wrap_content"
+                android:layout_height="30dp"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/btn_ghost"
+                android:clickable="true"
+                android:focusable="true"
+                android:fontFamily="@font/lucid_sans"
+                android:gravity="center"
+                android:paddingStart="14dp"
+                android:paddingEnd="14dp"
+                android:text="See the tour in this language"
+                android:textColor="@color/screen_muted"
+                android:textSize="10.5sp" />
+
+            <!-- ── translate into ─────────────────────────────────────── -->
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="15dp"
+                    android:layout_height="15dp"
+                    android:layout_marginEnd="7dp"
+                    android:contentDescription="@null"
+                    android:importantForAccessibility="no"
+                    android:src="@drawable/ic_sec_language" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/lucid_sans"
+                    android:letterSpacing="0.18"
+                    android:text="TRANSLATE INTO"
+                    android:textColor="@color/screen_faint"
+                    android:textSize="8.5sp" />
+
+                <TextView
+                    android:id="@+id/infoTarget"
+                    style="@style/InfoMark" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/settingsTarget"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:background="@drawable/card_bg"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingStart="15dp"
+                android:paddingTop="13dp"
+                android:paddingEnd="13dp"
+                android:paddingBottom="13dp">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/lucid_sans"
+                        android:text="Translate into"
+                        android:textColor="@color/screen_ink"
+                        android:textFontWeight="500"
+                        android:textSize="13sp" />
+
+                    <TextView
+                        android:id="@+id/settingsTargetHint"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="1dp"
+                        android:fontFamily="@font/lucid_sans"
+                        android:text="What every read comes out as — answered online, nothing to download"
+                        android:textColor="@color/screen_faint"
+                        android:textSize="10.5sp" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/settingsTargetName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="28dp"
+                    android:layout_marginStart="8dp"
+                    android:background="@drawable/chip_accent_bg"
+                    android:fontFamily="@font/lucid_sans"
+                    android:gravity="center"
+                    android:paddingStart="15dp"
+                    android:paddingEnd="15dp"
+                    android:text="English"
+                    android:textColor="@color/screen_accent_ink"
+                    android:textSize="11sp" />
+            </LinearLayout>
+
+            <!-- ── the page's own light ───────────────────────────────── -->
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="15dp"
+                    android:layout_height="15dp"
+                    android:layout_marginEnd="7dp"
+                    android:contentDescription="@null"
+                    android:importantForAccessibility="no"
+                    android:src="@drawable/ic_sec_appearance" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/lucid_sans"
+                    android:letterSpacing="0.18"
+                    android:text="APPEARANCE"
+                    android:textColor="@color/screen_faint"
+                    android:textSize="8.5sp" />
+
+                <TextView
+                    android:id="@+id/infoTheme"
+                    style="@style/InfoMark" />
+            </LinearLayout>
+
+            <!-- Three choices on one card: the surface is a property of the whole
+                 app, so it is one decision, not a switch that sits beside things
+                 that only change when you tap them. -->
+            <LinearLayout
+                android:id="@+id/themePicker"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:background="@drawable/card_bg"
+                android:orientation="vertical"
+                android:padding="4dp">
+
+                <TextView
+                    android:id="@+id/themeSystem"
+                    style="@style/ThemeChoice"
+                    android:text="System" />
+
+                <TextView
+                    android:id="@+id/themeLight"
+                    style="@style/ThemeChoice"
+                    android:text="Light" />
+
+                <TextView
+                    android:id="@+id/themeDark"
+                    style="@style/ThemeChoice"
+                    android:text="Dark" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/themeHint"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:fontFamily="@font/lucid_sans"
+                android:text="Follows your phone's setting"
+                android:textColor="@color/screen_faint"
+                android:textSize="10.5sp" />
+
+            <!-- ── the switches Android asks for ──────────────────────── -->
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="15dp"
+                    android:layout_height="15dp"
+                    android:layout_marginEnd="7dp"
+                    android:contentDescription="@null"
+                    android:importantForAccessibility="no"
+                    android:src="@drawable/ic_sec_lens" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/lucid_sans"
+                    android:letterSpacing="0.18"
+                    android:text="WHAT THE LENS NEEDS"
+                    android:textColor="@color/screen_faint"
+                    android:textSize="8.5sp" />
+
+                <TextView
+                    android:id="@+id/infoPermissions"
+                    style="@style/InfoMark" />
+            </LinearLayout>
+
+            <!-- Whether translation can run at all, said before the switches: the
+                 top two are the ground it stands on, the bottom two are extras. -->
+            <TextView
+                android:id="@+id/permStatus"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:fontFamily="@font/lucid_sans"
+                android:lineSpacingMultiplier="1.4"
+                android:text="Translation can't start yet — the first two below are what it runs on."
+                android:textColor="@color/screen_accent"
+                android:textSize="11.5sp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/card_bg"
+                android:orientation="vertical"
+                android:paddingStart="15dp"
+                android:paddingTop="1dp"
+                android:paddingEnd="13dp"
+                android:paddingBottom="1dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/lucid_sans"
+                    android:letterSpacing="0.16"
+                    android:paddingTop="11dp"
+                    android:text="ALL OF THESE ARE NEEDED TO TRANSLATE"
+                    android:textColor="@color/screen_faint"
+                    android:textSize="8sp" />
+
+                <!-- float over other apps -->
+                <LinearLayout
+                    android:id="@+id/permRow1"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingTop="11dp"
+                    android:paddingBottom="11dp">
+
+                    <!-- Numbered, because the two of them are a list to work
+                         through: 1 then 2. The filled numeral is a step that
+                         is done; the ringed one is still to do. -->
+                    <TextView
+                        android:id="@+id/dot1"
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
+                        android:background="@drawable/step_chip_pending"
+                        android:fontFamily="@font/lucid_sans"
+                        android:gravity="center"
+                        android:includeFontPadding="false"
+                        android:text="1"
+                        android:textColor="@color/screen_accent"
+                        android:textFontWeight="500"
+                        android:textSize="9sp" />
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="11dp"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/lucid_sans"
+                            android:text="Float over other apps"
+                            android:textColor="@color/screen_ink"
+                            android:textFontWeight="500"
+                            android:textSize="13sp" />
+
+                        <TextView
+                            android:id="@+id/sub1"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="1dp"
+                            android:fontFamily="@font/lucid_sans"
+                            android:text="Off by default — lets the lens sit on top"
+                            android:textColor="@color/screen_faint"
+                            android:textSize="10.5sp" />
+                    </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/btn1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="28dp"
+                        android:layout_marginStart="8dp"
+                        android:background="@drawable/btn_ghost"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:fontFamily="@font/lucid_sans"
+                        android:gravity="center"
+                        android:paddingStart="13dp"
+                        android:paddingEnd="13dp"
+                        android:text="Allow"
+                        android:textColor="@color/screen_ink"
+                        android:textSize="10.5sp" />
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/screen_divider" />
+
+                <!-- text access -->
+                <LinearLayout
+                    android:id="@+id/permRow2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingTop="11dp"
+                    android:paddingBottom="11dp">
+
+                    <TextView
+                        android:id="@+id/dot2"
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
+                        android:background="@drawable/step_chip_pending"
+                        android:fontFamily="@font/lucid_sans"
+                        android:gravity="center"
+                        android:includeFontPadding="false"
+                        android:text="2"
+                        android:textColor="@color/screen_accent"
+                        android:textFontWeight="500"
+                        android:textSize="9sp" />
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="11dp"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/lucid_sans"
+                            android:text="Read text on screen"
+                            android:textColor="@color/screen_ink"
+                            android:textFontWeight="500"
+                            android:textSize="13sp" />
+
+                        <TextView
+                            android:id="@+id/sub2"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="1dp"
+                            android:fontFamily="@font/lucid_sans"
+                            android:text="Off by default — lets the lens read text"
+                            android:textColor="@color/screen_faint"
+                            android:textSize="10.5sp" />
+                    </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/btn2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="28dp"
+                        android:layout_marginStart="8dp"
+                        android:background="@drawable/btn_ghost"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:fontFamily="@font/lucid_sans"
+                        android:gravity="center"
+                        android:paddingStart="13dp"
+                        android:paddingEnd="13dp"
+                        android:text="Allow"
+                        android:textColor="@color/screen_ink"
+                        android:textSize="10.5sp" />
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/screen_divider" />
+
+                <!-- screen capture, only where it is the only way to pixels -->
+                <LinearLayout
+                    android:id="@+id/captureRow"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingTop="11dp"
+                    android:paddingBottom="11dp">
+
+                    <TextView
+                        android:id="@+id/dot3"
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
+                        android:background="@drawable/step_chip_pending"
+                        android:fontFamily="@font/lucid_sans"
+                        android:gravity="center"
+                        android:includeFontPadding="false"
+                        android:text="3"
+                        android:textColor="@color/screen_accent"
+                        android:textFontWeight="500"
+                        android:textSize="9sp" />
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="11dp"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/lucid_sans"
+                            android:text="Screen capture"
+                            android:textColor="@color/screen_ink"
+                            android:textFontWeight="500"
+                            android:textSize="13sp" />
+
+                        <TextView
+                            android:id="@+id/sub3"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="1dp"
+                            android:fontFamily="@font/lucid_sans"
+                            android:text="Off by default — lets the lens read photos and video"
+                            android:textColor="@color/screen_faint"
+                            android:textSize="10.5sp" />
+                    </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/btn3"
+                        android:layout_width="wrap_content"
+                        android:layout_height="28dp"
+                        android:layout_marginStart="8dp"
+                        android:background="@drawable/btn_ghost"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:fontFamily="@font/lucid_sans"
+                        android:gravity="center"
+                        android:paddingStart="13dp"
+                        android:paddingEnd="13dp"
+                        android:text="Off"
+                        android:textColor="@color/screen_ink"
+                        android:textSize="10.5sp" />
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/screen_divider" />
+
+                <!-- Everything past this line is a convenience: said in words as
+                     well as by the numerals stopping, so a reader who skips the
+                     explanations still knows which rows are the ground the lens
+                     stands on and which it can do without. -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/lucid_sans"
+                    android:letterSpacing="0.16"
+                    android:paddingTop="11dp"
+                    android:text="OPTIONAL — THE LENS WORKS WITHOUT IT"
+                    android:textColor="@color/screen_faint"
+                    android:textSize="8sp" />
+
+                <!-- the shade's button -->
+                <LinearLayout
+                    android:id="@+id/permRow4"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingTop="11dp"
+                    android:paddingBottom="11dp">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="11dp"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/lucid_sans"
+                            android:text="Quick button"
+                            android:textColor="@color/screen_muted"
+                            android:textFontWeight="500"
+                            android:textSize="13sp" />
+
+                        <TextView
+                            android:id="@+id/sub4"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="1dp"
+                            android:fontFamily="@font/lucid_sans"
+                            android:text="Adds Lucid to the shade's quick buttons"
+                            android:textColor="@color/screen_faint"
+                            android:textSize="10.5sp" />
+                    </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/btn4"
+                        android:layout_width="wrap_content"
+                        android:layout_height="28dp"
+                        android:layout_marginStart="8dp"
+                        android:background="@drawable/btn_ghost"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:fontFamily="@font/lucid_sans"
+                        android:gravity="center"
+                        android:paddingStart="13dp"
+                        android:paddingEnd="13dp"
+                        android:text="Add"
+                        android:textColor="@color/screen_ink"
+                        android:textSize="10.5sp" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- ── the apps the lens opens over by itself ─────────────── -->
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="22dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_marginEnd="9dp"
+                    android:contentDescription="@null"
+                    android:importantForAccessibility="no"
+                    android:src="@drawable/ic_sec_apps" />
+
+                <!-- Weighted, not wrap_content: this is the longest heading on
+                     the page, and a wrap_content title takes every pixel it is
+                     measured with, which leaves the question mark no room and
+                     cuts it off at the screen's edge. Weight is measured after
+                     the mark, so the mark's 18dp is reserved and the title
+                     wraps to what is left. -->
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:fontFamily="@font/lucid_sans"
+                    android:letterSpacing="-0.02"
+                    android:text="Open the lens when the app opens"
+                    android:textColor="@color/screen_ink"
+                    android:textFontWeight="650"
+                    android:textSize="18sp" />
+
+                <TextView
+                    android:id="@+id/infoApps"
+                    style="@style/InfoMark" />
+            </LinearLayout>
+
+            <!-- The rule can be written down with the two switches off; it just
+                 cannot do anything, so the page says so before the list. -->
+            <TextView
+                android:id="@+id/settingsAppsWarn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="9dp"
+                android:fontFamily="@font/lucid_sans"
+                android:lineSpacingMultiplier="1.4"
+                android:text="The lens needs Float over other apps and Read text on screen before a switch here can do anything. Both are just above."
+                android:textColor="@color/screen_accent"
+                android:textSize="11sp"
+                android:visibility="gone" />
+
+            <EditText
+                android:id="@+id/appSearch"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:layout_marginTop="12dp"
+                android:background="@drawable/btn_ghost"
+                android:fontFamily="@font/lucid_sans"
+                android:hint="Search apps"
+                android:importantForAutofill="no"
+                android:inputType="text"
+                android:maxLines="1"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:textColor="@color/screen_ink"
+                android:textColorHint="@color/screen_faint"
+                android:textSize="12.5sp" />
+
+            <TextView
+                android:id="@+id/appsEmpty"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:fontFamily="@font/lucid_sans"
+                android:lineSpacingMultiplier="1.4"
+                android:text="No app matches that name."
+                android:textColor="@color/screen_faint"
+                android:textSize="11.5sp"
+                android:visibility="gone" />
+
+            <LinearLayout
+                android:id="@+id/settingsAppsList"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
+                android:background="@drawable/card_bg"
+                android:orientation="vertical"
+                android:paddingStart="13dp"
+                android:paddingTop="1dp"
+                android:paddingEnd="10dp"
+                android:paddingBottom="1dp" />
+
+            <!-- The list is at most ten rows, so it says so: a short list that
+                 says nothing reads as a phone with ten apps on it. -->
+            <TextView
+                android:id="@+id/appsHint"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="9dp"
+                android:fontFamily="@font/lucid_sans"
+                android:lineSpacingMultiplier="1.4"
+                android:text="Ten apps at most — type a name to reach any other app."
+                android:textColor="@color/screen_faint"
+                android:textSize="11sp"
+                android:visibility="gone" />
+
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>

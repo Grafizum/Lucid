@@ -24,10 +24,10 @@ style is one family away from its surface.
 
 | Token       | Hex       | Use                                              |
 | ----------- | --------- | ------------------------------------------------ |
-| `beige_200` | `#EBE1CE` | eyebrow pills, quiet buttons                      |
-| `beige_300` | `#DFD2B8` | **outer shell** of the double-bezel cards         |
-| `beige_400` | `#CDBB9B` | hairlines and dividers on cream                   |
-| `beige_500` | `#B39D7C` | icon strokes, the lens selection wash base        |
+| `beige_200` | `#E4D8CE` | eyebrow pills, quiet buttons                      |
+| `beige_300` | `#D3C2B5` | the start slide's outer shell                     |
+| `beige_400` | `#C7B2A4` | hairlines and dividers on cream                   |
+| `beige_500` | `#AA8F7F` | icon strokes, the lens selection wash base        |
 
 ## 3. Charcoal — ink and dark canvas
 
@@ -62,7 +62,12 @@ wash. Never for large fills.
 | `clay_400`  | `#B9825F` | accent graphics on dark                           |
 | `clay_500`  | `#A46E4B` | accent graphics on cream, icon 文                  |
 | `clay_600`  | `#8A5A3C` | **accent text on cream** — 5.2:1                  |
-| `clay_700`  | `#6E4630` | pressed accent                                    |
+| `clay_700`  | `#6E4630` | pressed accent; **accent text on an accent chip** |
+
+Accent words that sit on an accent fill — the state chips, the language chip — take
+`clay_700`, not `clay_600`. The tint darkens the ground under them, and `clay_600` there
+measures 4.2 : 1, under the floor for 11sp; one step down the stair buys 6.0 : 1 and keeps
+the hue. At night the chip labels take `#F3D8BC` for the same reason.
 
 ## 6. Semantics
 
@@ -98,6 +103,8 @@ wash. Never for large fills.
 | `sand_500` on `ink_800`               | 6.2 : 1  | meta on dark         |
 | `clay_300` on `ink_800`               | 7.2 : 1  | accent text on dark  |
 | `olive_600` on `cream_100`            | 6.0 : 1  | done / on state      |
+| `ink_900` on `cream_200`              | 14.7 : 1 | off-state chip labels |
+| `clay_700` on accent fill (20% clay)  | 6.0 : 1  | on-state chip labels |
 | `amber_600` on `cream_100`            | 4.5 : 1  | warning (large only) |
 | `rose_600` on `cream_100`             | 6.8 : 1  | error state          |
 

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The header's mark, bare: the lens ring and its handle, drawn at the same
+     optical size the 30dp launcher tile occupied. The tile belongs to the
+     launcher; on the page it only competed with the gear at the other end of
+     the same line. Stroked in ink so it follows the theme on its own — there is
+     no cream fill left at night, because there is no fill at all. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="26dp"
+    android:height="26dp"
+    android:viewportWidth="26"
+    android:viewportHeight="26">
+
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M11,11 m-6.4,0 a6.4,6.4 0 1,0 12.8,0 a6.4,6.4 0 1,0 -12.8,0"
+        android:strokeColor="@color/screen_ink"
+        android:strokeWidth="1.7" />
+
+    <path
+        android:pathData="M15.7,15.7 L21.2,21.2"
+        android:strokeColor="@color/screen_ink"
+        android:strokeLineCap="round"
+        android:strokeWidth="1.8" />
+</vector>

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="notif_channel">เซสชันเลนส์</string>
+    <string name="notif_title">เลนส์เปิดอยู่</string>
+    <string name="notif_text">แตะเลนส์บนข้อความใดก็ได้เพื่อแปล</string>
+    <string name="notif_stop">ปิด</string>
+    <string name="a11y_label">การเข้าถึงข้อความของ Lucid</string>
+    <string name="a11y_summary">ให้เลนส์อ่านข้อความที่อยู่ด้านล่าง</string>
+    <string name="a11y_description">Lucid อ่านข้อความใต้เลนส์เพื่อแปล ระบบอ่านเฉพาะข้อความนั้น ไม่เก็บสำเนา และไม่บันทึกสิ่งใด เมื่อใช้เอนจินออนไลน์ คำใต้เลนส์จะถูกส่งไปยังบริการแปลออนไลน์พร้อมส่วนที่เหลือของหน้าจอเป็นบริบท เมื่อใช้เอนจินบนเครื่อง ไม่มีข้อมูลใดออกจากโทรศัพท์</string>
+    <string name="lens_close">วางเลนส์ที่นี่เพื่อปิด</string>
+    <string name="lens_delete">ลบ</string>
+    <string name="tile_label">เลนส์ Lucid</string>
+    <string name="tile_on">เลนส์เปิด</string>
+    <string name="tile_off">เลนส์ปิด</string>
+    <string name="picker_search">ค้นหา %1$d ภาษา</string>
+    <string name="picker_none">ไม่มีภาษาที่ตรงกัน</string>
+</resources>
