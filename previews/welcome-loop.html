@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lucid — welcome loop, five options</title>
+<style>
+  :root {
+    --paper: #F8F2E7;
+    --card: #FCF8F1;
+    --ink: #26221E;
+    --muted: #6E655C;
+    --faint: #A2968A;
+    --accent: #8A6A4A;
+    --accent-soft: rgba(138, 106, 74, .30);
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 40px 26px 56px;
+    background: var(--paper); color: var(--ink);
+    font-family: ui-sans-serif, -apple-system, "Segoe UI", Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  header { max-width: 1120px; margin: 0 auto 26px; }
+  .eyebrow { font-size: 11px; letter-spacing: .22em; text-transform: uppercase; color: var(--faint); margin-bottom: 9px; }
+  h1 { font-size: clamp(24px, 3.4vw, 34px); margin: 0 0 8px; font-weight: 600; letter-spacing: -.02em; }
+  header p { margin: 0; color: var(--muted); font-size: 14px; line-height: 1.55; max-width: 60ch; }
+
+  .grid {
+    max-width: 1120px; margin: 0 auto;
+    display: grid; gap: 14px;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  }
+  .opt {
+    background: var(--card); border: 1px solid rgba(38,34,30,.07); border-radius: 22px;
+    padding: 16px 16px 14px; display: flex; flex-direction: column; gap: 10px;
+    box-shadow: 0 1px 0 rgba(255,255,255,.8) inset, 0 14px 26px -22px rgba(38,34,30,.55);
+  }
+  .head { display: flex; align-items: baseline; gap: 8px; }
+  .letter {
+    font-size: 11px; letter-spacing: .16em; color: var(--accent);
+    border: 1px solid rgba(138,106,74,.3); border-radius: 7px; padding: 2px 7px;
+  }
+  .name { font-size: 14.5px; font-weight: 600; letter-spacing: -.01em; }
+  .stage {
+    position: relative; height: 250px; border-radius: 16px;
+    background: var(--paper); overflow: hidden;
+    display: grid; place-items: center;
+  }
+  .desc { font-size: 12.5px; line-height: 1.5; color: var(--muted); margin: 0; }
+  .desc b { color: var(--ink); font-weight: 600; }
+
+  /* ── the mark itself ────────────────────────────────────────────── */
+  .mark { width: 148px; height: 148px; position: relative; z-index: 3; will-change: transform, opacity; }
+  .mark svg { width: 100%; height: 100%; display: block; }
+
+  .layer {
+    position: absolute; left: 50%; top: 50%; translate: -50% -50%;
+    border-radius: 50%; pointer-events: none;
+  }
+
+  /* A · breath: nothing static, one soft ring leaves the mark and lets go */
+  .a-ring {
+    width: 210px; height: 210px; border: 1px solid var(--accent-soft);
+    animation: breathe 4.4s ease-in-out infinite;
+  }
+  .a-wash {
+    width: 210px; height: 210px;
+    background: radial-gradient(circle, rgba(138,106,74,.10), rgba(138,106,74,0) 68%);
+    animation: breathe 4.4s ease-in-out infinite;
+  }
+  @keyframes breathe {
+    0%   { transform: scale(.52); opacity: 0; }
+    50%  { transform: scale(.92); opacity: 1; }
+    100% { transform: scale(.52); opacity: 0; }
+  }
+
+  /* B · ripple: two rings, half a cycle apart */
+  .b-ring {
+    width: 190px; height: 190px; border: 1px solid var(--accent-soft);
+    animation: ripple 4.4s ease-out infinite;
+  }
+  .b-ring.two { animation-delay: -2.2s; }
+  @keyframes ripple {
+    0%   { transform: scale(.45); opacity: 0; }
+    28%  { opacity: .85; }
+    78%  { transform: scale(1.18); opacity: 0; }
+    100% { transform: scale(1.18); opacity: 0; }
+  }
+
+  /* C · reticle: a thin arc traces the circle once, then is gone */
+  .c-arc {
+    position: absolute; left: 50%; top: 50%; translate: -50% -50%;
+    width: 214px; height: 214px; animation: sweep 4.4s cubic-bezier(.5,0,.5,1) infinite;
+  }
+  .c-arc circle {
+    fill: none; stroke: var(--accent-soft); stroke-width: 1.2;
+    stroke-linecap: round; stroke-dasharray: 168 506;
+    transform-origin: 50% 50%;
+  }
+  @keyframes sweep {
+    0%   { transform: rotate(-30deg); opacity: 0; }
+    18%  { opacity: 1; }
+    72%  { opacity: .85; }
+    100% { transform: rotate(300deg); opacity: 0; }
+  }
+  .c-core {
+    width: 176px; height: 176px;
+    background: radial-gradient(circle, rgba(138,106,74,.07), rgba(138,106,74,0) 70%);
+    animation: glowSoft 4.4s ease-in-out infinite;
+  }
+  @keyframes glowSoft {
+    0%, 100% { opacity: .25; transform: scale(.94); }
+    50%      { opacity: 1;   transform: scale(1.04); }
+  }
+
+  /* D · glass: no circles at all — a wash behind that comes forward and fades */
+  .d-wash {
+    width: 200px; height: 200px;
+    background: radial-gradient(circle, rgba(138,106,74,.14), rgba(138,106,74,0) 66%);
+    animation: forward 4.4s ease-in-out infinite;
+  }
+  @keyframes forward {
+    0%, 100% { transform: scale(.72); opacity: 0; }
+    50%      { transform: scale(1.02); opacity: 1; }
+  }
+  .d-mark { animation: markPush 4.4s ease-in-out infinite; }
+  @keyframes markPush {
+    0%, 100% { transform: scale(1) translateY(0); opacity: 1; }
+    50%      { transform: scale(1.035) translateY(-1px); opacity: .9; }
+  }
+
+  /* E · bare: only the mark breathes */
+  .e-mark { animation: markPush 4.4s ease-in-out infinite; }
+
+  /* the mark sits in the middle of the stage; the rings are centred on it */
+  .stage > .mark { grid-area: 1 / 1; }
+
+  footer { max-width: 1120px; margin: 24px auto 0; color: var(--faint); font-size: 12px; line-height: 1.6; }
+</style>
+</head>
+<body>
+<header>
+  <div class="eyebrow">Lucid · welcome loop</div>
+  <h1>Five loops, no standing circle</h1>
+  <p>Every option below drops the always-on outer ring. They run at the real speed (4.4 s a cycle) and the real faintness — all of them are meant to be felt at arm’s length, not watched. Tell me the letter and it goes on the phone.</p>
+</header>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="lucid-mark" viewBox="196 190 748 748">
+    <defs>
+      <linearGradient id="rim" x1="0.1" y1="0.02" x2="0.86" y2="0.98">
+        <stop offset="0" stop-color="#FDF8EC"/><stop offset="0.42" stop-color="#F2E6CE"/><stop offset="1" stop-color="#DBC9A8"/>
+      </linearGradient>
+      <linearGradient id="handle" x1="0" y1="0" x2="0.9" y2="1">
+        <stop offset="0" stop-color="#F7EEDB"/><stop offset="1" stop-color="#DFCFB1"/>
+      </linearGradient>
+      <radialGradient id="glass" cx="0.36" cy="0.3" r="0.88">
+        <stop offset="0" stop-color="#332E26"/><stop offset="0.66" stop-color="#282420"/><stop offset="1" stop-color="#211E19"/>
+      </radialGradient>
+      <filter id="lift" x="-30%" y="-30%" width="160%" height="160%">
+        <feDropShadow dx="0" dy="18" stdDeviation="26" flood-color="#4A3A22" flood-opacity="0.22"/>
+      </filter>
+    </defs>
+    <g filter="url(#lift)">
+      <path d="M651.39,648.39 L856.76,853.76" stroke="url(#handle)" stroke-width="111.3" stroke-linecap="round" fill="none"/>
+      <path d="M5.72,18 a12.28,12.28 0 1,0 24.56,0 a12.28,12.28 0 1,0 -24.56,0 M9.28,18 a8.72,8.72 0 1,0 17.44,0 a8.72,8.72 0 1,0 -17.44,0"
+            fill="url(#rim)" fill-rule="evenodd"
+            transform="translate(473.0,470.0) scale(21.2) translate(-18.0,-18.0)"/>
+      <circle cx="473" cy="470" r="184.86" fill="url(#glass)"/>
+      <path d="M298.004,451.607 A175.96,175.96 0 0,1 466.859,294.147" stroke="#191712" stroke-opacity=".55" stroke-width="13.14" fill="none" stroke-linecap="round"/>
+      <path d="M644.285,506.408 A175.112,175.112 0 0,1 509.408,641.285" stroke="#FFF8E9" stroke-opacity=".22" stroke-width="8.48" fill="none" stroke-linecap="round"/>
+      <path d="M334.423,414.011 A149.46,149.46 0 0,1 402.833,338.035" stroke="#FBF4E4" stroke-opacity=".11" stroke-width="11.66" fill="none" stroke-linecap="round"/>
+      <path d="M325.328,397.976 A164.3,164.3 0 0,1 376.427,337.079" stroke="#FBF4E4" stroke-opacity=".28" stroke-width="6.78" fill="none" stroke-linecap="round"/>
+      <path d="M397.528,389.44 L348.556,518.76 M397.528,389.44 L451.164,518.76 M363.82,474.24 L433.78,474.24" stroke="#F6EFE3" stroke-width="25.86" stroke-linecap="round" fill="none"/>
+      <path d="M537.66,400.464 L537.66,431.416 M566.28,456.22 L481.48,552.68 M509.04,456.22 L592.78,551.62 M473,445.196 L602.32,445.196" stroke="#D2B88E" stroke-width="25.86" stroke-linecap="round" fill="none"/>
+    </g>
+  </symbol>
+</svg>
+
+<main class="grid">
+
+  <article class="opt">
+    <div class="head"><span class="letter">A</span><span class="name">Breath</span></div>
+    <div class="stage">
+      <div class="layer a-wash"></div>
+      <div class="layer a-ring"></div>
+      <div class="mark"><svg><use href="#lucid-mark"/></svg></div>
+    </div>
+    <p class="desc"><b>What you have now, minus the frame.</b> One soft ring leaves the mark, widens a third of the way out and lets go halfway. Nothing on screen when it is at rest.</p>
+  </article>
+
+  <article class="opt">
+    <div class="head"><span class="letter">B</span><span class="name">Ripple</span></div>
+    <div class="stage">
+      <div class="layer b-ring"></div>
+      <div class="layer b-ring two"></div>
+      <div class="mark"><svg><use href="#lucid-mark"/></svg></div>
+    </div>
+    <p class="desc"><b>Two rings, half a cycle apart.</b> A slow sonar: the second leaves as the first is halfway out, so there is always one faint ring travelling, never a standing one.</p>
+  </article>
+
+  <article class="opt">
+    <div class="head"><span class="letter">C</span><span class="name">Reticle</span></div>
+    <div class="stage">
+      <div class="layer c-core"></div>
+      <svg class="c-arc" viewBox="0 0 214 214" aria-hidden="true"><circle cx="107" cy="107" r="107"/></svg>
+      <div class="mark"><svg><use href="#lucid-mark"/></svg></div>
+    </div>
+    <p class="desc"><b>A third of a circle tracing round.</b> The arc sweeps past the mark and dissolves on the far side, like a lens finding focus. Quietest of the three with a circle.</p>
+  </article>
+
+  <article class="opt">
+    <div class="head"><span class="letter">D</span><span class="name">Glass</span></div>
+    <div class="stage">
+      <div class="layer d-wash"></div>
+      <div class="mark d-mark"><svg><use href="#lucid-mark"/></svg></div>
+    </div>
+    <p class="desc"><b>No ring at all.</b> A warm wash comes forward behind the mark while the mark itself pushes 3.5 % closer and gives up a tenth of its weight — the zoom you asked for, carried by light.</p>
+  </article>
+
+  <article class="opt">
+    <div class="head"><span class="letter">E</span><span class="name">Bare</span></div>
+    <div class="stage">
+      <div class="mark e-mark"><svg><use href="#lucid-mark"/></svg></div>
+    </div>
+    <p class="desc"><b>Nothing but the mark.</b> A 3.5 % push and a 10 % fade, once every 4.4 s. For when the page should be completely still and only the lens is alive.</p>
+  </article>
+
+</main>
+
+<footer>
+  All five use the same 4.4 s cycle and the same accent at 22–30 % opacity, so whatever is chosen sits at the same weight as the rest of the app. Pick a letter — or a mix, e.g. “C’s arc with D’s wash”.
+</footer>
+</body>
+</html>

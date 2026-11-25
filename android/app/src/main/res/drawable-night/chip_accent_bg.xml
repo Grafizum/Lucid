@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The state pill at night: a hairline, not a block. The day chip is a tint of
+     clay that reads as a surface on paper; on charcoal the same fill turns into
+     the loudest shape in the card — louder than the slide that starts the lens.
+     Dropping the fill keeps the state legible from the hairline and the clay
+     word, and lets clay stay an accent instead of a wall. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
+    <solid android:color="@android:color/transparent" />
+    <corners android:radius="999dp" />
+    <stroke android:width="1dp" android:color="@color/screen_accent_edge" />
+</shape>

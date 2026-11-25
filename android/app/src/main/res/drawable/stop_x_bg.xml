@@ -9,7 +9,7 @@
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
     <item>
         <shape android:shape="oval">
-            <solid android:color="@color/cream_100" />
+            <solid android:color="@color/screen_well" />
         </shape>
     </item>
     <item>
@@ -17,13 +17,13 @@
             <gradient
                 android:centerY="0.40"
                 android:endColor="#00191814"
-                android:startColor="#1A191814"
+                android:startColor="@color/screen_well_shade"
                 android:type="linear" />
         </shape>
     </item>
     <item>
         <shape android:shape="oval">
-            <stroke android:width="1.25dp" android:color="#8CB39D7C" />
+            <stroke android:width="1.25dp" android:color="@color/screen_well_rim" />
         </shape>
     </item>
 </layer-list>

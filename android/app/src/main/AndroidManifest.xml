@@ -9,6 +9,22 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.REORDER_TASKS" />
 
+    <!-- The card's speaker asks the phone for its speech engine; on Android 11
+         and later that lookup has to be declared to be visible. -->
+    <!-- The apps settings lists, and the apps a per-app language can belong to.
+         Visibility is asked for by name of intent rather than with QUERY_ALL_PACKAGES:
+         the launcher entry is the only list the page needs, and it is the one
+         Android's own launcher draws from. -->
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.TTS_SERVICE" />
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.MAIN" />
+            <category android:name="android.intent.category.LAUNCHER" />
+        </intent>
+    </queries>
+
     <application
         android:allowBackup="false"
         android:icon="@mipmap/ic_launcher"
@@ -16,6 +32,34 @@
         android:roundIcon="@mipmap/ic_launcher"
         android:supportsRtl="true"
         android:theme="@style/Theme.Lucid">
+
+        <!-- What the lens has read, on its own page: opened from the settings
+             sheet, and never from outside the app. -->
+        <activity
+            android:name=".HistoryActivity"
+            android:exported="false"
+            android:label="Translation history" />
+
+        <!-- The offline languages: what the lens can read with nothing leaving
+             the phone, searchable, with a tap to add a pack. -->
+        <activity
+            android:name=".ModelsActivity"
+            android:exported="false"
+            android:label="Offline models"
+            android:theme="@style/Theme.Lucid" />
+
+        <!-- The corner button's page: the switches Android asks for, the
+             language, the apps that open the lens by themselves, and what has
+             been read. -->
+        <!-- adjustResize, not the system's pan: the page has a search field near
+             its foot, and a panned page puts that field on the keyboard's top
+             edge with the results underneath it, where they cannot be seen. -->
+        <activity
+            android:name=".SettingsActivity"
+            android:exported="false"
+            android:label="Settings"
+            android:theme="@style/Theme.Lucid"
+            android:windowSoftInputMode="adjustResize" />
 
         <activity
             android:name=".MainActivity"
@@ -27,12 +71,30 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+            <!-- The long-press shortcut: puts the lens on screen from the home
+                 screen, without opening the page. -->
+            <meta-data
+                android:name="android.app.shortcuts"
+                android:resource="@xml/shortcuts" />
         </activity>
 
         <activity
             android:name=".DemoChatActivity"
             android:exported="true"
             android:label="Demo chat"
+            android:theme="@style/Theme.Lucid" />
+
+        <!-- The first screen a new install meets: the mark and the welcome,
+             opened by MainActivity on a first launch. -->
+        <activity
+            android:name=".WelcomeActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Lucid" />
+
+        <!-- The five loops the welcome leads into. -->
+        <activity
+            android:name=".OnboardingActivity"
+            android:exported="false"
             android:theme="@style/Theme.Lucid" />
 
         <service

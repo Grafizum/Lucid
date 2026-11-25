@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The light half of the appearance choice: a sun, drawn the way the gear and
+     the theme disc are — a hairline in the app's own ink, no fill, so it reads
+     the same on paper and on charcoal. The tint is set at runtime to say which
+     surface is in force. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="20dp"
+    android:height="20dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M12,12 m-4.3,0 a4.3,4.3 0 1,0 8.6,0 a4.3,4.3 0 1,0 -8.6,0"
+        android:strokeColor="@color/screen_ink"
+        android:strokeWidth="1.6" />
+
+    <!-- Four long rays on the axes, four short ones on the diagonals: enough to
+         say "sun" at 20dp without turning into a starburst. -->
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M12,2.4 L12,4.7 M12,19.3 L12,21.6 M2.4,12 L4.7,12 M19.3,12 L21.6,12"
+        android:strokeColor="@color/screen_ink"
+        android:strokeLineCap="round"
+        android:strokeWidth="1.6" />
+
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M5.4,5.4 L7,7 M17,17 L18.6,18.6 M18.6,5.4 L17,7 M7,17 L5.4,18.6"
+        android:strokeColor="@color/screen_ink"
+        android:strokeLineCap="round"
+        android:strokeWidth="1.4" />
+</vector>

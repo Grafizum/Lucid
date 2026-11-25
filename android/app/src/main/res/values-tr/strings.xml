@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="notif_channel">Lens oturumu</string>
+    <string name="notif_title">Lens açık</string>
+    <string name="notif_text">Herhangi bir metnin üzerine lensi getirip dokunun; çevrilsin.</string>
+    <string name="notif_stop">Kapat</string>
+    <string name="a11y_label">Lucid metin erişimi</string>
+    <string name="a11y_summary">Lensin altındaki metni okumasını sağlar</string>
+    <string name="a11y_description">Lucid, çevirebilmek için lensin altındaki metni okur. Yalnızca o metni okur, kopyasını tutmaz ve hiçbir şey kaydetmez. Çevrimiçi motorla lensteki sözcükler, o ekranın geri kalanı bağlam olarak eklenerek çevrimiçi bir çeviri hizmetine gönderilir; cihaz üzerindeki motorla hiçbir şey telefondan çıkmaz.</string>
+    <string name="lens_close">Kapatmak için lensi buraya bırakın</string>
+    <string name="lens_delete">Sil</string>
+    <string name="tile_label">Lucid lensi</string>
+    <string name="tile_on">Lens açık</string>
+    <string name="tile_off">Lens kapalı</string>
+    <string name="picker_search">%1$d dil içinde ara</string>
+    <string name="picker_none">Eşleşen dil yok.</string>
+</resources>

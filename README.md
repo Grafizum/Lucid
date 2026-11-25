@@ -9,7 +9,7 @@
 <sub>A <a href="https://github.com/grafizum">Grafizum</a> studio product</sub>
 
 [![Release](https://img.shields.io/github/v/release/grafizum/Lucid?label=release)](https://github.com/grafizum/Lucid/releases/latest)
-[![Platform](https://img.shields.io/badge/platform-Android%208.0%2B-3ddc84)](#-install)
+[![Platform](https://img.shields.io/badge/platform-Android%207.0%2B-3ddc84)](#-install)
 [![Build](https://img.shields.io/badge/build-debug%20%C2%B7%20v1.0.0-e0a94f)](#-install)
 [![Engine](https://img.shields.io/badge/engine-online%20%2B%20on--device-6f9f86)](#-translation-engine)
 [![Licence](https://img.shields.io/badge/licence-source--available-8a8271)](#-licence)
@@ -23,7 +23,7 @@
 ---
 
 > [!NOTE]
-> **Status: first release, debug build.** Android 8.0 or newer, arm64 and x86_64. It is verified on an Android 15 emulator and installs on a Galaxy S22+; some manufacturers kill accessibility services aggressively, and Look mode still asks Android to share the screen each session.
+> **Status: first release, debug build.** Android 7.0 or newer, on 32-bit and 64-bit ARM. It is verified on an Android 15 emulator and installs on a Galaxy S22+; some manufacturers kill accessibility services aggressively, and screen capture still asks Android to share the screen each session.
 
 Lucid is not a split-screen translator and not a screenshot tool. It is a small glass lens that floats over every app: drag it like a cursor, and the moment it stops it reads the text underneath and puts the translation in a card beside it. Nothing is configured per app, and the card clears itself as soon as you touch anywhere else.
 
@@ -31,7 +31,7 @@ Lucid is not a split-screen translator and not a screenshot tool. It is a small 
 
 <img src="docs/screenshots/how-it-works.png" alt="Three steps: the lens resting on a chat message, the card translating it, then the translated card beside the mint-highlighted line" width="900" />
 
-1. **Drag it anywhere.** A small lens floats over every app — no split screen, no picking an app, no screenshot button. Whatever is under it when you let go is what it reads.
+1. **Drag it anywhere.** A small lens floats over every app — no split screen, no picking an app, no screenshot button. Whatever is under it when you let go is what it reads: the whole sentence, not just the word the lens happens to sit on.
 2. **It reads in place.** The words come from Android's accessibility tree, not from the framebuffer: the exact string plus the bounds of every character, which is why the highlight can sit on the glyphs instead of a rectangle around them.
 3. **The translation arrives beside it.** The line it read is washed in mint, one band per line, and the card holds the meaning with the language on each side. A press anywhere else takes both away — and the touch still reaches the app underneath.
 
@@ -39,13 +39,13 @@ Lucid is not a split-screen translator and not a screenshot tool. It is a small 
 
 - **Reads the text, not the pixels** — it asks Android's accessibility tree what is at the point under the lens, so the highlight sits exactly on the words and no screen recording is involved.
 - **Works over any app** — chat apps, browsers, PDFs, settings, even a game's UI: if the app publishes text, the lens reads it.
-- **Translates in place** — the card opens beside the text you pointed at, with the picked line washed in mint, one band per line, ending where the words end.
+- **Translates in place** — the card opens beside the text you pointed at, with the read sentence washed in mint, one band per line, ending where the sentence ends.
 - **Touch anywhere and it is gone** — the card and the highlight clear together, and the touch still reaches the app underneath. That holds mid-read too: pressing outside drops the read instead of making you wait for an answer you no longer want.
 - **Tap for languages** — the lens opens the language list; the pick is saved for everything it reads next. A tap never reads.
 - **Long-press to pause** — the lens fades to a ghost until you long-press again.
-- **Two engines** — Google's translation service when you have a connection, ML Kit models on-device when you want nothing to leave the phone.
+- **Two engines** — an online translation service when you have a connection, ML Kit models on-device when you want nothing to leave the phone.
 - **Japanese extras** — furigana-style readings above the kanji, and a short word-by-word list under the line.
-- **Look mode (optional)** — when a surface has no text in the tree (a photo, a video frame, a game), it can OCR one still frame instead.
+- **Photos and video read the same way (optional)** — with screen capture allowed, a surface with no text in the tree (a photo, a video frame, a game) is read from one still frame instead of the tree. Same lens, same card, same sentence: there is no second mode to learn.
 - **Quick-settings tile** — start and stop the lens from the shade, without opening the app.
 
 ## 📲 Coming to Google Play
@@ -54,7 +54,7 @@ Lucid is being tested right now and is heading to Google Play next — the store
 
 ## 📦 Install
 
-Grab **`Lucid-1.0-debug.apk`** from the [latest release](https://github.com/grafizum/Lucid/releases/latest) (67 MB, arm64 + x86_64), open it on the phone, or with a USB cable:
+Grab **`Lucid-1.0-debug.apk`** from the [latest release](https://github.com/grafizum/Lucid/releases/latest) (88 MB, 32-bit and 64-bit ARM), open it on the phone, or with a USB cable:
 
 ```bash
 adb install -r Lucid-1.0-debug.apk
@@ -67,7 +67,7 @@ It is a debug build, so Android asks you to allow installing from this source th
 | **Display over other apps** | So the lens, its card and its highlight can float on top of whatever you are using. |
 | **Text access** (Android Accessibility) | So the lens can read the words under it. It applies to the whole phone, not one app. |
 
-Text access is asked in the open, before Android's switch: the sheet says exactly what the lens reads — the words under it, never the rest of the screen, with no copy kept — and that with **ENGINE: Online** those words are sent to Google Translate, along with the rest of that screen as context. You tap **I agree** first; only then does the switch appear. Declining leaves the app usable, and asking again brings the note back.
+Text access is asked in the open, before Android's switch: the sheet says exactly what the lens reads — the words under it, never the rest of the screen, with no copy kept — and that with **ENGINE: Online** those words are sent to an online translation service, along with the rest of that screen as context. You tap **I agree** first; only then does the switch appear. Declining leaves the app usable, and asking again brings the note back.
 
 Then press **Start the lens**.
 
@@ -105,7 +105,7 @@ Lucid asks Android's accessibility tree "what text is at this point?" instead of
 
 | Engine | What it does |
 | --- | --- |
-| **Online** (default) | Google's translation service. Best quality, especially for Japanese, Chinese and Korean. The text under the lens leaves the phone. |
+| **Online** (default) | An online translation service. Best quality, especially for Japanese, Chinese and Korean. The text under the lens leaves the phone. |
 | **On-device** | ML Kit models, downloaded once and then offline. Nothing leaves the phone, though the smaller models are occasionally clumsy on complex sentences. |
 
 If the online service is unreachable the card says so instead of showing a rough guess.
@@ -133,9 +133,11 @@ Both chips in the card are live: tap the target chip (`English ▾`) to translat
 
 The change applies to **that card only** — the footer gains a `temporary` marker and the target chip loses its mint fill. Nothing is saved: drag the lens to the next thing and it translates into the language chosen in the app again. For a change that sticks, tap the lens itself — that list saves what you pick — or use `TRANSLATE INTO → Change` in the app.
 
-### Look mode (optional)
+### Screen capture (optional)
 
-Some surfaces (images, games, video, apps that hide their text) have nothing in the accessibility tree. **Look mode** adds a screen-capture fallback: same lens, but it asks for the *whole display* — never a single app — takes one still frame per read, runs OCR on-device, and keeps nothing. It is off by default and only prompted for when you turn it on.
+Some surfaces (images, games, video, apps that hide their text) have nothing in the accessibility tree. Screen capture is the permission that lets the lens read them: it asks for the *whole display* — never a single app — takes one still frame per read, runs OCR on-device, and keeps nothing. It is off by default and only asked for when you allow it.
+
+It is a permission, not a mode. With it on, the lens decides per read: the tree where there is text, the pixels where there is not, and either way the sentence under the lens is what gets translated.
 
 ## 🛠 Build from source
 
@@ -149,7 +151,7 @@ echo "sdk.dir=$HOME/Android/Sdk" > local.properties   # your SDK path
 # -> app/build/outputs/apk/debug/Lucid-v1.0.0-v1-debug.apk
 ```
 
-Stack: Kotlin, plain Android views (no Compose), an `AccessibilityService` for text, `TYPE_APPLICATION_OVERLAY` windows for the lens, the highlight and the card, ML Kit for translation (and OCR in Look mode), and coroutines for the pipeline.
+Stack: Kotlin, plain Android views (no Compose), an `AccessibilityService` for text, `TYPE_APPLICATION_OVERLAY` windows for the lens, the highlight and the card, ML Kit for translation (and OCR on captured pixels), and coroutines for the pipeline.
 
 ### Trying it without a chat app
 
@@ -173,10 +175,10 @@ android/                      the app
     RubyTextView.kt              keeps room above the line and draws that kana there
     TextLines.kt                 text box -> per-line bands, from the app's
                                  character boxes or a fitted type size
-    TextRun.kt                   narrows a mixed-script line to the run under the lens
-    SightView.kt                 crop frame for look mode
-    ScreenCapturer.kt            MediaProjection -> one cropped still (look mode)
-    VisionTranslator.kt          clean-up -> language ID -> translation (OCR in look mode)
+    TextRun.kt                   cuts a line down to the sentence under the lens
+    SightView.kt                 crop frame for screen capture
+    ScreenCapturer.kt            MediaProjection -> one cropped still
+    VisionTranslator.kt          clean-up -> language ID -> translation (OCR on pixels)
     LanguagePicker.kt            target language list
     DemoChatActivity.kt          demo chat surface
   app/src/main/assets/demo-chat.html
@@ -190,7 +192,7 @@ store-listing/                Play Store listing copy and art
 ## ⚠️ Limits worth knowing
 
 - **Android only.** iOS does not allow floating overlays over other apps.
-- **Text access needs text.** Chat apps, browsers, settings and most native apps expose it; images, video and some games do not — that is what Look mode is for.
+- **Text access needs text.** Chat apps, browsers, settings and most native apps expose it; images, video and some games do not — that is what screen capture is for.
 - The APK is a **debug build**: no Play Store signing, no minification.
 - Tested on an Android 15 emulator (1080×2400, Pixel 7a profile) and installed on a Galaxy S22+; some manufacturers kill accessibility services aggressively, so if the lens stops reading, check that **Lucid text access** is still switched on.
 - Machine translation is good, not perfect: "portería" came back as "goal" in one test instead of "concierge desk".

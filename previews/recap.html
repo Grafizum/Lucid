@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lucid — what we built</title>
+<style>
+  :root {
+    --paper: #F8F2E7;
+    --band: #E4D8CE;
+    --card: #FCF8F1;
+    --ink: #26221E;
+    --muted: #6E655C;
+    --faint: #A2968A;
+    --accent: #8A6A4A;
+    --ok: #4E6B4F;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 48px 28px 64px;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: ui-sans-serif, -apple-system, "Segoe UI", Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  header { max-width: 1180px; margin: 0 auto 34px; }
+  .eyebrow {
+    font-size: 11px; letter-spacing: .22em; text-transform: uppercase;
+    color: var(--faint); margin-bottom: 10px;
+  }
+  h1 { font-size: clamp(28px, 4vw, 44px); line-height: 1.05; margin: 0 0 10px; font-weight: 600; letter-spacing: -0.02em; }
+  header p { margin: 0; color: var(--muted); font-size: 15px; max-width: 62ch; line-height: 1.55; }
+
+  .grid {
+    max-width: 1180px; margin: 0 auto;
+    display: grid; gap: 14px;
+    grid-template-columns: repeat(auto-fill, minmax(258px, 1fr));
+    align-items: start;
+  }
+  .tile {
+    background: var(--card);
+    border: 1px solid rgba(38, 34, 30, .07);
+    border-radius: 20px;
+    padding: 18px 18px 16px;
+    box-shadow: 0 1px 0 rgba(255,255,255,.8) inset, 0 10px 22px -18px rgba(38,34,30,.5);
+    display: flex; flex-direction: column; gap: 9px;
+    min-height: 168px;
+  }
+  .tile.wide { grid-column: span 2; }
+  .top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .n {
+    font-size: 11px; color: var(--faint); font-variant-numeric: tabular-nums;
+    letter-spacing: .08em;
+  }
+  .tag {
+    font-size: 10px; letter-spacing: .12em; text-transform: uppercase;
+    padding: 4px 9px; border-radius: 999px; white-space: nowrap;
+    border: 1px solid rgba(38,34,30,.12); color: var(--muted);
+  }
+  .tag.shipped { color: var(--ok); border-color: rgba(78,107,79,.35); background: rgba(78,107,79,.07); }
+  .tag.parked { color: #8A5A2B; border-color: rgba(138,90,43,.35); background: rgba(138,90,43,.07); }
+  .tag.dropped { color: var(--faint); text-decoration: line-through; }
+  h2 { font-size: 16.5px; margin: 0; font-weight: 600; letter-spacing: -0.01em; line-height: 1.3; }
+  .tile p { margin: 0; color: var(--muted); font-size: 13px; line-height: 1.5; }
+  .where {
+    margin-top: auto; font-size: 11px; color: var(--faint);
+    letter-spacing: .04em; display: flex; gap: 6px; align-items: baseline;
+  }
+  .where b { color: var(--accent); font-weight: 600; letter-spacing: .02em; }
+  .swatches { display: flex; gap: 6px; margin-top: 4px; }
+  .sw { width: 26px; height: 26px; border-radius: 9px; border: 1px solid rgba(38,34,30,.08); }
+  .langs { font-size: 12px; color: var(--muted); line-height: 1.6; letter-spacing: .01em; }
+  footer { max-width: 1180px; margin: 26px auto 0; color: var(--faint); font-size: 12px; line-height: 1.6; }
+</style>
+</head>
+<body>
+<header>
+  <div class="eyebrow">Lucid · session recap</div>
+  <h1>What we built</h1>
+  <p>Every card below is something that ships in v1.0.2 (build 4) and was seen on the S24. Two are honest exceptions and say so: one is parked, one was deleted rather than built.</p>
+</header>
+
+<main class="grid">
+  <article class="tile">
+    <div class="top"><span class="n">01</span><span class="tag shipped">Shipped</span></div>
+    <h2>Welcome mark</h2>
+    <p>The logo redrawn as vector geometry from the owner’s SVG — one stroke sweep, true proportions — and it draws itself on launch instead of sitting still.</p>
+    <div class="where"><b>WelcomeMark.kt</b> · launch</div>
+  </article>
+
+  <article class="tile">
+    <div class="top"><span class="n">02</span><span class="tag shipped">Shipped</span></div>
+    <h2>Five-loop onboarding</h2>
+    <p>The tour that shows what the lens does, with equal-width tiles and a shade that no longer fades twice. Pages 1–4 walked on the phone.</p>
+    <div class="where"><b>OnboardingActivity</b> · scene</div>
+  </article>
+
+  <article class="tile">
+    <div class="top"><span class="n">03</span><span class="tag shipped">Shipped</span></div>
+    <h2>Permission ask, in the tour</h2>
+    <p>The last loop now names the switch (Settings › Accessibility › Installed apps › Lucid) with one CTA, “Allow text access”. The old sheet no longer opens after the tour.</p>
+    <div class="where"><b>onResume</b> · relabels on return</div>
+  </article>
+
+  <article class="tile">
+    <div class="top"><span class="n">04</span><span class="tag shipped">Shipped</span></div>
+    <h2>New home top bar</h2>
+    <p>Mark, wordmark, lens state and theme — nothing else. The “Screen lens” chip, the big mark row and the long-press hint are gone.</p>
+    <div class="where"><b>activity_main.xml</b> · 30 dp mark</div>
+  </article>
+
+  <article class="tile">
+    <div class="top"><span class="n">05</span><span class="tag shipped">Shipped</span></div>
+    <h2>Every phone width</h2>
+    <p>Audited at 320, 360, 393, 411 and 430 dp: all four options present, nothing clipped. It scrolls only where it has to — 320 and 360.</p>
+    <div class="where"><b>previews/</b> · 5 widths</div>
+  </article>
+
+  <article class="tile">
+    <div class="top"><span class="n">06</span><span class="tag shipped">Shipped</span></div>
+    <h2>Reels read text now</h2>
+    <p>When a window screenshot comes back empty — a video drawn in a hardware layer — the read retries once from the whole screen. Confirmed on Reels by the owner.</p>
+    <div class="where"><b>LensService</b> · readPixels retry</div>
+  </article>
+
+  <article class="tile">
+    <div class="top"><span class="n">07</span><span class="tag shipped">Shipped</span></div>
+    <h2>A quiet lens notice</h2>
+    <p>Its own channel, silent, importance min: the lens is on without a notification tone every session. Checked live in dumpsys.</p>
+    <div class="where"><b>lens_session_quiet</b> · SILENT</div>
+  </article>
+
+  <article class="tile">
+    <div class="top"><span class="n">08</span><span class="tag shipped">Shipped</span></div>
+    <h2>Palette, day and night</h2>
+    <p>Warm paper by day, charcoal by night, and the card sits on a band rather than floating. The theme is a choice, not a sunset.</p>
+    <div class="swatches">
+      <div class="sw" style="background:#F8F2E7"></div>
+      <div class="sw" style="background:#E4D8CE"></div>
+      <div class="sw" style="background:#FCF8F1"></div>
+      <div class="sw" style="background:#131210"></div>
+      <div class="sw" style="background:#2A2722"></div>
+    </div>
+    <div class="where"><b>values/</b> · values-night/</div>
+  </article>
+
+  <article class="tile wide">
+    <div class="top"><span class="n">09</span><span class="tag shipped">New today</span></div>
+    <h2>Every language, and a phone that speaks for itself</h2>
+    <p>The picker went from 20 hand-picked targets to <b>all 60 languages</b> ML Kit can hold a model for, with a search field that folds accents (“espanol” finds Español). With nothing chosen yet, Lucid translates into the phone’s own language instead of assuming English, and the model-tag bridges (iw↔he, fil↔tl, zh‑TW↔zh) are handled so detection and the picker always agree. Lucid’s own shell — notification, quick button, text-access name — is now localised in 20 languages.</p>
+    <div class="langs">Afrikaans · Albanian · Arabic · Belarusian · Bengali · Bulgarian · Catalan · Chinese · Croatian · Czech · Danish · Dutch · English · Esperanto · Estonian · Filipino · Finnish · French · Galician · Georgian · German · Greek · Gujarati · Haitian Creole · Hebrew · Hindi · Hungarian · Icelandic · Indonesian · Irish · Italian · Japanese · Kannada · Korean · Latvian · Lithuanian · Macedonian · Malay · Maltese · Marathi · Norwegian · Persian · Polish · Portuguese · Romanian · Russian · Serbian · Slovak · Slovenian · Spanish · Swahili · Swedish · Tamil · Telugu · Thai · Turkish · Ukrainian · Urdu · Vietnamese · Welsh</div>
+    <div class="where"><b>Languages.kt</b> · LanguagePicker.kt · Prefs.kt · 20 locales</div>
+  </article>
+
+  <article class="tile">
+    <div class="top"><span class="n">10</span><span class="tag parked">On hold</span></div>
+    <h2>Full live whole-screen</h2>
+    <p>A second overlay drawing translation boxes over every text block, refreshing as you move. Parked at the owner’s request — the card stays in To do, marked ON HOLD, because the overlay does not exist yet.</p>
+    <div class="where"><b>task</b> · still todo</div>
+  </article>
+
+  <article class="tile">
+    <div class="top"><span class="n">11</span><span class="tag dropped">Deleted</span></div>
+    <h2>Neumorphic icon</h2>
+    <p>Dropped, not built: the launcher icon stays the real mark. The card was removed from the board rather than quietly marked done.</p>
+    <div class="where"><b>board</b> · removed</div>
+  </article>
+</main>
+
+<footer>
+  Built from the session’s actual commits and device checks. The language pass was verified on the S24: 60 rows, search, and a pick that survives back on the home row.
+</footer>
+</body>
+</html>

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="notif_channel">جلسة العدسة</string>
+    <string name="notif_title">العدسة قيد التشغيل</string>
+    <string name="notif_text">المس أي نص بالعدسة لترجمته.</string>
+    <string name="notif_stop">إيقاف التشغيل</string>
+    <string name="a11y_label">وصول Lucid إلى النص</string>
+    <string name="a11y_summary">يتيح للعدسة قراءة النص الذي تحتها</string>
+    <string name="a11y_description">يقرأ Lucid النص الواقع تحت عدسته ليتمكن من ترجمته. لا يقرأ سوى ذلك النص، ولا يحتفظ بنسخة، ولا يسجل شيئًا. مع المحرك عبر الإنترنت، تُرسل الكلمات التي تحت العدسة مع بقية الشاشة كسياق إلى خدمة ترجمة عبر الإنترنت؛ ومع المحرك على الجهاز، لا يخرج شيء من الهاتف.</string>
+    <string name="lens_close">أفلت العدسة هنا لإيقافها</string>
+    <string name="lens_delete">حذف</string>
+    <string name="tile_label">عدسة Lucid</string>
+    <string name="tile_on">العدسة قيد التشغيل</string>
+    <string name="tile_off">العدسة متوقفة</string>
+    <string name="picker_search">البحث في %1$d لغة</string>
+    <string name="picker_none">لا توجد لغة مطابقة.</string>
+</resources>

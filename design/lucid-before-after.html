@@ -1,0 +1,498 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lucid — before and after</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --ink:#191814; --paper:#F8F2E7; --card:#FCF8F1; --band:#E4D8CE; --shell:#D3C2B5;
+    --muted:#6A6254; --faint:#857B6C; --clay:#8A5A3C; --clay-soft:#B9825F;
+    --night:#191814; --night-card:#2E2C27; --night-band:#23221E; --night-text:#EDE6D8; --night-muted:#A9A08E;
+  }
+  body{background:#141310;color:#EDE6D8;font-family:'Inter','DejaVu Sans',system-ui,sans-serif;
+       padding:34px 30px 54px;line-height:1.45}
+  .wrap{max-width:1180px;margin:0 auto}
+  h1{font-size:23px;font-weight:650;letter-spacing:-.02em}
+  .sub{color:#9C9280;font-size:12.5px;margin-top:6px;max-width:760px}
+  .lede{color:#C7BEAC;font-size:12.5px;margin-top:10px;max-width:840px;line-height:1.55}
+
+  /* checklist */
+  .check{margin-top:26px;border:1px solid #2A2823;border-radius:16px;overflow:hidden;background:#1A1916}
+  .check h2{font-size:10px;letter-spacing:.16em;font-weight:700;color:#9C9280;
+            padding:13px 18px 11px;border-bottom:1px solid #262420}
+  .item{display:flex;gap:14px;padding:13px 18px;border-bottom:1px solid #22201C;align-items:flex-start}
+  .item:last-child{border-bottom:0}
+  .num{width:22px;height:22px;border-radius:7px;border:1px solid #3A3730;color:#D8CFBC;
+       font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;flex:0 0 auto}
+  .item b{font-size:13px;font-weight:600;color:#F3ECDE}
+  .item p{font-size:11.5px;color:#9C9280;margin-top:2px}
+  .item p em{color:#C7BEAC;font-style:normal}
+
+  /* sections */
+  section{margin-top:38px}
+  .head{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+  .head h3{font-size:16px;font-weight:600;letter-spacing:-.01em}
+  .tag{font-size:8.5px;letter-spacing:.1em;text-transform:uppercase;padding:3px 7px;border-radius:5px;
+       font-weight:700;background:#2A2721;color:#C2B9A6;border:1px solid #35322B}
+  .tag.now{background:#3B2A1E;color:#E0B48F;border-color:#5A4432}
+  .why{color:#9C9280;font-size:11.5px;margin-top:5px;max-width:820px}
+  .pair{display:flex;gap:26px;flex-wrap:wrap;margin-top:16px}
+  .col{width:286px}
+  .cap{display:flex;align-items:center;gap:7px;margin-bottom:9px}
+  .cap span{font-size:9px;letter-spacing:.13em;text-transform:uppercase;color:#8B8272;font-weight:700}
+  .cap .dot{width:5px;height:5px;border-radius:50%;background:#4A463C}
+  .cap.now .dot{background:var(--clay-soft)}
+  .cap.now span{color:#D6A986}
+
+  .phone{background:#000;border-radius:28px;padding:6px;box-shadow:0 14px 34px rgba(0,0,0,.5)}
+  .phone.old{opacity:.9}
+  .screen{position:relative;height:498px;border-radius:22px;overflow:hidden;background:var(--paper)}
+  .dark{background:var(--night)}
+  .status{display:flex;justify-content:space-between;font-size:8px;color:#857B6C;padding:8px 15px 0}
+  .dark .status{color:#8E857A}
+  .pad{padding:12px 17px}
+  .top{display:flex;align-items:center;justify-content:space-between;margin-top:2px}
+  .mark{display:flex;align-items:center;gap:7px;font-size:12.5px;font-weight:600;color:var(--ink)}
+  .dark .mark{color:#EDE6D8}
+  .lensmark{width:14px;height:14px;border-radius:50%;border:2px solid #C7B2A4;background:#FCF8F1}
+  .dark .lensmark{border-color:#5A5449;background:#23221E}
+  .corner{display:flex;gap:6px}
+  .glyph{width:26px;height:26px;border-radius:50%;border:1px solid rgba(25,24,20,.14);
+         display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--muted)}
+  .dark .glyph{border-color:rgba(252,248,241,.16);color:#C2B9A6}
+  .glyph.call{box-shadow:0 0 0 3px rgba(185,130,95,.35);border-color:var(--clay-soft);color:var(--clay)}
+  h4{font-size:20px;letter-spacing:-.02em;font-weight:650;color:var(--ink);margin-top:12px}
+  .dark h4{color:#F3ECDE}
+  .note{font-size:10px;color:var(--muted);margin-top:5px;line-height:1.5}
+  .dark .note{color:#A9A08E}
+
+  .tray{background:var(--shell);border-radius:14px;padding:4px;margin-top:12px}
+  .dark .tray{background:#23221E}
+  .core{background:var(--card);border-radius:11px;padding:10px 12px}
+  .dark .core{background:var(--night-card)}
+  .row{display:flex;align-items:center;justify-content:space-between;padding:6px 0;
+       font-size:10.5px;color:var(--ink)}
+  .dark .row{color:#EDE6D8}
+  .row .lab{font-size:7.5px;letter-spacing:.12em;color:var(--faint);font-weight:700}
+  .hair{height:1px;background:rgba(199,178,164,.4);margin:2px 0}
+  .dark .hair{background:rgba(252,248,241,.1)}
+  .btnrow{display:flex;justify-content:space-between;align-items:center;font-size:10px;color:var(--muted)}
+  .ghost{font-size:9px;border:1px solid rgba(25,24,20,.14);border-radius:999px;padding:3px 9px;color:var(--muted)}
+  .dark .ghost{border-color:rgba(252,248,241,.16);color:#C2B9A6}
+  .emptyline{font-size:10px;color:var(--faint);line-height:1.5;margin-top:14px}
+  .dark .emptyline{color:#8E857A}
+
+  .card{background:var(--card);border:1px solid rgba(25,24,20,.1);border-radius:14px;margin-top:11px;padding:10px 12px}
+  .dark .card{background:var(--night-card);border-color:rgba(252,248,241,.1)}
+  .eyebrow{font-size:7px;letter-spacing:.13em;font-weight:700;color:var(--clay)}
+  .dark .eyebrow{color:#D6A986}
+  .say{font-size:12px;color:var(--ink);margin-top:5px;line-height:1.35}
+  .dark .say{color:#F3ECDE}
+  .cut{font-size:12px;color:var(--ink);margin-top:5px;line-height:1.35;
+       display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .dark .cut{color:#F3ECDE}
+  .readfull{display:flex;align-items:center;justify-content:space-between;margin-top:9px;
+            border-top:1px solid rgba(199,178,164,.4);padding-top:8px;font-size:9.5px;color:var(--clay);font-weight:600}
+  .dark .readfull{color:#D6A986;border-color:rgba(252,248,241,.1)}
+  .readfull .chip{font-size:8px;border:1px solid rgba(138,90,60,.35);border-radius:999px;padding:2px 7px}
+  .origin{font-size:9.5px;color:var(--faint);margin-top:8px;line-height:1.45}
+
+  .reader{position:relative;height:100%;background:var(--card);border-radius:22px;padding:18px 19px}
+  .dark .reader{background:#23221E}
+  .reader .klabel{font-size:7.5px;letter-spacing:.14em;color:var(--clay);font-weight:700}
+  .reader h5{font-size:21px;line-height:1.35;letter-spacing:-.015em;color:var(--ink);font-weight:500;margin-top:9px}
+  .reader .orig{font-size:10px;color:var(--muted);margin-top:16px;line-height:1.5;
+                border-top:1px solid rgba(199,178,164,.45);padding-top:11px}
+  .reader .acts{display:flex;gap:7px;margin-top:14px}
+  .reader .acts span{font-size:9px;border-radius:999px;padding:4px 10px;background:var(--band);color:var(--ink)}
+  .shadowcut{position:absolute;left:0;right:0;bottom:0;height:54px;
+             background:linear-gradient(180deg,rgba(252,248,241,0),var(--card));pointer-events:none}
+
+  /* theme demo */
+  .demo{margin-top:16px;display:flex;gap:26px;flex-wrap:wrap;align-items:flex-start}
+  .demo .col{width:286px}
+  .stack{position:relative;height:100%}
+  .layer{position:absolute;inset:0;border-radius:22px;overflow:hidden}
+  .layer.light{background:var(--paper)}
+  .layer.dark{background:var(--night);opacity:0}
+  .beforemove{transition:opacity 260ms cubic-bezier(0,0,.2,1)}
+  .aftermove{transition:opacity 190ms cubic-bezier(.4,0,.2,1)}
+  .demo .go{margin-top:10px;display:flex;gap:8px;align-items:center}
+  .gobtn{font-family:inherit;font-size:10.5px;font-weight:600;color:#191814;background:#E7DCC7;
+         border:0;border-radius:999px;padding:7px 14px;cursor:pointer}
+  .gobtn.alt{background:transparent;color:#C7BEAC;border:1px solid #3A3730}
+  .timing{margin-top:16px;border:1px solid #2A2723;border-radius:14px;padding:14px 16px;background:#1A1916}
+  .timing h4{font-size:11px;letter-spacing:.12em;color:#9C9280;font-weight:700;text-transform:uppercase}
+  .bar{display:flex;align-items:center;gap:10px;margin-top:10px;font-size:11px;color:#C7BEAC}
+  .bar i{display:block;height:9px;border-radius:999px;background:#4A463C}
+  .bar.now i{background:var(--clay-soft)}
+  .bar span{width:64px;color:#8B8272;font-variant-numeric:tabular-nums}
+
+  .steps{margin-top:14px;padding-left:0;list-style:none}
+  .steps li{font-size:11.5px;color:#B6AD9C;padding:7px 0 7px 26px;position:relative;border-bottom:1px solid #22201C}
+  .steps li:last-child{border-bottom:0}
+  .steps li:before{content:attr(data-n);position:absolute;left:0;top:7px;width:17px;height:17px;border-radius:5px;
+                   border:1px solid #3A3730;font-size:9.5px;display:flex;align-items:center;justify-content:center;color:#C7BEAC}
+  .foot{margin-top:36px;font-size:10.5px;color:#7E7666}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Lucid — what to look at, before and after</h1>
+  <p class="sub">Every change from this round, as it was on the left and as it is on your phone on the right.</p>
+  <p class="lede">Nothing here needs code review. Each row is a thing to do on the phone once, and the “look for” line says what would make it wrong. The board cards already in review are the two at the bottom: sentence stepping and the rules.</p>
+
+  <div class="check">
+    <h2>WHAT TO CHECK, IN ORDER</h2>
+    <div class="item"><span class="num">1</span><div><b>Light ↔ dark, four or five times</b>
+      <p>Look for: one page dissolving into the other, not a colour flash. <em>Tap it twice quickly</em> — the second flip should land, not be swallowed. If the lens is up it will switch dress instantly; only the page dissolves.</p></div></div>
+    <div class="item"><span class="num">2</span><div><b>Gear → Add apps → add one app → open that app</b>
+      <p>Look for: the lens already there over it. Close the lens, leave the app, come back — it should come back. Take the app out, open it again — it should not.</p></div></div>
+    <div class="item"><span class="num">3</span><div><b>Home → Recent reads → Open</b>
+      <p>Look for: the reads you just made, grouped by day. Tap a row to unfold the answer; long-press to copy the original. The list survives closing the app.</p></div></div>
+    <div class="item"><span class="num">4</span><div><b>Translate something long → Read the whole sentence</b>
+      <p>Look for: no button at all on a short answer; on a cut one, the button leads to the full text at reading size, and the sheet scrolls when it still runs past the screen.</p></div></div>
+    <div class="item"><span class="num">5</span><div><b>Sentence by sentence on a long page</b>
+      <p>Look for: a counter and ‹ › arrows over a page of two sentences or more; each tap answers that sentence in the card, and one sentence means no arrows at all.</p></div></div>
+    <div class="item"><span class="num">6</span><div><b>Anything you expected and can't find</b>
+      <p><em>Reader region</em> was dropped on purpose — there is no region-picking mode to look for. If something else is missing, that is the report.</p></div></div>
+  </div>
+
+  <!-- 1. THEME -->
+  <section>
+    <div class="head"><h3>1 · Light ↔ dark</h3><span class="tag">changed</span></div>
+    <p class="why">Before: the rebuilt page arrived already in its new colours — a cut. Now: the old page is photographed, the new one comes up under it, and both fade on an ease-in-out curve in 190 ms. Press the buttons to feel the difference; the two phones switch at the same moment. One honest exception: the lens, if it is up, is a separate window and takes the new colours at once — it does not ride the dissolve.</p>
+
+    <div class="demo">
+      <div class="col">
+        <div class="cap"><span class="dot"></span><span>Before · 260 ms, decelerate</span></div>
+        <div class="phone old">
+          <div class="screen">
+            <div class="stack beforemove" id="before">
+              <div class="layer light" data-face="light"></div>
+              <div class="layer dark" data-face="dark" id="beforeDark"></div>
+            </div>
+          </div>
+        </div>
+        <div class="go"><button class="gobtn" data-switch="before">Switch theme</button><button class="gobtn alt" id="play">Play both</button></div>
+      </div>
+
+      <div class="col">
+        <div class="cap now"><span class="dot"></span><span>Now · 190 ms, ease-in-out</span></div>
+        <div class="phone">
+          <div class="screen">
+            <div class="stack aftermove" id="after">
+              <div class="layer light" data-face="light"></div>
+              <div class="layer dark" data-face="dark" id="afterDark"></div>
+            </div>
+          </div>
+        </div>
+        <div class="go"><button class="gobtn" data-switch="after">Switch theme</button></div>
+      </div>
+
+      <div class="timing" style="flex:1;min-width:280px">
+        <h4>What changed in the timing</h4>
+        <div class="bar"><span>260 ms</span><i style="width:72%"></i></div>
+        <div class="bar now"><span>190 ms</span><i style="width:52%"></i></div>
+        <div class="bar"><span>flip guard</span><i style="width:46%"></i><em style="font-style:normal;color:#8B8272;font-size:10px">700 → 450 ms</em></div>
+        <p class="why" style="margin-top:10px">Both halves use AccelerateDecelerate: gentle start, speed through the middle, settle. Nothing in the page moves — only the picture over it.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2. RULES -->
+  <section>
+    <div class="head"><h3>2 · Which apps open the lens</h3><span class="tag now">new</span></div>
+    <p class="why">Before: the only way to start the lens was your thumb — the slide, the quick-settings button, or the shortcut. Now: a gear in the corner lists the apps that should bring it up by themselves. The gear sits left of the theme switch, top-right.</p>
+    <div class="pair">
+      <div class="col">
+        <div class="cap"><span class="dot"></span><span>Before · thumb only</span></div>
+        <div class="phone old"><div class="screen">
+          <div class="status"><span>9:41</span><span>▮▮▮ ▮</span></div>
+          <div class="pad">
+            <div class="top"><div class="mark"><span class="lensmark"></span>Lucid</div>
+              <div class="corner"><span class="glyph">☾</span></div></div>
+            <h4>Screen translator</h4>
+            <p class="note">Drag the lens over any app. Nothing decides for you when it should appear.</p>
+            <div class="tray"><div class="core">
+              <div class="row"><span>Float over other apps</span><span class="ghost">On</span></div>
+              <div class="hair"></div>
+              <div class="row"><span>Text access</span><span class="ghost">On</span></div>
+            </div></div>
+            <p class="emptyline">No settings page, no per-app list. A rule was impossible to write down.</p>
+          </div>
+        </div></div>
+      </div>
+
+      <div class="col">
+        <div class="cap now"><span class="dot"></span><span>Now · the gear's page</span></div>
+        <div class="phone"><div class="screen">
+          <div class="status"><span>9:41</span><span>▮▮▮ ▮</span></div>
+          <div class="pad">
+            <div style="display:flex;align-items:center;gap:5px;margin-top:2px">
+              <span style="font-size:12px;color:var(--muted)">‹</span>
+              <span style="font-size:10px;font-weight:600;color:var(--ink)">Settings</span>
+            </div>
+            <h4 style="font-size:18px;margin-top:12px;line-height:1.2">Open the lens<br>by itself</h4>
+            <p class="note" style="margin-top:6px">Add an app and the lens comes up over it whenever it reaches the front — a chat, a game, a page you read every morning.</p>
+            <div class="card" style="display:flex;align-items:center;gap:9px;margin-top:12px">
+              <span style="width:24px;height:24px;border-radius:7px;background:#D3C2B5;display:inline-block"></span>
+              <span style="flex:1"><b style="font-size:11px;display:block">WhatsApp</b>
+                <em style="font-style:normal;font-size:8.5px;color:var(--faint)">Translates into English</em></span>
+              <span style="width:30px;height:17px;border-radius:999px;background:var(--clay);position:relative;display:inline-block">
+                <i style="position:absolute;right:1.5px;top:1.5px;width:14px;height:14px;border-radius:50%;background:#FCF8F1"></i></span>
+            </div>
+            <div class="card" style="display:flex;align-items:center;gap:9px">
+              <span style="width:24px;height:24px;border-radius:7px;background:#C7B2A4;display:inline-block"></span>
+              <span style="flex:1"><b style="font-size:11px;display:block">Chrome</b>
+                <em style="font-style:normal;font-size:8.5px;color:var(--faint)">Translates into English</em></span>
+              <span style="width:30px;height:17px;border-radius:999px;background:var(--clay);position:relative;display:inline-block">
+                <i style="position:absolute;right:1.5px;top:1.5px;width:14px;height:14px;border-radius:50%;background:#FCF8F1"></i></span>
+            </div>
+            <div style="margin-top:14px;border:1px solid rgba(25,24,20,.14);border-radius:999px;height:30px;display:flex;align-items:center;justify-content:center;font-size:10.5px;font-weight:500;color:var(--ink)">Add apps</div>
+            <p class="note" style="margin-top:9px;font-size:8.5px;line-height:1.5">Opens every installed app, searchable — one tap adds, a second takes it out. The switch on a row is the removal.</p>
+          </div>
+        </div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. HISTORY -->
+  <section>
+    <div class="head"><h3>3 · Recent reads</h3><span class="tag now">new</span></div>
+    <p class="why">Before: a read vanished the moment the card cleared. Now: the last 50 are kept on the phone, reached from <b style="color:#C7BEAC;font-weight:600">Recent reads → Open</b> on the home card, grouped by day, one tap to unfold, long-press to copy the original.</p>
+    <div class="pair">
+      <div class="col">
+        <div class="cap"><span class="dot"></span><span>Before · gone on the next touch</span></div>
+        <div class="phone old"><div class="screen">
+          <div class="status"><span>9:41</span><span>▮▮▮ ▮</span></div>
+          <div class="pad">
+            <div class="top"><div class="mark"><span class="lensmark"></span>Lucid</div><div class="corner"><span class="glyph">☾</span></div></div>
+            <div class="tray" style="margin-top:16px"><div class="core">
+              <div class="row"><span>Offline models</span><span class="ghost">Manage</span></div>
+              <div class="hair"></div>
+              <div class="row"><span>What was sent</span><span class="ghost">View</span></div>
+            </div></div>
+            <p class="emptyline">The card was the only place a translation existed. Copy it or lose it.</p>
+          </div>
+        </div></div>
+      </div>
+
+      <div class="col">
+        <div class="cap now"><span class="dot"></span><span>Now · kept, grouped, unfoldable</span></div>
+        <div class="phone"><div class="screen">
+          <div class="status"><span>9:41</span><span>▮▮▮ ▮</span></div>
+          <div class="pad">
+            <div class="top"><span style="font-size:9px;color:var(--clay)">‹</span><span style="font-size:9.5px;font-weight:600;color:var(--ink)">Recent reads</span><span style="width:10px"></span></div>
+            <p style="font-size:7.5px;letter-spacing:.13em;color:var(--faint);margin-top:14px">TODAY</p>
+            <div class="card" style="margin-top:6px">
+              <div style="display:flex;align-items:center;gap:8px">
+                <span style="font-size:7px;background:var(--band);border-radius:4px;padding:2px 5px;color:var(--muted)">ES</span>
+                <span style="flex:1;font-size:10.5px;color:var(--ink)">¿Dónde está la estación?</span>
+                <span style="color:var(--faint);font-size:11px">›</span>
+              </div>
+              <p style="font-size:8px;color:var(--faint);margin-top:3px">English · 2 min ago</p>
+            </div>
+            <div class="card">
+              <div style="display:flex;align-items:center;gap:8px">
+                <span style="font-size:7px;background:var(--band);border-radius:4px;padding:2px 5px;color:var(--muted)">JA</span>
+                <span style="flex:1;font-size:10.5px;color:var(--ink)">本日の会議は中止です</span>
+                <span style="color:var(--faint);font-size:11px">⌄</span>
+              </div>
+              <p style="font-size:8px;color:var(--faint);margin-top:3px">English · 18 min ago</p>
+              <p style="font-size:10.5px;color:var(--ink);margin-top:7px;line-height:1.4">Today’s meeting is cancelled.</p>
+            </div>
+            <p style="font-size:7.5px;letter-spacing:.13em;color:var(--faint);margin-top:12px">YESTERDAY</p>
+            <div class="card" style="margin-top:6px"><span style="font-size:10.5px;color:var(--ink)">La réunion est reportée à jeudi.</span></div>
+          </div>
+        </div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. LONG TRANSLATION -->
+  <section>
+    <div class="head"><h3>4 · A translation longer than the card</h3><span class="tag now">new</span></div>
+    <p class="why">Before: a long answer was squeezed into the card, and the tail was simply unreadable. Now: the card cuts at the sentence it cannot finish, and only then offers <b style="color:#C7BEAC;font-weight:600">Read the whole sentence</b>, which opens the same words at reading size on their own sheet — scrolling when they still run long. A short answer never shows the button.</p>
+    <div class="pair">
+      <div class="col">
+        <div class="cap"><span class="dot"></span><span>Before · everything crammed in</span></div>
+        <div class="phone old"><div class="screen dark">
+          <div style="padding:16px"><p style="font-size:9px;color:rgba(243,236,222,.42);line-height:1.6">
+            Le comité a décidé, après trois heures de discussion et un vote serré, que le projet serait repris au printemps prochain.</p></div>
+          <div style="position:absolute;left:16px;right:16px;bottom:120px;background:#2E2C27;border-radius:12px;padding:11px 12px">
+            <p class="eyebrow">FRENCH → ENGLISH</p>
+            <p style="font-size:9.5px;line-height:1.35;color:#EDE6D8;margin-top:4px;max-height:74px;overflow:hidden">
+              The committee decided, after three hours of discussion and a close vote, that the project would be taken up again next spring, with no change to…</p>
+            <p style="font-size:8.5px;color:#857B6C;margin-top:6px">Copy</p>
+          </div>
+          <p style="position:absolute;left:16px;right:16px;bottom:60px;font-size:9px;color:rgba(243,236,222,.35);line-height:1.5">
+            There was nowhere to go for the rest of the sentence.</p>
+        </div></div>
+      </div>
+
+      <div class="col">
+        <div class="cap now"><span class="dot"></span><span>Now · the card cuts, and says so</span></div>
+        <div class="phone"><div class="screen dark">
+          <div style="padding:16px"><p style="font-size:9px;color:rgba(243,236,222,.42);line-height:1.6">
+            Le comité a décidé, après trois heures de discussion et un vote serré, que le projet serait repris au printemps prochain.</p></div>
+          <div style="position:absolute;left:16px;right:16px;bottom:70px;background:#2E2C27;border-radius:12px;padding:11px 12px">
+            <p class="eyebrow" style="color:#D6A986">FRENCH → ENGLISH</p>
+            <p style="font-size:9.5px;line-height:1.4;color:#EDE6D8;margin-top:4px">
+              The committee decided, after three hours of discussion and a close vote, that the project would be taken up again next spring, with no…</p>
+            <div class="readfull" style="color:#D6A986;border-color:rgba(252,248,241,.1)">
+              <span>Read the whole sentence</span><span class="chip" style="border-color:rgba(214,169,134,.4)">Full screen</span>
+            </div>
+          </div>
+        </div></div>
+      </div>
+
+      <div class="col">
+        <div class="cap now"><span class="dot"></span><span>And then · reading size</span></div>
+        <div class="phone"><div class="screen">
+          <div class="reader">
+            <p class="klabel">READING · FRENCH → ENGLISH</p>
+            <h5>The committee decided, after three hours of discussion and a close vote, that the project would be taken up again next spring.</h5>
+            <p class="orig">Le comité a décidé, après trois heures de discussion et un vote serré, que le projet serait repris au printemps prochain.</p>
+            <div class="acts"><span>Speak</span><span>Copy</span></div>
+          </div>
+        </div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5. SENTENCE STEPPING -->
+  <section>
+    <div class="head"><h3>5 · Sentence by sentence</h3><span class="tag">in review</span></div>
+    <p class="why">Before: each arrow read the line the lens was over, so a long page meant re-picking every line. Now: one read collects the whole page, and the arrows walk its sentences — the card answers each one in place, and the counter says where you are. The page underneath is not re-marked past the first read; that is deliberate.</p>
+    <div class="pair">
+      <div class="col">
+        <div class="cap"><span class="dot"></span><span>Before · one line per pick</span></div>
+        <div class="phone old"><div class="screen">
+          <div class="pad">
+            <p style="font-size:9px;color:var(--faint);margin-top:10px">One article, seven sentences</p>
+            <p style="font-size:9.5px;color:var(--muted);line-height:1.7;margin-top:10px">
+              The committee met on Tuesday. It reviewed the proposal line by line.</p>
+            <p style="font-size:9.5px;color:var(--ink);line-height:1.7;background:rgba(185,130,95,.18);border-radius:4px;padding:1px 3px">
+              Three members objected to the timeline.</p>
+            <p style="font-size:9.5px;color:var(--muted);line-height:1.7">
+              A second draft is expected next week. The vote was postponed. No date has been set.</p>
+            <div style="margin-top:16px;font-size:9px;color:var(--faint);line-height:1.5">
+              The arrows moved one line, then stopped: the next sentence had to be picked with the lens again.
+            </div>
+          </div>
+        </div></div>
+      </div>
+
+      <div class="col">
+        <div class="cap now"><span class="dot"></span><span>Now · the whole page</span></div>
+        <div class="phone"><div class="screen">
+          <div class="pad">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px">
+              <span style="font-size:9px;color:var(--faint)">Sentence 2 of 7</span>
+              <span style="display:flex;gap:6px"><span class="ghost">‹</span><span class="ghost">›</span></span>
+            </div>
+            <p style="font-size:9.5px;color:var(--muted);line-height:1.7;margin-top:12px">
+              The committee met on Tuesday. It reviewed the proposal line by line. Three members objected to the timeline.</p>
+            <p style="font-size:9.5px;color:var(--faint);line-height:1.7">
+              A second draft is expected next week. The vote was postponed. No date has been set.</p>
+            <div class="card" style="margin-top:16px">
+              <p class="eyebrow">ENGLISH → GERMAN</p>
+              <p class="say">Es prüfte den Vorschlag Zeile für Zeile.</p>
+            </div>
+            <div style="margin-top:10px;font-size:9px;color:var(--faint);line-height:1.5">
+              The page is read once; the arrows step through it, and only an app that changes underneath makes it read again.
+            </div>
+          </div>
+        </div></div>
+      </div>
+    </div>
+    <ul class="steps"><li data-n="✓">To close this card: say yes on the phone, or tell me what the cut and the Read the whole sentence button should do differently.</li></ul>
+  </section>
+
+  <p class="foot">Lucid 1.0.2 (5) · this sheet lives in design/lucid-before-after.html · nothing here is a live app screen; the right-hand column is the shape the app now draws. What a compile cannot prove is the feel of the 190 ms dissolve, or the bubble over a real app — those are the two things worth your eye.</p>
+</div>
+
+<script>
+/* The two theme demos share one set of faces, so a click can switch both at
+   the same instant and the only difference left is the curve. */
+const FACES = {
+  light: `
+    <div class="status"><span>9:41</span><span>▮▮▮ ▮</span></div>
+    <div class="pad">
+      <div class="top"><div class="mark"><span class="lensmark"></span>Lucid</div>
+        <div class="corner"><span class="glyph">⚙</span><span class="glyph">☾</span></div></div>
+      <h4>Screen translator</h4>
+      <p class="note">Drag the lens over any app. It reads the words underneath and translates them where you left it.</p>
+      <div class="tray"><div class="core">
+        <div class="row"><span class="lab">FROM</span><span>Auto · detect</span></div>
+        <div class="hair"></div>
+        <div class="row"><span class="lab">TO</span><span>English</span></div>
+        <div class="hair"></div>
+        <div class="row"><span class="lab">ENGINE</span><span style="color:var(--clay);font-weight:600">Online</span></div>
+      </div></div>
+      <div class="tray"><div class="core">
+        <div class="row"><span class="ghost" style="border:0;background:var(--band);padding:2px 6px">READY</span></div>
+        <p class="note" style="margin-top:6px">Text access is on. The lens is not running.</p>
+      </div></div>
+      <div class="card" style="background:#2E2C27;border-color:#2E2C27">
+        <p class="eyebrow" style="color:#C2B9A6">SPANISH → ENGLISH</p>
+        <p class="say" style="color:#F3ECDE">Where is the station?</p>
+      </div>
+    </div>`,
+  dark: `
+    <div class="status"><span>9:41</span><span>▮▮▮ ▮</span></div>
+    <div class="pad">
+      <div class="top"><div class="mark"><span class="lensmark"></span>Lucid</div>
+        <div class="corner"><span class="glyph">⚙</span><span class="glyph">☀</span></div></div>
+      <h4>Screen translator</h4>
+      <p class="note">Drag the lens over any app. It reads the words underneath and translates them where you left it.</p>
+      <div class="tray"><div class="core">
+        <div class="row"><span class="lab">FROM</span><span>Auto · detect</span></div>
+        <div class="hair"></div>
+        <div class="row"><span class="lab">TO</span><span>English</span></div>
+        <div class="hair"></div>
+        <div class="row"><span class="lab">ENGINE</span><span style="color:#D6A986;font-weight:600">Online</span></div>
+      </div></div>
+      <div class="tray"><div class="core">
+        <div class="row"><span class="ghost" style="border:0;background:#3A3831;padding:2px 6px">READY</span></div>
+        <p class="note" style="margin-top:6px">Text access is on. The lens is not running.</p>
+      </div></div>
+      <div class="card">
+        <p class="eyebrow" style="color:#D6A986">SPANISH → ENGLISH</p>
+        <p class="say">Where is the station?</p>
+      </div>
+    </div>`
+};
+
+Object.entries(FACES).forEach(([face, html]) => {
+  document.querySelectorAll(`[data-face="${face}"]`).forEach(el => { el.innerHTML = html; });
+});
+
+const state = { before: false, after: false };
+
+function flip(which) {
+  state[which] = !state[which];
+  const dark = document.querySelector(`#${which}Dark`);
+  if (dark) dark.style.opacity = state[which] ? '1' : '0';
+}
+
+document.querySelectorAll('[data-switch]').forEach(button => {
+  button.addEventListener('click', () => flip(button.dataset.switch));
+});
+
+document.querySelector('#play').addEventListener('click', () => {
+  const go = () => { flip('before'); flip('after'); };
+  // Put both back to the light page first, so the comparison starts level.
+  if (state.before || state.after) {
+    flip('before'); flip('after');
+    setTimeout(go, 420);
+  } else {
+    setTimeout(go, 220);
+  }
+});
+</script>
+</body>
+</html>
