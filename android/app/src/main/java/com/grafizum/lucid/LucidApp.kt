@@ -11,5 +11,8 @@ class LucidApp : Application() {
     override fun onCreate() {
         super.onCreate()
         AppLanguage.restore(this)
+        // Packs this version retired — an older word list, a download the phone
+        // cut short — go now, so the phone never carries words nothing can read.
+        UiText.sweep(this)
     }
 }
