@@ -20,6 +20,7 @@ import android.view.Display
 import android.view.accessibility.AccessibilityEvent
 import android.view.accessibility.AccessibilityNodeInfo
 import android.view.accessibility.AccessibilityWindowInfo
+import android.view.inputmethod.InputMethodManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
@@ -287,6 +288,12 @@ class LensAccessibilityService : AccessibilityService() {
         if (pkg.isNullOrBlank()) return
         if (pkg == packageName) return
         if (pkg == SYSTEM_UI) return
+        // A keyboard, a permission sheet, the shade: a window over an app is not
+        // the app leaving. Only something with a screen of its own to open is an
+        // arrival — otherwise typing one word inside a ruled app would read as a
+        // departure and a return, and the rule would put the lens back over the
+        // words the person is writing.
+        if (!isApp(pkg)) return
         if (pkg == foreground) return
         foreground = pkg
 
@@ -295,6 +302,8 @@ class LensAccessibilityService : AccessibilityService() {
             Log.i("LucidA11y", "front=$pkg ruled=$ruled running=${LensService.isRunning}")
         }
         if (!ruled) {
+            // A different app is at the front: the rule for the last one is
+            // spent, and opens again the next time that app is opened.
             lastAuto = null
             return
         }
@@ -309,6 +318,28 @@ class LensAccessibilityService : AccessibilityService() {
         lastAuto = pkg
         runCatching { LensService.start(this) }
             .onFailure { Log.i("LucidA11y", "auto-open refused: ${it.javaClass.simpleName}") }
+    }
+
+    /**
+     * True when [pkg] is an app someone can open: it has a screen to launch and
+     * it is not a keyboard. Both halves matter — Gboard ships a launchable
+     * settings activity, so "has a launcher" alone would count the keyboard as
+     * an app, and a phone with an IME would then re-open the lens on every word.
+     */
+    private fun isApp(pkg: String): Boolean {
+        if (pkg in imePackages) return false
+        return runCatching { packageManager.getLaunchIntentForPackage(pkg) != null }.getOrDefault(false)
+    }
+
+    /** The keyboards installed on this phone, read once and kept. */
+    private val imePackages: Set<String> by lazy {
+        runCatching {
+            getSystemService(InputMethodManager::class.java)
+                ?.enabledInputMethodList
+                ?.mapNotNull { it.packageName }
+                ?.toSet()
+                ?: emptySet()
+        }.getOrDefault(emptySet())
     }
 
     /** The app at the front last, so a rule fires on arrival and not on every
