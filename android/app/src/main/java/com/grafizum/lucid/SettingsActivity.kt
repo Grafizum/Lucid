@@ -569,7 +569,9 @@ class SettingsActivity : AppCompatActivity() {
         dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
         dialog.setContentView(
             LanguagePicker.build(this, Prefs.uiLanguage(this)) { lang ->
-                Prefs.setUiLanguage(this, lang.code)
+                // Remembered and put in force: every screen, this one too, is
+                // redrawn in the chosen language as soon as it is picked.
+                AppLanguage.choose(this, lang.code)
                 dialog.dismiss()
                 paintAppLanguage()
             },
