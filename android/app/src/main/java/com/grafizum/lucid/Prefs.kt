@@ -34,7 +34,15 @@ object Prefs {
      * [UiText] owns that — and until it is, the app's words stay English.
      */
     fun uiLanguage(context: Context): String =
-        sp(context).getString("uiLang", null)?.takeIf { it.isNotBlank() } ?: defaultUiLanguage()
+        storedUiLanguage(context) ?: defaultUiLanguage()
+
+    /**
+     * The language picked in the app, or null while the person has never picked
+     * one — in which case the app follows the phone rather than taking a choice
+     * that was never made.
+     */
+    fun storedUiLanguage(context: Context): String? =
+        sp(context).getString("uiLang", null)?.takeIf { it.isNotBlank() }
 
     fun setUiLanguage(context: Context, code: String) =
         sp(context).edit().putString("uiLang", code).apply()

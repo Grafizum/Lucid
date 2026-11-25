@@ -613,8 +613,13 @@ class MainActivity : AppCompatActivity() {
         val dialog = Dialog(this)
         dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
         dialog.setContentView(
-            LanguagePicker.build(this, Prefs.targetLanguage(this)) { lang ->
+            LanguagePicker.build(this, Prefs.uiLanguage(this)) { lang ->
+                // The word at the top left is the language of the app, so the
+                // whole app is redrawn in it — and the reads come out in it
+                // too, because a page answered in a language other than the
+                // one on screen would be a second, silent setting.
                 Prefs.setTargetLanguage(this, lang.code)
+                AppLanguage.choose(this, lang.code)
                 langPill.text = Languages.nativeShort(lang.code)
                 dialog.dismiss()
             },
@@ -732,7 +737,10 @@ class MainActivity : AppCompatActivity() {
     /* ── state ───────────────────────────────────────────────────────── */
 
     private fun refresh() {
-        langPill.text = Languages.nativeShort(Prefs.targetLanguage(this))
+        // The pill shows the app's own language, not the read target: that is
+        // the setting the person changes on this page, and the one the app is
+        // drawn in.
+        langPill.text = Languages.nativeShort(Prefs.uiLanguage(this))
         val canOverlay = Settings.canDrawOverlays(this)
         val textAccess = LensAccessibilityService.isEnabled(this)
         // A lens put away from the shade's button is not running *on screen*:
