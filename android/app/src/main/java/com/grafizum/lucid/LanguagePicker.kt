@@ -64,6 +64,14 @@ object LanguagePicker {
             if (includeAuto) add(Languages.Lang("auto", "Auto detect", "Auto detect"))
             addAll(Languages.targets)
         }
+
+        // The words this phone already has, read once rather than on every
+        // keystroke: they head the list, so a person can see at a glance which
+        // languages they have used before and which are still the long tail.
+        val here = Languages.targets
+            .filter { UiText.has(context, it.code) }
+            .map { it.code }
+            .toSet()
         // With two hundred-odd languages in the list, the keyboard is the only
         // way to reach one in a single gesture.
         val listHeight = if (searchable) dp(226) else dp(270)
@@ -103,11 +111,28 @@ object LanguagePicker {
             }
         }
 
+        /** A section's name: the language the app speaks, small and quiet. */
+        fun heading(text: String): View = TextView(context).apply {
+            this.text = text
+            setTextColor(faint)
+            textSize = 9f
+            letterSpacing = 0.18f
+            typeface = sans
+            setPadding(0, dp(12), 0, dp(2))
+        }
+
         fun show(query: String) {
             val found = options.filter { Languages.matches(it, query) }
+            val onPhone = found.filter { it.code in here }
+            val rest = found.filter { it.code !in here }
             list.removeAllViews()
             empty.visibility = if (found.isEmpty()) View.VISIBLE else View.GONE
-            found.forEach { list.addView(row(it)) }
+            if (onPhone.isNotEmpty()) {
+                list.addView(heading(UiText.line(context, "ON THIS PHONE") + "  ·  ${onPhone.size}"))
+                onPhone.forEach { list.addView(row(it)) }
+                if (rest.isNotEmpty()) list.addView(heading(UiText.line(context, "MORE LANGUAGES")))
+            }
+            rest.forEach { list.addView(row(it)) }
             list.addView(empty)
         }
 
