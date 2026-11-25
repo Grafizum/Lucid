@@ -117,9 +117,9 @@ class SettingsActivity : AppCompatActivity() {
             // what tells an updated app that the user allowed screen capture.
             Prefs.setLookMode(this, true)
             LensService.startWithCapture(this, result.resultCode, data)
-            say("Screen capture is on — the whole screen, every app.")
+            say(UiText.line(this, "Screen capture is on — the whole screen, every app."))
         } else {
-            say("Screen access declined. Text access alone still works everywhere it can read.")
+            say(UiText.line(this, "Screen access declined. Text access alone still works everywhere it can read."))
         }
         refresh()
     }
@@ -180,11 +180,19 @@ class SettingsActivity : AppCompatActivity() {
 
         // Each heading carries the paragraph that used to sit under it: the
         // page stays a page of rows, and the explanation is a tap away.
-        info(R.id.infoAppLang, "App language", R.string.info_app_lang)
-        info(R.id.infoTarget, "Translate into", R.string.info_target)
-        info(R.id.infoTheme, "Appearance", R.string.info_theme)
-        info(R.id.infoPermissions, "What the lens needs", R.string.info_permissions)
-        info(R.id.infoApps, "Open the lens when the app opens", R.string.info_apps)
+        info(R.id.infoAppLang, "App language", "Two languages, two jobs. This one is the app itself — its tour, its buttons, its own words. English is written in; every other language is translated once by the same online engine the lens uses and then kept on this phone, which is what the arrow downloads. The card below it is the other question: the language a read comes out as, answered online every time, so nothing is ever downloaded for it.")
+        info(R.id.infoTarget, "Translate into", "This is the default for every app. If you pick a language on the lens while it sits over an app, that app keeps its own choice — a chat read into German, a browser into English — and every other app still uses this one.")
+        info(R.id.infoTheme, "Appearance", "The page's own light. System follows the phone, so the app changes when the phone does; Light and Dark hold the app where you put it. The lens, its card and the sheets it opens keep their own dressing either way — they have to read over whatever is underneath them.")
+        info(
+            R.id.infoPermissions,
+            "What the lens needs",
+            "These live in Android's own screens; Lucid can open them but never flips them for you. Steps 1 and 2 are the ground translation stands on, and without both the lens cannot start: float over other apps lets it sit on top of what you are reading, and read text on screen is what lets it see the words under it. A step 3 appears only where the phone will not give a screenshot any other way, and lasts one session. Anything past the optional line can stay off — the quick button is only the tile in the shade.",
+        )
+        info(
+            R.id.infoApps,
+            "Open the lens when the app opens",
+            "Turn one on and the lens comes up over that app whenever it reaches the front — a chat, a game, a page you read every morning. Off is the app left alone. A switch only brings the lens up: nothing is read until you drag it onto something, and it still closes when you clear it. An app you have read into its own language shows a small cross on its row — tap it to forget that app's language and take the page's default back. Nothing else moves.",
+        )
 
         // App language: the row is the pick, the arrow is the download, and the
         // tour is one tap away because the tour is where the words show.
@@ -279,6 +287,9 @@ class SettingsActivity : AppCompatActivity() {
                 View.VISIBLE
             }
         paintApps()
+        // Every line above was written in English; this is where the page is
+        // given the language the pack holds, if the person fetched one.
+        UiText.apply(this, findViewById(R.id.settingsRoot))
     }
 
     /**
@@ -398,12 +409,15 @@ class SettingsActivity : AppCompatActivity() {
 
     /* ── the question marks ──────────────────────────────────────────── */
 
-    /** One heading's explanation: the mark asks, this sheet answers. */
-    private fun info(markId: Int, title: String, bodyRes: Int) {
+    /**
+     * One heading's explanation: the mark asks, this sheet answers. Both are the
+     * app's own words, so both are read through the pack.
+     */
+    private fun info(markId: Int, title: String, body: String) {
         val mark = findViewById<TextView>(markId)
-        mark.contentDescription = getString(R.string.info_mark) + " — " + title
+        mark.contentDescription = getString(R.string.info_mark) + " — " + UiText.line(this, title)
         Press.attach(mark)
-        mark.setOnClickListener { showInfo(title, getString(bodyRes)) }
+        mark.setOnClickListener { showInfo(UiText.line(this, title), UiText.line(this, body)) }
     }
 
     private fun showInfo(title: String, body: String) {
@@ -419,6 +433,7 @@ class SettingsActivity : AppCompatActivity() {
 
         dialog.findViewById<TextView>(R.id.infoTitle).text = title
         dialog.findViewById<TextView>(R.id.infoBody).text = body
+        dialog.window?.decorView?.let { UiText.apply(this, it) }
         val done = dialog.findViewById<View>(R.id.infoDone)
         Press.attach(done)
         done.setOnClickListener { dialog.dismiss() }
@@ -447,7 +462,7 @@ class SettingsActivity : AppCompatActivity() {
             accessibilityLauncher.launch(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
         }
         if (opened.isFailure) {
-            say("Couldn't open Accessibility settings — find Lucid in Settings › Accessibility.")
+            say(UiText.line(this, "Couldn't open Accessibility settings — find Lucid in Settings › Accessibility."))
         }
     }
 
@@ -460,6 +475,7 @@ class SettingsActivity : AppCompatActivity() {
         val dialog = Dialog(this)
         dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
         dialog.setContentView(R.layout.dialog_consent)
+        dialog.window?.decorView?.let { UiText.apply(this, it) }
         dialog.window?.setLayout(
             (resources.displayMetrics.widthPixels * 0.86f).toInt(),
             WindowManager.LayoutParams.WRAP_CONTENT,
@@ -559,8 +575,8 @@ class SettingsActivity : AppCompatActivity() {
         appLangHint.text = when {
             builtIn -> "The app's own words — English is built in."
             fetching == code -> appLangHint.text
-            ready -> "$name is on this phone — the tour reads in it."
-            else -> "Not on this phone — tap the arrow to fetch $name."
+            ready -> UiText.t(this, "appLang.onPhone", name)
+            else -> UiText.t(this, "appLang.notOnPhone", name)
         }
     }
 
@@ -599,18 +615,28 @@ class SettingsActivity : AppCompatActivity() {
         if (code == "en" || fetching != null || UiText.has(this, code)) return
         fetching = code
         paintAppLanguage()
-        appLangHint.text = "Fetching ${Languages.nativeShort(code)}…"
+        appLangHint.text = UiText.t(this, "appLang.fetching", Languages.nativeShort(code))
         fetchJob = CoroutineScope(Dispatchers.Main).launch {
             val result = UiText.download(this@SettingsActivity, code) { done, total ->
-                appLangHint.text = "Fetching ${Languages.nativeShort(code)}… $done/${total}"
+                appLangHint.text = UiText.t(
+                    this@SettingsActivity,
+                    "appLang.progress",
+                    Languages.nativeShort(code),
+                    done,
+                    total,
+                )
             }
             fetching = null
             paintAppLanguage()
             if (isFinishing || isDestroyed) return@launch
             result.onSuccess { count ->
-                say("$count lines in ${Languages.nativeShort(code)} — the tour reads in it now.")
+                say(UiText.t(this@SettingsActivity, "appLang.done", count, Languages.nativeShort(code)))
+                // The page is asked for its words again now that the pack
+                // exists: the lines it was built with are English until a pack
+                // answers them.
+                UiText.apply(this@SettingsActivity, findViewById(R.id.settingsRoot))
             }.onFailure {
-                say("Couldn't reach the translation service. Try again on Wi-Fi.")
+                say(UiText.t(this@SettingsActivity, "appLang.failed"))
             }
         }
     }
@@ -629,7 +655,11 @@ class SettingsActivity : AppCompatActivity() {
             LanguagePicker.build(this, Prefs.targetLanguage(this)) { lang ->
                 Prefs.setTargetLanguage(this, lang.code)
                 targetName.text = Languages.label(lang.code)
-                Toast.makeText(this, "Translating into ${lang.label}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    this,
+                    UiText.line(this, "Translating into %s", lang.label),
+                    Toast.LENGTH_SHORT,
+                ).show()
                 dialog.dismiss()
             },
         )

@@ -68,22 +68,28 @@ class WelcomeActivity : AppCompatActivity() {
             )
             insets
         }
+
+        UiText.apply(this, root)
     }
 
-    /** The chip's word: the language the lens is set to, short enough for a chip. */
+    /** The chip's word: the app's language, short enough for a chip. */
     private fun bindLanguage() {
         // The label alone: the chip is a button, and an arrow beside a name at
         // this size only ever read as noise.
-        language.text = Languages.nativeShort(Prefs.targetLanguage(this))
+        language.text = Languages.nativeShort(Prefs.uiLanguage(this))
     }
 
-    /** The picker the main screen and the tour both use. */
+    /**
+     * The app's language switch — the same one Settings and the tour open, so the
+     * first page of the app and the last one cannot disagree about it.
+     */
     private fun pickLanguage() {
         val dialog = Dialog(this)
         dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
         dialog.setContentView(
-            LanguagePicker.build(this, Prefs.targetLanguage(this)) { lang ->
+            LanguagePicker.build(this, Prefs.uiLanguage(this), title = "APP LANGUAGE") { lang ->
                 Prefs.setTargetLanguage(this, lang.code)
+                AppLanguage.choose(this, lang.code)
                 bindLanguage()
                 dialog.dismiss()
             },

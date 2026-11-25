@@ -201,6 +201,9 @@ class OnboardingActivity : AppCompatActivity() {
         // above them never changes size or moves when the deck is turned. It is
         // measured, not guessed at, so a larger system font still fits.
         reserveHeights()
+
+        // The corner chip and the buttons are the app's own words too.
+        UiText.apply(this, findViewById(R.id.obRoot))
     }
 
     /** Holds the words' blocks at one height, the tallest page's, so the
@@ -456,18 +459,22 @@ class OnboardingActivity : AppCompatActivity() {
         dialog.window?.addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND)
         dialog.window?.setDimAmount(0.42f)
 
-        dialog.findViewById<TextView>(R.id.exitTitle).text = words("exit.title")
-        dialog.findViewById<TextView>(R.id.exitBody).text = words("exit.body")
+        dialog.findViewById<TextView>(R.id.exitTitle).text = UiText.line(this, "Leave the tour?")
+        dialog.findViewById<TextView>(R.id.exitBody).text = UiText.line(
+            this,
+            "The two switches can still be set up from the home page — the card there says what is missing. The tour will not come back on its own.",
+        )
         val stay = dialog.findViewById<TextView>(R.id.exitStay)
         val leave = dialog.findViewById<TextView>(R.id.exitLeave)
-        stay.text = words("exit.stay")
-        leave.text = words("exit.leave")
+        stay.text = UiText.line(this, "Stay")
+        leave.text = UiText.line(this, "Leave")
         Press.attachAll(stay, leave)
         stay.setOnClickListener { dialog.dismiss() }
         leave.setOnClickListener {
             dialog.dismiss()
             finishOnboarding()
         }
+        dialog.window?.decorView?.let { UiText.apply(this, it) }
         dialog.show()
     }
 
