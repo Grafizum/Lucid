@@ -9,10 +9,11 @@
     android:paddingEnd="26dp"
     android:paddingBottom="18dp">
 
-    <!-- The language the lens reads into, in the corner the main screen keeps
-         its chip in, and in that language's own name: "日本語", not "Japanese".
-         Tapping it picks another one before the tour starts. No caption — the
-         corner carries the language alone, as home does. -->
+    <!-- The app's language, in the corner, in that language's own name:
+         "日本語", not "Japanese". It is the one switch for the language: the
+         page it opens is the page Settings opens, and the pick is put in force
+         on every screen at once. No caption — the corner carries the language
+         alone. -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="34dp"

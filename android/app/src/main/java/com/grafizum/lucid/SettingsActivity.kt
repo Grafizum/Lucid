@@ -568,7 +568,9 @@ class SettingsActivity : AppCompatActivity() {
         val dialog = Dialog(this)
         dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
         dialog.setContentView(
-            LanguagePicker.build(this, Prefs.uiLanguage(this)) { lang ->
+            // Named for what it is here: this is the app's own language, not the
+            // language a read comes out as. The row below opens that one.
+            LanguagePicker.build(this, Prefs.uiLanguage(this), title = "APP LANGUAGE") { lang ->
                 // Remembered and put in force: every screen, this one too, is
                 // redrawn in the chosen language as soon as it is picked.
                 AppLanguage.choose(this, lang.code)
