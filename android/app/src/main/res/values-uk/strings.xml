@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="notif_channel">Сеанс лінзи</string>
+    <string name="notif_title">Лінза ввімкнена</string>
+    <string name="notif_text">Торкніться лінзою будь-якого тексту, щоб перекласти його.</string>
+    <string name="notif_stop">Вимкнути</string>
+    <string name="a11y_label">Доступ до тексту Lucid</string>
+    <string name="a11y_summary">Дозволяє лінзі читати текст під нею</string>
+    <string name="a11y_description">Lucid читає текст під своєю лінзою, щоб перекласти його. Він читає лише цей текст, не зберігає копію й нічого не записує. З онлайн-рушієм слова під лінзою разом з рештою екрана як контекстом надсилаються до онлайн-сервісу перекладу; з рушієм на пристрої з телефона нічого не виходить.</string>
+    <string name="lens_close">Відпустіть лінзу тут, щоб вимкнути її</string>
+    <string name="lens_delete">Видалити</string>
+    <string name="tile_label">Лінза Lucid</string>
+    <string name="tile_on">Лінза ввімкнена</string>
+    <string name="tile_off">Лінза вимкнена</string>
+    <string name="picker_search">Пошук серед %1$d мов</string>
+    <string name="picker_none">Жодна мова не підходить.</string>
+</resources>

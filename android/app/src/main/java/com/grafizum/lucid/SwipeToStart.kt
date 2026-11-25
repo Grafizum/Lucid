@@ -97,13 +97,18 @@ class SwipeToStart @JvmOverloads constructor(
     private val density = resources.displayMetrics.density
     private fun dp(value: Float) = value * density
 
-    private val cream50 = color(R.color.cream_50)
-    private val cream100 = color(R.color.cream_100)
-    private val beige300 = color(R.color.beige_300)
-    private val stone600 = color(R.color.stone_600)
-    private val ink900 = color(R.color.ink_900)
-    private val clay400 = color(R.color.clay_400)
-    private val clay600 = color(R.color.clay_600)
+    // The slide is part of the page, so it is dressed from the page's roles —
+    // never from the palette directly. That is what lets the whole screen turn
+    // dark without the control keeping a cream well under a sand label.
+    private val knobHigh = color(R.color.screen_knob_high)
+    private val knobLow = color(R.color.screen_knob_low)
+    private val band = color(R.color.screen_band)
+    private val shell = color(R.color.screen_shell)
+    private val muted = color(R.color.screen_muted)
+    private val ink = color(R.color.screen_ink)
+    private val shade = color(R.color.screen_shade)
+    private val accentSoft = color(R.color.screen_accent_soft)
+    private val accent = color(R.color.screen_accent)
 
     private val typeface = ResourcesCompat.getFont(context, R.font.lucid_sans)
 
@@ -113,7 +118,7 @@ class SwipeToStart @JvmOverloads constructor(
     /** Static sprite: the knob's soft shadow, painted once per size. */
     private var shadowSprite: Bitmap? = null
 
-    private val knobPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = blend(cream100, cream50, 0.55f) }
+    private val knobPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = blend(knobLow, knobHigh, 0.55f) }
 
     /**
      * The drag's answer: a pool of colour under the knob, clipped to the well.
@@ -137,7 +142,11 @@ class SwipeToStart @JvmOverloads constructor(
         textSize = dp(13.5f)
         isSubpixelText = true
         letterSpacing = 0.01f
-        fontVariationSettings = "'wght' 500"
+        // Variable-font axes are Android 8 and later; before that the call does
+        // not exist, so older phones draw the weight the typeface already has.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            fontVariationSettings = "'wght' 500"
+        }
     }
 
     private val glyphPath = Path()
@@ -160,6 +169,15 @@ class SwipeToStart @JvmOverloads constructor(
     private var cooling = false
 
     private var downAt = 0f
+    private var downY = 0f
+
+    /**
+     * A touch that landed on the track rather than on the knob. It is a tap
+     * unless the finger travels: the well answers a tap by running its own
+     * slide, so nobody has to find the handle to start the product.
+     */
+    private var tapCandidate = false
+
     private var progressAtDown = 0f
     private val touchSlop = ViewConfiguration.get(context).scaledTouchSlop
     private val flingPx = dp(900f)
@@ -233,11 +251,11 @@ class SwipeToStart @JvmOverloads constructor(
         val r = h / 2f
         val pill = RectF(0f, 0f, w.toFloat(), h.toFloat())
         val clip = Path().apply { addRoundRect(pill, r, r, Path.Direction.CW) }
-        val blur = dp(5.5f)
+        val blur = dp(4.2f)
 
         // everything that is not the pill: blurred, its edge bleeds inward and
-        // becomes the shadow of a hole. Nudge the hole up and the bleed runs
-        // deeper under the top edge; nudge it down and the light sits on the foot.
+        // becomes the shadow of a hole. Nudged up, the bleed runs under the top
+        // edge, so the track reads as pressed into the page at the top.
         val outside = Path().apply {
             fillType = Path.FillType.EVEN_ODD
             addRect(-blur * 4, -blur * 4, w + blur * 4, h + blur * 4, Path.Direction.CW)
@@ -247,27 +265,27 @@ class SwipeToStart @JvmOverloads constructor(
         canvas.save()
         canvas.clipPath(clip)
 
+        // The track is a real beige surface, not the page's paper showing
+        // through: the knob is cream, and the palette needs somewhere to live
+        // that a thumb can actually cover.
+        canvas.drawColor(band)
+
+        // ONE shadow, at the top. The white lip that used to sit along the foot
+        // is gone: two opposing shades on a 58dp capsule read as a bevel, not as
+        // depth, and a bevel is exactly what a flat 2D control must not be. The
+        // direction carries the statement now — light from above, so the shade
+        // gathers under the top edge and the foot is left clean.
         canvas.save()
-        canvas.translate(0f, -dp(2f))
+        canvas.translate(0f, -dp(2.6f))
         canvas.drawPath(
             outside,
             Paint(Paint.ANTI_ALIAS_FLAG).apply {
-                color = withAlpha(ink900, 0.30f)
+                color = withAlpha(shade, 0.20f)
                 maskFilter = BlurMaskFilter(blur, BlurMaskFilter.Blur.NORMAL)
             },
         )
         canvas.restore()
 
-        canvas.save()
-        canvas.translate(0f, dp(1.8f))
-        canvas.drawPath(
-            outside,
-            Paint(Paint.ANTI_ALIAS_FLAG).apply {
-                color = withAlpha(0xFFFFFFFF.toInt(), 0.78f)
-                maskFilter = BlurMaskFilter(blur, BlurMaskFilter.Blur.NORMAL)
-            },
-        )
-        canvas.restore()
 
         canvas.restore()
 
@@ -281,13 +299,13 @@ class SwipeToStart @JvmOverloads constructor(
         val reach = h * 1.35f
         poolCool = RadialGradient(
             0f, 0f, reach,
-            intArrayOf(withAlpha(beige300, 0.52f), withAlpha(beige300, 0.24f), withAlpha(beige300, 0f)),
+            intArrayOf(withAlpha(shell, 0.30f), withAlpha(shell, 0.13f), withAlpha(shell, 0f)),
             floatArrayOf(0f, 0.58f, 1f),
             Shader.TileMode.CLAMP,
         )
         poolWarm = RadialGradient(
             0f, 0f, reach,
-            intArrayOf(withAlpha(clay400, 0.55f), withAlpha(clay400, 0.26f), withAlpha(clay400, 0f)),
+            intArrayOf(withAlpha(accentSoft, 0.34f), withAlpha(accentSoft, 0.15f), withAlpha(accentSoft, 0f)),
             floatArrayOf(0f, 0.58f, 1f),
             Shader.TileMode.CLAMP,
         )
@@ -303,7 +321,7 @@ class SwipeToStart @JvmOverloads constructor(
         // by exactly that soft edge. So its top lands on the disc's top: the
         // shadow gathers under the knob and all but disappears above it, which
         // is what stops it reading as a halo around a coin.
-        val soft = dp(3.2f)
+        val soft = dp(2.6f)
         val size = ((knobRadius + soft) * 2f).toInt().coerceAtLeast(2)
         val core = knobRadius / (knobRadius + soft)
         shadowSprite?.recycle()
@@ -317,10 +335,10 @@ class SwipeToStart @JvmOverloads constructor(
                 shader = RadialGradient(
                     half, half, half,
                     intArrayOf(
-                        withAlpha(ink900, 0.19f),
-                        withAlpha(ink900, 0.165f),
-                        withAlpha(ink900, 0.085f),
-                        withAlpha(ink900, 0f),
+                        withAlpha(shade, 0.16f),
+                        withAlpha(shade, 0.13f),
+                        withAlpha(shade, 0.05f),
+                        withAlpha(shade, 0f),
                     ),
                     floatArrayOf(0f, core * 0.92f, core, 1f),
                     Shader.TileMode.CLAMP,
@@ -328,7 +346,9 @@ class SwipeToStart @JvmOverloads constructor(
             },
         )
         shadowSprite = bitmap
-        shadowOffset = soft
+        // The knob is the thing that floats, so it casts its own shade a touch
+        // below centre: the separation is the depth the lip used to fake.
+        shadowOffset = soft + dp(1.6f)
     }
 
     /* ── paint ─────────────────────────────────────────────────────── */
@@ -378,7 +398,7 @@ class SwipeToStart @JvmOverloads constructor(
         val alpha = (1f - c / 0.22f).coerceIn(0f, 1f) * labelIn
         if (alpha <= 0.02f) return
 
-        labelPaint.color = blend(withAlpha(stone600, alpha), withAlpha(clay600, alpha), hot)
+        labelPaint.color = blend(withAlpha(muted, alpha), withAlpha(accent, alpha), hot)
         val baseline = h / 2f - (labelPaint.ascent() + labelPaint.descent()) / 2f - dp(2.5f) * c
 
         canvas.save()
@@ -419,7 +439,7 @@ class SwipeToStart @JvmOverloads constructor(
         val s = knobRadius * 0.52f          // glyph half-width, in the well's units
         val mix = checkMix.coerceIn(0f, 1f)
         glyphPaint.strokeWidth = dp(1.7f)
-        glyphPaint.color = blend(withAlpha(ink900, 0.62f), withAlpha(clay600, 1f), hot)
+        glyphPaint.color = blend(withAlpha(ink, 0.62f), withAlpha(accent, 1f), hot)
 
         canvas.save()
         canvas.translate(cx, cy)
@@ -459,7 +479,10 @@ class SwipeToStart @JvmOverloads constructor(
             MotionEvent.ACTION_DOWN -> {
                 if (busy) return false
                 val cx = inset + knobRadius + progress.coerceAtLeast(0f) * travel
-                if (abs(event.x - cx) > knobRadius + dp(10f)) return false
+                // Anywhere on the well is a valid press; only a press outside
+                // its own height belongs to whatever is behind it.
+                if (event.y < 0f || event.y > height.toFloat()) return false
+                val onKnob = abs(event.x - cx) <= knobRadius + dp(10f)
                 cancelIdle()
                 cancelAnimator()
                 checkAnimator?.cancel()
@@ -467,20 +490,35 @@ class SwipeToStart @JvmOverloads constructor(
                 labelIn = 1f
                 cooling = false
                 dragging = true
+                tapCandidate = !onKnob
                 downAt = event.x
+                downY = event.y
                 progressAtDown = progress
                 velocity.clear()
                 velocity.addMovement(event)
                 parent?.requestDisallowInterceptTouchEvent(true)
-                squash(target = 1.03f)
-                if (commitment <= 0.001f) {
-                    performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
+                if (onKnob) {
+                    squash(target = 1.03f)
+                    if (commitment <= 0.001f) {
+                        performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
+                    }
                 }
                 return true
             }
 
             MotionEvent.ACTION_MOVE -> {
                 if (!dragging) return false
+                // A press on the track becomes a drag the moment it travels;
+                // until then it stays a tap and the well does not move.
+                if (tapCandidate) {
+                    if (abs(event.x - downAt) > touchSlop || abs(event.y - downY) > touchSlop) {
+                        tapCandidate = false
+                        downAt = event.x
+                        progressAtDown = progress
+                    } else {
+                        return true
+                    }
+                }
                 velocity.addMovement(event)
                 val raw = progressAtDown + (event.x - downAt) / travel
                 progress = raw.coerceIn(0f, 1f)
@@ -499,6 +537,15 @@ class SwipeToStart @JvmOverloads constructor(
                 if (!dragging) return false
                 dragging = false
                 parent?.requestDisallowInterceptTouchEvent(false)
+                if (tapCandidate) {
+                    // A tap on the track runs the same slide a drag would. It
+                    // is the accessibility path too, so there is one behaviour
+                    // to keep true rather than two.
+                    tapCandidate = false
+                    velocity.clear()
+                    performClick()
+                    return true
+                }
                 velocity.addMovement(event)
                 velocity.computeCurrentVelocity(1000)
                 // a flick counts even when it never reaches the threshold: the
@@ -521,6 +568,11 @@ class SwipeToStart @JvmOverloads constructor(
                 dragging = false
                 parent?.requestDisallowInterceptTouchEvent(false)
                 velocity.clear()
+                if (tapCandidate) {
+                    tapCandidate = false
+                    squash(target = 1f)
+                    return true
+                }
                 settleBack()
                 return true
             }
@@ -576,7 +628,7 @@ class SwipeToStart @JvmOverloads constructor(
         busy = true
         dragging = false
         performHapticFeedback(
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) HapticFeedbackConstants.CONFIRM
+            if (Capabilities.confirmHaptic) HapticFeedbackConstants.CONFIRM
             else HapticFeedbackConstants.LONG_PRESS,
         )
         checkMix = 0f
@@ -600,7 +652,7 @@ class SwipeToStart @JvmOverloads constructor(
         busy = true
         animate(progress, endProgress, 280, land) {
             performHapticFeedback(
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) HapticFeedbackConstants.CONFIRM
+                if (Capabilities.confirmHaptic) HapticFeedbackConstants.CONFIRM
                 else HapticFeedbackConstants.LONG_PRESS,
             )
             animateCheck(1f, 150)

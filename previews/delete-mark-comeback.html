@@ -1,0 +1,287 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Delete mark — comeback styles</title>
+<style>
+  :root { color-scheme: dark; }
+  body {
+    margin: 0; padding: 20px 22px 34px; background: #0C0C0D; color: #E9E2D2;
+    font: 13px/1.45 ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  h1 { font-size: 15px; font-weight: 650; margin: 0 0 3px; letter-spacing: .01em; }
+  p.sub { margin: 0 0 16px; color: #9A9284; font-size: 12px; max-width: 720px; }
+  .grid { display: grid; grid-template-columns: 1fr; gap: 12px; max-width: 800px; }
+  .card { background: #131315; border: 1px solid #232327; border-radius: 14px; padding: 10px 13px 2px; }
+  .head { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
+  .name { font-weight: 650; font-size: 13px; }
+  .tag { font-size: 11px; color: #7F7768; letter-spacing: .02em; white-space: nowrap; }
+  .desc { font-size: 11.5px; color: #9A9284; margin: 1px 0 0; }
+  canvas { display: block; width: 100%; height: 240px; margin: 4px 0 10px; }
+  .bar { display: flex; align-items: center; gap: 10px; margin: 0 0 14px; }
+  button {
+    font: 600 12px/1 ui-sans-serif, system-ui, sans-serif; color: #E9E2D2;
+    background: #1D1D20; border: 1px solid #33333A; border-radius: 9px;
+    padding: 8px 13px; cursor: pointer;
+  }
+  button[aria-pressed="true"] { background: #E9E2D2; color: #121214; border-color: #E9E2D2; }
+  .hint { font-size: 11.5px; color: #7F7768; }
+</style>
+</head>
+<body>
+<h1>The comeback of the rectangle</h1>
+<p class="sub">Each card loops: the bar at rest, the mark opens (the cross, as it does now), then the piece under review — the way the rectangle comes back when the mark folds away. Real sizes and night-theme colours from your phone, the same slice of screen in every card.</p>
+<div class="bar">
+  <button id="slow" aria-pressed="false">Slow motion</button>
+  <span class="hint">one and a half seconds a loop, so the fold comes round often</span>
+</div>
+<div class="grid" id="grid"></div>
+
+<script>
+const W = 1080, H = 2340;
+const BAR = { w: 409, h: 47, top: 2293 };
+const MARK = { w: 189, h: 177, top: 2016, disc: 121 };
+const VIEW_TOP = 1800, VIEW_BOTTOM = 2392;      // the slice every canvas shows
+const RING = '#FBF3E2', FILL = '#191814', PILL = '#211F1B', DEV = '#D7C7F5';
+
+const CYCLE = 1500, OPEN_AT = 200, CLOSE_AT = 900;
+
+const easeInOut    = t => t < .5 ? 4*t*t*t : 1 - Math.pow(-2*t + 2, 3) / 2;
+const easeOutCubic = t => 1 - Math.pow(1 - t, 3);
+const easeOutBack  = t => 1 + 2.6*Math.pow(t-1, 3) + 1.6*Math.pow(t-1, 2);
+
+const styles = [
+  {
+    name: '1 — Snap back', tag: 'instant · what ships now',
+    desc: 'No transition at all: the cross is gone and the rectangle is simply there again, in one frame. Fastest, but the eye is given nothing to follow.',
+    ms: 0, ease: easeInOut,
+  },
+  {
+    name: '2 — Swallowed', tag: '200 ms · ease in-out',
+    desc: 'The disc and the word shrink down towards the edge while they fade, and the rectangle fades in underneath them, so the cross looks drawn into the bar.',
+    ms: 200, ease: easeInOut,
+  },
+  {
+    name: '3 — Cross-fade', tag: '150 ms · linear',
+    desc: 'Nothing moves: the cross fades out where it stands and the rectangle fades in at its resting size. The calmest of the five.',
+    ms: 150, ease: t => t,
+  },
+  {
+    name: '4 — Fall into the edge', tag: '220 ms · ease out cubic',
+    desc: 'The cross drops about 60 px towards the edge as it fades, and the rectangle arrives as it lands. Reads as the mark being let go of.',
+    ms: 220, ease: easeOutCubic,
+  },
+  {
+    name: '5 — Drawn back out', tag: '240 ms · ease in-out',
+    desc: 'The cross goes quickly and the rectangle grows out of the middle of its line, outwards to full width and up to full height, as if the edge drew it again.',
+    ms: 240, ease: easeInOut,
+  },
+  {
+    name: '6 — Land and settle', tag: '230 ms · ease out, 3 px dip',
+    desc: 'The cross fades as it drops, and the rectangle arrives from 3 px below its seat with a small spring back, so the comeback has a landing.',
+    ms: 230, ease: easeOutBack,
+  },
+];
+
+function archPath(ctx, w, h, bottom, radius) {
+  const x = -w/2, y = bottom - h, r = Math.min(radius, h/2, w/2);
+  ctx.beginPath();
+  ctx.moveTo(x, bottom);
+  ctx.lineTo(x, y + r);
+  ctx.quadraticCurveTo(x, y, x + r, y);
+  ctx.lineTo(-x - r, y);
+  ctx.quadraticCurveTo(-x, y, -x, y + r);
+  ctx.lineTo(-x, bottom);
+}
+
+function drawBar(ctx, alpha, w = BAR.w, h = BAR.h, dy = 0) {
+  if (alpha <= 0.001 || w <= 1 || h <= 1) return;
+  ctx.save();
+  ctx.globalAlpha = alpha;
+  ctx.translate(0, dy);
+  ctx.fillStyle = FILL;
+  archPath(ctx, w, h, 0, 23.5); ctx.fill();
+  ctx.strokeStyle = RING; ctx.lineWidth = 2.4;
+  archPath(ctx, w, h, 0, 23.5); ctx.stroke();
+  ctx.restore();
+}
+
+function drawMark(ctx, alpha, scale = 1, dy = 0) {
+  if (alpha <= 0.001) return;
+  const cy = MARK.top + MARK.disc / 2;
+  ctx.save();
+  ctx.globalAlpha = alpha;
+  ctx.translate(W / 2, cy + dy);
+  ctx.scale(scale, scale);
+  // disc
+  ctx.beginPath(); ctx.arc(0, 0, MARK.disc / 2, 0, Math.PI * 2);
+  ctx.fillStyle = FILL; ctx.fill();
+  ctx.strokeStyle = RING; ctx.lineWidth = 2.4; ctx.stroke();
+  // cross
+  ctx.strokeStyle = RING; ctx.lineWidth = 2.6; ctx.lineCap = 'round';
+  ctx.beginPath();
+  ctx.moveTo(-17, 0); ctx.lineTo(17, 0);
+  ctx.moveTo(0, -17); ctx.lineTo(0, 17);
+  ctx.stroke();
+  ctx.restore();
+
+  // pill + word, in the mark's own frame below the disc
+  ctx.save();
+  ctx.globalAlpha = alpha;
+  ctx.translate(W / 2, MARK.top + MARK.disc + 10 + 23 + dy);
+  ctx.scale(scale, scale);
+  const pw = MARK.w, ph = 46, r = 23;
+  ctx.beginPath();
+  ctx.moveTo(-pw/2 + r, -ph/2);
+  ctx.lineTo(pw/2 - r, -ph/2);
+  ctx.quadraticCurveTo(pw/2, -ph/2, pw/2, -ph/2 + r);
+  ctx.lineTo(pw/2, ph/2 - r);
+  ctx.quadraticCurveTo(pw/2, ph/2, pw/2 - r, ph/2);
+  ctx.lineTo(-pw/2 + r, ph/2);
+  ctx.quadraticCurveTo(-pw/2, ph/2, -pw/2, ph/2 - r);
+  ctx.lineTo(-pw/2, -ph/2 + r);
+  ctx.quadraticCurveTo(-pw/2, -ph/2, -pw/2 + r, -ph/2);
+  ctx.fillStyle = PILL; ctx.fill();
+  ctx.strokeStyle = 'rgba(251,243,226,0.55)'; ctx.lineWidth = 2; ctx.stroke();
+  ctx.fillStyle = RING;
+  ctx.font = '500 26px ui-sans-serif, system-ui, sans-serif';
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText('Delete', 0, 1);
+  ctx.restore();
+}
+
+const grid = document.getElementById('grid');
+const panels = styles.map(style => {
+  const card = document.createElement('div');
+  card.className = 'card';
+  card.innerHTML = `<div class="head"><span class="name">${style.name}</span><span class="tag">${style.tag}</span></div>
+    <div class="desc">${style.desc}</div>`;
+  const canvas = document.createElement('canvas');
+  card.appendChild(canvas);
+  grid.appendChild(card);
+  return { style, canvas, ctx: canvas.getContext('2d') };
+});
+
+function size() {
+  const dpr = window.devicePixelRatio || 1;
+  for (const p of panels) {
+    const w = p.canvas.clientWidth, h = p.canvas.clientHeight;
+    p.canvas.width = Math.round(w * dpr);
+    p.canvas.height = Math.round(h * dpr);
+    p.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+}
+new ResizeObserver(size).observe(document.body);
+size();
+
+function drawPanel(p, now) {
+  const { ctx, canvas, style } = p;
+  const cw = canvas.clientWidth, ch = canvas.clientHeight;
+  ctx.clearRect(0, 0, cw, ch);
+
+  const scale = Math.min(cw / W, ch / (VIEW_BOTTOM - VIEW_TOP));
+  ctx.save();
+  ctx.translate((cw - W * scale) / 2, ch - (VIEW_BOTTOM - VIEW_TOP) * scale);
+  ctx.scale(scale, scale);
+  ctx.translate(0, -VIEW_TOP);
+
+  const phase = now % CYCLE;
+  const bottom = BAR.top + BAR.h;          // the screen edge line
+  let open = 1, barAlpha = 1, markAlpha = 1, markScale = 1, markDy = 0;
+  let barW = BAR.w, barH = BAR.h, barDy = 0, label = 'rest';
+
+  if (phase < OPEN_AT) {
+    open = 0; markAlpha = 0;
+  } else if (phase < OPEN_AT + 120) {
+    open = 1; markAlpha = 1; barAlpha = 0; label = 'open';
+  } else if (phase < CLOSE_AT) {
+    open = 1; markAlpha = 1; barAlpha = 0; label = 'open';
+  } else {
+    const span = Math.max(style.ms, 1);
+    const raw = (phase - CLOSE_AT) / span;
+    if (raw >= 1) {
+      open = 0; markAlpha = 0;
+    } else {
+      const e = style.ease(Math.min(raw, 1));
+      label = 'coming back';
+      if (style.name.startsWith('1')) {
+        open = 0; markAlpha = 0;
+      } else if (style.name.startsWith('2')) {
+        markAlpha = Math.max(0, 1 - e * 1.25);
+        markScale = 1 - 0.55 * e;
+        barAlpha = Math.min(1, Math.max(0, (e - 0.35) / 0.65));
+      } else if (style.name.startsWith('3')) {
+        markAlpha = 1 - e; barAlpha = e;
+      } else if (style.name.startsWith('4')) {
+        markAlpha = Math.max(0, 1 - e * 1.15);
+        markDy = 60 * e;
+        barAlpha = Math.min(1, e * 1.3);
+      } else if (style.name.startsWith('5')) {
+        markAlpha = Math.max(0, 1 - e * 2.4);
+        barAlpha = Math.min(1, e * 1.5);
+        const g = Math.min(1, Math.max(0, (e - 0.15) / 0.85));
+        barW = BAR.w * (0.18 + 0.82 * g);
+        barH = BAR.h * (0.35 + 0.65 * g);
+      } else {
+        markAlpha = Math.max(0, 1 - e * 1.4);
+        markDy = 40 * Math.min(e, 1);
+        barAlpha = Math.min(1, e * 1.6);
+        if (e > 1) barDy = (e - 1) * 90;   // the dip below the seat
+      }
+    }
+  }
+
+  // The lens is at the bottom edge in every card: kept still, out of frame.
+  // Faint guide: where the resting bar sits.
+  ctx.save();
+  ctx.translate(W / 2, 0);
+  ctx.globalAlpha = 0.10;
+  ctx.strokeStyle = RING; ctx.lineWidth = 1.4; ctx.setLineDash([8, 10]);
+  archPath(ctx, BAR.w, BAR.h, bottom, 23.5); ctx.stroke();
+  ctx.restore();
+
+  ctx.save();
+  ctx.translate(W / 2, bottom);             // the bar sits on the edge, centred
+  drawBar(ctx, barAlpha, barW, barH, barDy);
+  ctx.restore();
+
+  // the system's grabber, drawn over the bar as it is on the phone, so the
+  // rectangle is judged against something that never moves
+  ctx.save();
+  ctx.globalAlpha = 0.45;
+  ctx.strokeStyle = DEV; ctx.lineWidth = 9; ctx.lineCap = 'round';
+  ctx.beginPath();
+  ctx.moveTo(W / 2 - 152, bottom - 22); ctx.lineTo(W / 2 + 152, bottom - 22);
+  ctx.stroke();
+  ctx.restore();
+
+  if (open) drawMark(ctx, markAlpha, markScale, markDy);
+
+  ctx.fillStyle = 'rgba(233,226,210,0.45)';
+  ctx.font = '500 26px ui-sans-serif, system-ui, sans-serif';
+  ctx.textAlign = 'left'; ctx.textBaseline = 'top';
+  ctx.fillText(label, 28, VIEW_TOP + 22);
+
+  ctx.restore();
+}
+
+// A clock the slow motion button can stretch, so a 200 ms hand-back can be
+// watched at a third of its speed.
+let simMs = 0, lastFrame = 0, speed = 1;
+document.getElementById('slow').addEventListener('click', e => {
+  speed = speed === 1 ? 0.3 : 1;
+  e.currentTarget.setAttribute('aria-pressed', String(speed !== 1));
+  e.currentTarget.textContent = speed === 1 ? 'Slow motion' : 'Normal speed';
+});
+
+function frame(now) {
+  if (!lastFrame) lastFrame = now;
+  simMs += (now - lastFrame) * speed;
+  lastFrame = now;
+  for (const p of panels) drawPanel(p, simMs);
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>

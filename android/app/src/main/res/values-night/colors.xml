@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The same page at night, built to the same standard as the paper one.
+
+     Not the paper page with the lights turned out: a deep neutral charcoal with a
+     clear stair of surfaces — canvas, tray, shell, card, chip — so each layer sits
+     visibly above the one behind it, and inks held far enough above those surfaces
+     to read at 9sp. Every pair used by the screen is measured: ink 13:1 on a card,
+     muted 9:1, faint 6.2:1 (was 4.1:1, which is what made the small labels look
+     washed out), accent 8.6:1. Hairlines went from 10% to 20% and dividers from
+     20% to 30% of cream, so the edges of a card are drawn rather than suggested. -->
+<resources>
+
+    <color name="screen_canvas">#131210</color>
+    <color name="screen_band">#1B1916</color>
+    <color name="screen_shell">#211F1A</color>
+    <color name="screen_card">#2A2722</color>
+    <color name="screen_knob_low">#302D27</color>
+    <color name="screen_knob_high">#3D3931</color>
+    <color name="screen_chip">#302D27</color>
+    <color name="screen_button">#2E2B26</color>
+    <color name="screen_dot">#7A7160</color>
+    <color name="screen_ok">#BCCE90</color>
+    <color name="screen_ok_ink">#C3D398</color>
+    <color name="screen_edge">#33FCF8F1</color>
+    <color name="screen_divider">#4DFCF8F1</color>
+    <color name="screen_ink">#F7F1E5</color>
+    <color name="screen_muted">#D8CEBA</color>
+    <color name="screen_faint">#C2B8A4</color>
+    <color name="screen_accent">#E9BC96</color>
+    <!-- On the night page the accent already reads on its own fill; this is a
+         shade lighter so the small chip labels clear 6:1 as the day ones do. -->
+    <color name="screen_accent_ink">#F3D8BC</color>
+    <color name="screen_accent_soft">#D8A87F</color>
+    <color name="screen_accent_fill">#3DE9BC96</color>
+    <color name="screen_accent_edge">#73E9BC96</color>
+    <color name="screen_shade">#000000</color>
+    <color name="screen_well">#1B1916</color>
+    <color name="screen_well_shade">#4D000000</color>
+    <color name="screen_well_rim">#73B39D7C</color>
+
+    <!-- The lens's chrome, as it has always been dressed at night: the machined
+         charcoal disc, a cream hairline, cream glyphs. The day theme keeps these
+         roles but points them at paper and ink, so the lens belongs to whichever
+         page the app is on. -->
+    <!-- At night the page is already dark, so the buttons sit on their own
+         contrast whatever the version and the bar can stay transparent. -->
+    <color name="nav_bar">@android:color/transparent</color>
+
+    <color name="lens_surface">#CC191814</color>
+    <color name="lens_surface_high">#383429</color>
+    <color name="lens_ring">#F2FBF3E2</color>
+    <color name="lens_glyph">#FCF8F1</color>
+    <color name="lens_glyph_soft">#D3A582</color>
+    <color name="lens_label">#B3191814</color>
+    <color name="lens_label_edge">#00FFFFFF</color>
+
+    <!-- The lip at night is the charcoal handle with the cream hairline it has
+         always had. -->
+    <color name="lens_lip_surface">#CC191814</color>
+    <color name="lens_lip_ring">#F2FBF3E2</color>
+
+    <!-- The translation card sits on the same stair as the screen, so the card the
+         lens opens at night is the dark page's own paper, not a separate palette. -->
+    <color name="card_surface">#2A2722</color>
+    <color name="card_edge">#33FCF8F1</color>
+    <color name="card_ink">#F7F1E5</color>
+    <color name="card_muted">#D2C8B4</color>
+    <color name="card_faint">#B0A692</color>
+    <color name="card_accent">#E9BC96</color>
+    <color name="card_accent_ink">#F3D8BC</color>
+    <color name="card_warn">#EBCE97</color>
+    <color name="card_danger">#E7AFA2</color>
+    <color name="card_chip_fill">#1FFCF8F1</color>
+    <color name="card_chip_edge">#33FCF8F1</color>
+    <color name="card_chip_accent_fill">#3DE9BC96</color>
+    <color name="card_chip_accent_edge">#73E9BC96</color>
+
+</resources>

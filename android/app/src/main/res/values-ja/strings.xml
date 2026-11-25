@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="notif_channel">レンズのセッション</string>
+    <string name="notif_title">レンズはオンです</string>
+    <string name="notif_text">レンズを任意のテキストに合わせてタップすると翻訳します。</string>
+    <string name="notif_stop">オフにする</string>
+    <string name="a11y_label">Lucid のテキストアクセス</string>
+    <string name="a11y_summary">レンズが下にあるテキストを読めるようにします</string>
+    <string name="a11y_description">Lucid はレンズの下にあるテキストを読み取って翻訳します。読み取るのはそのテキストだけで、コピーも記録も残しません。オンラインエンジンでは、レンズの下の単語がその画面の残りを文脈としてオンライン翻訳サービスに送信されます。デバイス上のエンジンでは、何もスマートフォンの外に出ません。</string>
+    <string name="lens_close">ここにレンズをドロップするとオフになります</string>
+    <string name="lens_delete">削除</string>
+    <string name="tile_label">Lucid レンズ</string>
+    <string name="tile_on">レンズ オン</string>
+    <string name="tile_off">レンズ オフ</string>
+    <string name="picker_search">%1$d 言語を検索</string>
+    <string name="picker_none">一致する言語がありません。</string>
+</resources>

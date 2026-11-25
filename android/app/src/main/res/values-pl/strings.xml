@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="notif_channel">Sesja lupy</string>
+    <string name="notif_title">Lupa jest włączona</string>
+    <string name="notif_text">Dotknij lupą dowolnego tekstu, aby go przetłumaczyć.</string>
+    <string name="notif_stop">Wyłącz</string>
+    <string name="a11y_label">Dostęp do tekstu Lucid</string>
+    <string name="a11y_summary">Pozwala lupie czytać tekst pod nią</string>
+    <string name="a11y_description">Lucid czyta tekst znajdujący się pod lupą, aby go przetłumaczyć. Czyta tylko ten tekst, nie zachowuje kopii i niczego nie zapisuje. Przy silniku online słowa pod lupą są wysyłane do internetowej usługi tłumaczeniowej wraz z resztą ekranu jako kontekstem; przy silniku na urządzeniu nic nie opuszcza telefonu.</string>
+    <string name="lens_close">Upuść lupę tutaj, aby ją wyłączyć</string>
+    <string name="lens_delete">Usuń</string>
+    <string name="tile_label">Lupa Lucid</string>
+    <string name="tile_on">Lupa włączona</string>
+    <string name="tile_off">Lupa wyłączona</string>
+    <string name="picker_search">Przeszukaj %1$d języków</string>
+    <string name="picker_none">Żaden język nie pasuje.</string>
+</resources>

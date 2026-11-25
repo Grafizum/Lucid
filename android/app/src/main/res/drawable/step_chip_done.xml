@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The same step, done: filled with the page's olive. The numeral is drawn in
+     the canvas colour, which is dark on the light olive of the night theme and
+     light on the deep olive of the day theme. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="oval">
+    <solid android:color="@color/screen_ok" />
+    <size android:width="18dp" android:height="18dp" />
+</shape>

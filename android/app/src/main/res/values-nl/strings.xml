@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="notif_channel">Lenssessie</string>
+    <string name="notif_title">Lens staat aan</string>
+    <string name="notif_text">Tik met de lens op tekst om die te vertalen.</string>
+    <string name="notif_stop">Uitzetten</string>
+    <string name="a11y_label">Lucid-teksttoegang</string>
+    <string name="a11y_summary">Laat de lens de tekst eronder lezen</string>
+    <string name="a11y_description">Lucid leest de tekst onder zijn lens om die te kunnen vertalen. Het leest alleen die tekst, bewaart geen kopie en legt niets vast. Met de online-engine worden de woorden onder de lens samen met de rest van dat scherm als context naar een online vertaaldienst gestuurd; met de engine op het toestel verlaat niets de telefoon.</string>
+    <string name="lens_close">Laat de lens hier los om hem uit te zetten</string>
+    <string name="lens_delete">Verwijderen</string>
+    <string name="tile_label">Lucid-lens</string>
+    <string name="tile_on">Lens aan</string>
+    <string name="tile_off">Lens uit</string>
+    <string name="picker_search">Zoek in %1$d talen</string>
+    <string name="picker_none">Geen taal komt overeen.</string>
+</resources>

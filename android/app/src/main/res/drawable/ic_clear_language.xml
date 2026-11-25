@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The clear on an app's own language: a cross, nothing else. It sits on the
+     row of the app that carries the choice, takes the accent ink the language
+     chips use, and is the whole button — a word here would cost the row its
+     width for something the accent already says. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+
+    <path
+        android:pathData="M8.2,8.2 L15.8,15.8 M15.8,8.2 L8.2,15.8"
+        android:strokeWidth="1.7"
+        android:strokeColor="@color/screen_accent_ink"
+        android:strokeLineCap="round" />
+</vector>
