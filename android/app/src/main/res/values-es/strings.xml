@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="notif_channel">Sesión de la lente</string>
+    <string name="notif_title">La lente está activa</string>
+    <string name="notif_text">Toca con la lente cualquier texto para traducirlo.</string>
+    <string name="notif_stop">Apagar</string>
+    <string name="a11y_label">Acceso al texto de Lucid</string>
+    <string name="a11y_summary">Permite que la lente lea el texto que tiene debajo</string>
+    <string name="a11y_description">Lucid lee el texto que está bajo su lente para poder traducirlo. Solo lee ese texto, no guarda ninguna copia y no registra nada. Con el motor en línea, las palabras bajo la lente se envían a un servicio de traducción en línea junto con el resto de esa pantalla como contexto; con el motor en el dispositivo, nada sale del teléfono.</string>
+    <string name="lens_close">Suelta la lente aquí para apagarla</string>
+    <string name="lens_delete">Eliminar</string>
+    <string name="tile_label">Lente de Lucid</string>
+    <string name="tile_on">Lente activa</string>
+    <string name="tile_off">Lente desactivada</string>
+    <string name="picker_search">Buscar entre %1$d idiomas</string>
+    <string name="picker_none">Ningún idioma coincide.</string>
+</resources>

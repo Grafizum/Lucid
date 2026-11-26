@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="notif_channel">렌즈 세션</string>
+    <string name="notif_title">렌즈가 켜져 있습니다</string>
+    <string name="notif_text">렌즈를 아무 텍스트에 대고 탭하면 번역합니다.</string>
+    <string name="notif_stop">끄기</string>
+    <string name="a11y_label">Lucid 텍스트 접근</string>
+    <string name="a11y_summary">렌즈가 아래의 텍스트를 읽도록 허용합니다</string>
+    <string name="a11y_description">Lucid는 렌즈 아래의 텍스트를 읽어 번역합니다. 오직 그 텍스트만 읽고, 사본을 남기지 않으며, 아무것도 기록하지 않습니다. 온라인 엔진에서는 렌즈 아래의 단어가 화면의 나머지 부분과 함께 문맥으로 온라인 번역 서비스에 전송됩니다. 기기 내 엔진에서는 아무것도 휴대전화를 떠나지 않습니다.</string>
+    <string name="lens_close">렌즈를 끄려면 여기에 놓으세요</string>
+    <string name="lens_delete">삭제</string>
+    <string name="tile_label">Lucid 렌즈</string>
+    <string name="tile_on">렌즈 켜짐</string>
+    <string name="tile_off">렌즈 꺼짐</string>
+    <string name="picker_search">%1$d개 언어 검색</string>
+    <string name="picker_none">일치하는 언어가 없습니다.</string>
+</resources>

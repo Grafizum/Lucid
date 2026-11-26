@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Asked when Back is pressed on the tour's first page, or on its Back button
+     when there is no earlier loop to turn to: a card of the page's own paper,
+     the plain words, and the quiet answer first so leaving is never the path of
+     least resistance. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/dialog_sheet_bg"
+    android:orientation="vertical"
+    android:paddingStart="20dp"
+    android:paddingTop="20dp"
+    android:paddingEnd="20dp"
+    android:paddingBottom="14dp">
+
+    <TextView
+        android:id="@+id/exitTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/lucid_sans"
+        android:letterSpacing="-0.015"
+        android:text="Leave the tour?"
+        android:textColor="@color/screen_ink"
+        android:textFontWeight="600"
+        android:textSize="18sp" />
+
+    <TextView
+        android:id="@+id/exitBody"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:fontFamily="@font/lucid_sans"
+        android:lineSpacingMultiplier="1.5"
+        android:text="The two switches can still be set up from the home page — the card there says what is missing. The tour will not come back on its own."
+        android:textColor="@color/screen_muted"
+        android:textSize="12.5sp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/exitStay"
+            android:layout_width="0dp"
+            android:layout_height="42dp"
+            android:layout_weight="1"
+            android:background="@drawable/btn_ghost"
+            android:clickable="true"
+            android:focusable="true"
+            android:fontFamily="@font/lucid_sans"
+            android:gravity="center"
+            android:text="Stay"
+            android:textColor="@color/screen_ink"
+            android:textFontWeight="500"
+            android:textSize="12.5sp" />
+
+        <TextView
+            android:id="@+id/exitLeave"
+            android:layout_width="0dp"
+            android:layout_height="42dp"
+            android:layout_marginStart="8dp"
+            android:layout_weight="1"
+            android:background="@drawable/btn_primary"
+            android:clickable="true"
+            android:focusable="true"
+            android:fontFamily="@font/lucid_sans"
+            android:gravity="center"
+            android:text="Leave"
+            android:textColor="@color/btn_primary_ink"
+            android:textFontWeight="600"
+            android:textSize="12.5sp" />
+    </LinearLayout>
+</LinearLayout>

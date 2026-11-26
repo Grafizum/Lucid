@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- What one question mark explains: a title, a paragraph, and the way out. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/dialog_sheet_bg"
+    android:orientation="vertical"
+    android:paddingStart="20dp"
+    android:paddingTop="20dp"
+    android:paddingEnd="20dp"
+    android:paddingBottom="14dp">
+
+    <TextView
+        android:id="@+id/infoTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/lucid_sans"
+        android:letterSpacing="-0.015"
+        android:text="Translate into"
+        android:textColor="@color/screen_ink"
+        android:textFontWeight="600"
+        android:textSize="18sp" />
+
+    <TextView
+        android:id="@+id/infoBody"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:fontFamily="@font/lucid_sans"
+        android:lineSpacingMultiplier="1.5"
+        android:textColor="@color/screen_muted"
+        android:textSize="12.5sp" />
+
+    <TextView
+        android:id="@+id/infoDone"
+        android:layout_width="match_parent"
+        android:layout_height="42dp"
+        android:layout_marginTop="16dp"
+        android:background="@drawable/btn_ghost"
+        android:clickable="true"
+        android:focusable="true"
+        android:fontFamily="@font/lucid_sans"
+        android:gravity="center"
+        android:text="Got it"
+        android:textColor="@color/screen_ink"
+        android:textFontWeight="500"
+        android:textSize="12.5sp" />
+</LinearLayout>

@@ -80,6 +80,19 @@ class ScreenCapturer(private val context: Context) {
         }
     }
 
+    /**
+     * The screen changed shape — a rotation, a display-size change. The mirror
+     * is rebuilt at the new size on the projection already held, so a frame
+     * keeps lining up with the lens. Returns false when there is no session to
+     * rebuild, which is the same answer [attach] would give.
+     */
+    fun resize(w: Int, h: Int, densityDpi: Int): Boolean {
+        val held = projection ?: return false
+        if (w <= 0 || h <= 0) return false
+        if (w == width && h == height) return true
+        return attach(held, w, h, densityDpi)
+    }
+
     /** The newest frame, cropped to [rect] (in screen pixels). Null if none yet. */
     fun grab(rect: Rect): Bitmap? {
         val imageReader = reader ?: return null

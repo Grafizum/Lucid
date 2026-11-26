@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The offline languages page: what the lens can read with nothing leaving the
+     phone. Paper like Recent reads, and the same corner button.
+
+     The rows themselves are built in ModelsActivity, because each one holds a
+     state that moves — adding, on the phone, removable — and a row that changes
+     its mind should not be a layout that cannot. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/modelsRoot"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/screen_canvas"
+    android:orientation="vertical"
+    android:paddingStart="24dp"
+    android:paddingTop="14dp"
+    android:paddingEnd="24dp"
+    android:paddingBottom="18dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="44dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:id="@+id/modelsBack"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:layout_marginStart="-12dp"
+            android:clickable="true"
+            android:contentDescription="Back"
+            android:focusable="true"
+            android:padding="12dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/ic_back" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:fontFamily="@font/lucid_sans"
+            android:includeFontPadding="false"
+            android:letterSpacing="-0.01"
+            android:maxLines="1"
+            android:text="Offline models"
+            android:textColor="@color/screen_ink"
+            android:textFontWeight="600"
+            android:textSize="13sp" />
+    </LinearLayout>
+
+    <ScrollView
+        android:id="@+id/modelsScroll"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:clipToPadding="false"
+        android:paddingBottom="10dp"
+        android:scrollbars="none">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:fontFamily="@font/lucid_sans"
+                android:letterSpacing="-0.022"
+                android:lineSpacingMultiplier="1.15"
+                android:text="Languages on this phone"
+                android:textColor="@color/screen_ink"
+                android:textFontWeight="650"
+                android:textSize="25sp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="7dp"
+                android:fontFamily="@font/lucid_sans"
+                android:lineSpacingMultiplier="1.42"
+                android:text="Add a language once and the lens reads it with nothing leaving the phone."
+                android:textColor="@color/screen_muted"
+                android:textSize="12sp" />
+
+            <!-- A pill, not a box: the page has no straight corners anywhere, and
+                 the magnifier sits in the end of the well where the eye looks. -->
+            <EditText
+                android:id="@+id/modelsSearch"
+                android:layout_width="match_parent"
+                android:layout_height="46dp"
+                android:layout_marginTop="15dp"
+                android:background="@drawable/btn_ghost"
+                android:drawableStart="@drawable/ic_search"
+                android:drawablePadding="10dp"
+                android:fontFamily="@font/lucid_sans"
+                android:importantForAutofill="no"
+                android:inputType="text"
+                android:maxLines="1"
+                android:paddingStart="17dp"
+                android:paddingEnd="17dp"
+                android:textColor="@color/screen_ink"
+                android:textColorHint="@color/screen_faint"
+                android:textSize="13sp"
+                android:textStyle="normal" />
+
+            <!-- The two section labels carry a glyph the way the settings page's
+                 eyebrows do, so the page can be read at a glance: the phone for
+                 what is already here, the globe for what can be added. -->
+            <!-- The id on the row hides the glyph with the words: an icon
+                 above an empty list would be a heading for nothing. -->
+            <LinearLayout
+                android:id="@+id/modelsOnRow"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingStart="2dp"
+                android:paddingTop="19dp"
+                android:paddingBottom="8dp"
+                android:visibility="gone">
+
+                <ImageView
+                    android:layout_width="13dp"
+                    android:layout_height="13dp"
+                    android:layout_marginEnd="6dp"
+                    android:contentDescription="@null"
+                    android:importantForAccessibility="no"
+                    android:src="@drawable/ic_sec_device" />
+
+                <TextView
+                    android:id="@+id/modelsOnLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/lucid_sans"
+                    android:includeFontPadding="false"
+                    android:letterSpacing="0.14"
+                    android:text="ON THIS PHONE"
+                    android:textColor="@color/screen_faint"
+                    android:textFontWeight="600"
+                    android:textSize="8.5sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/modelsOnList"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" />
+
+            <!-- Same rule as the row above: the glyph hides with its words. -->
+            <LinearLayout
+                android:id="@+id/modelsAddRow"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingStart="2dp"
+                android:paddingTop="19dp"
+                android:paddingBottom="8dp">
+
+                <ImageView
+                    android:layout_width="13dp"
+                    android:layout_height="13dp"
+                    android:layout_marginEnd="6dp"
+                    android:contentDescription="@null"
+                    android:importantForAccessibility="no"
+                    android:src="@drawable/ic_sec_language" />
+
+                <TextView
+                    android:id="@+id/modelsAddLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/lucid_sans"
+                    android:includeFontPadding="false"
+                    android:letterSpacing="0.14"
+                    android:text="MORE LANGUAGES"
+                    android:textColor="@color/screen_faint"
+                    android:textFontWeight="600"
+                    android:textSize="8.5sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/modelsAddList"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" />
+
+            <TextView
+                android:id="@+id/modelsEmpty"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="18dp"
+                android:fontFamily="@font/lucid_sans"
+                android:lineSpacingMultiplier="1.45"
+                android:text="No language matches that."
+                android:textColor="@color/screen_faint"
+                android:textSize="12.5sp"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/modelsNote"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="18dp"
+                android:fontFamily="@font/lucid_sans"
+                android:lineSpacingMultiplier="1.45"
+                android:text="@string/models_note"
+                android:textColor="@color/screen_faint"
+                android:textSize="10.5sp" />
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>

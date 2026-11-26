@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="notif_channel">Linsensitzung</string>
+    <string name="notif_title">Linse ist an</string>
+    <string name="notif_text">Tippe mit der Linse auf einen Text, um ihn zu übersetzen.</string>
+    <string name="notif_stop">Ausschalten</string>
+    <string name="a11y_label">Lucid-Textzugriff</string>
+    <string name="a11y_summary">Lässt die Linse den Text darunter lesen</string>
+    <string name="a11y_description">Lucid liest den Text unter seiner Linse, um ihn zu übersetzen. Es liest nur diesen Text, behält keine Kopie und zeichnet nichts auf. Mit der Online-Engine werden die Wörter unter der Linse zusammen mit dem übrigen Bildschirm als Kontext an einen Online-Übersetzungsdienst gesendet; mit der Engine auf dem Gerät verlässt nichts das Telefon.</string>
+    <string name="lens_close">Linse hier ablegen, um sie auszuschalten</string>
+    <string name="lens_delete">Löschen</string>
+    <string name="tile_label">Lucid-Linse</string>
+    <string name="tile_on">Linse an</string>
+    <string name="tile_off">Linse aus</string>
+    <string name="picker_search">%1$d Sprachen durchsuchen</string>
+    <string name="picker_none">Keine Sprache passt dazu.</string>
+</resources>

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The way into a page, as a chevron rather than a pill. A filled pill says
+     "a value you own" — On, Online, Off — and the two rows that leave the screen
+     are doors. A bare chevron says that before the tap, and keeps the card's
+     right edge calm. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="18dp"
+    android:height="18dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:pathData="M9.5,6.5 L15,12 L9.5,17.5"
+        android:strokeColor="@color/screen_faint"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:strokeWidth="1.6" />
+</vector>

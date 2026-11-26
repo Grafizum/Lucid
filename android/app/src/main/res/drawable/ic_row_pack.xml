@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Offline models: a box, the language packs fetched once and kept on the
+     phone. The three faces are enough to read as a box and no more. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M12,3.2 L19.8,7.5 V16.5 L12,20.8 L4.2,16.5 V7.5 Z"
+        android:strokeColor="@color/screen_muted"
+        android:strokeLineJoin="round"
+        android:strokeWidth="1.7" />
+
+    <path
+        android:pathData="M4.2,7.5 L12,11.8 L19.8,7.5 M12,11.8 V20.8"
+        android:strokeColor="@color/screen_muted"
+        android:strokeLineJoin="round"
+        android:strokeWidth="1.7" />
+</vector>

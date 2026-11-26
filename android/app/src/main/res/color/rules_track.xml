@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The rules page's track: clay under the thumb once on, a warm hairline tone
+     while off. Shell was the off colour before, and on the night page the shell
+     is almost the card, so the track disappeared and the knob read as a lone
+     dot; the divider tone is drawn against both surfaces. -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:color="@color/screen_accent" android:state_checked="true" />
+    <item android:color="@color/screen_divider" />
+</selector>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- The same theme at night. The bars sit over charcoal now, so their icons
+         have to be light; everything else is the light theme's own list, so the
+         two can never drift apart in an item nobody thought about. -->
+    <style name="Theme.Lucid" parent="Theme.MaterialComponents.Light.NoActionBar">
+        <item name="android:windowBackground">@drawable/app_bg</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@color/nav_bar</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowLightNavigationBar" tools:targetApi="27">false</item>
+        <item name="android:windowOptOutEdgeToEdgeEnforcement" tools:targetApi="35">true</item>
+        <item name="colorPrimary">@color/clay_500</item>
+        <item name="colorAccent">@color/clay_500</item>
+        <item name="android:textColorPrimary">@color/sand_300</item>
+        <item name="android:fontFamily">@font/lucid_sans</item>
+    </style>
+</resources>

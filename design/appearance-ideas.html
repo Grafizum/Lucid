@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lucid — the appearance card, four ways</title>
+<style>
+  @font-face {
+    font-family: "Lucida";
+    src: url("./fonts/PlusJakarta.ttf") format("truetype");
+    font-weight: 200 800;
+    font-display: swap;
+  }
+
+  :root {
+    --ease: cubic-bezier(.32, .72, 0, 1);
+    --spring: cubic-bezier(.22, 1.4, .36, 1);
+
+    --page: #EFE6D6;
+    --page-light: #FBF5E9;
+    --paper: #FCF8F1;
+    --ink: #191814;
+    --body: #6A6254;
+    --faint: #857B6C;
+    --clay: #8A5A3C;
+    --clay-ink: #6E4630;
+    --hair: rgba(25, 24, 20, .12);
+    --tint: rgba(164, 110, 75, .13);
+    --tint-edge: rgba(164, 110, 75, .26);
+    --shadow: 0 20px 44px -28px rgba(70, 48, 30, .5);
+
+    /* the two pages every preview shows, whatever theme this page is in */
+    --page-light-color: #FCF8F1;
+    --page-dark: #23221E;
+    --ink-on-light: rgba(25, 24, 20, .32);
+    --ink-on-dark: rgba(247, 241, 229, .58);
+  }
+
+  body.night {
+    --page: #171613;
+    --page-light: #23211D;
+    --paper: #2A2722;
+    --ink: #F7F1E5;
+    --body: #C2B9A6;
+    --faint: #B0A692;
+    --clay: #E9BC96;
+    --clay-ink: #F3D8BC;
+    --hair: rgba(252, 248, 241, .13);
+    --tint: rgba(233, 188, 150, .17);
+    --tint-edge: rgba(233, 188, 150, .3);
+    --shadow: 0 26px 56px -28px rgba(0, 0, 0, .85);
+  }
+
+  * { box-sizing: border-box; }
+
+  html { background: var(--page); transition: background .6s var(--ease); }
+
+  body {
+    margin: 0;
+    padding: 58px 40px 100px;
+    font-family: "Lucida", system-ui, sans-serif;
+    color: var(--ink);
+    background:
+      radial-gradient(120% 64% at 50% -10%, var(--page-light) 0%, rgba(251, 245, 233, 0) 58%),
+      var(--page);
+    transition: background .6s var(--ease), color .6s var(--ease);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 40;
+    opacity: .035;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/></filter><rect width='140' height='140' filter='url(%23n)'/></svg>");
+  }
+
+  .head { max-width: 1120px; margin: 0 auto; }
+
+  .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 9.5px;
+    letter-spacing: .22em;
+    text-transform: uppercase;
+    font-weight: 600;
+    color: var(--clay);
+    padding: 6px 13px;
+    border-radius: 999px;
+    border: 1px solid var(--tint-edge);
+    background: rgba(252, 248, 241, .6);
+  }
+
+  .eyebrow::before {
+    content: "";
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: var(--clay);
+    box-shadow: 0 0 0 3px var(--tint);
+  }
+
+  h1 {
+    margin: 22px 0 14px;
+    font-size: clamp(32px, 4.2vw, 48px);
+    line-height: 1.04;
+    letter-spacing: -.04em;
+    font-weight: 650;
+    max-width: 24ch;
+  }
+
+  h1 em { font-style: normal; color: var(--clay); }
+
+  .lede { margin: 0; max-width: 66ch; font-size: 15px; line-height: 1.7; color: var(--body); }
+
+  .bar {
+    max-width: 1120px;
+    margin: 28px auto 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+    padding-top: 20px;
+    border-top: 1px solid var(--hair);
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    height: 36px;
+    padding: 0 17px;
+    border-radius: 999px;
+    border: 1px solid var(--tint-edge);
+    background: var(--tint);
+    color: var(--clay-ink);
+    font-family: inherit;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .05em;
+    cursor: pointer;
+    transition: transform .45s var(--spring), background .4s var(--ease);
+  }
+
+  .btn:active { transform: scale(.97); }
+  .btn .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+
+  .bar p { margin: 0; font-size: 12px; color: var(--faint); }
+  .bar p b { color: var(--body); font-weight: 600; }
+
+  .grid {
+    max-width: 1120px;
+    margin: 44px auto 0;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 30px;
+    align-items: start;
+  }
+
+  .idea {
+    background: var(--paper);
+    border: 1px solid var(--hair);
+    border-radius: 26px;
+    padding: 24px 24px 26px;
+    box-shadow: var(--shadow);
+    transition: background .6s var(--ease), border-color .6s var(--ease);
+  }
+
+  .idea .idx {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 9.5px;
+    letter-spacing: .2em;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: var(--faint);
+  }
+
+  .idea .idx i {
+    font-style: normal;
+    font-size: 10.5px;
+    letter-spacing: .04em;
+    color: var(--clay-ink);
+    background: var(--tint);
+    border: 1px solid var(--tint-edge);
+    border-radius: 999px;
+    padding: 2px 8px;
+  }
+
+  .idea h2 { margin: 12px 0 8px; font-size: 20px; letter-spacing: -.03em; font-weight: 650; }
+
+  .idea .why { margin: 0; font-size: 12.5px; line-height: 1.7; color: var(--body); min-height: 62px; }
+
+  .cost {
+    margin: 14px 0 0;
+    font-size: 11px;
+    line-height: 1.6;
+    color: var(--clay-ink);
+    background: var(--tint);
+    border: 1px solid var(--tint-edge);
+    border-radius: 12px;
+    padding: 9px 12px;
+  }
+
+  .cost b { letter-spacing: .12em; text-transform: uppercase; font-size: 8.5px; font-weight: 700; }
+
+  /* ── the section under study ─────────────────────────────────────── */
+
+  .study {
+    margin-top: 18px;
+    padding: 14px;
+    border-radius: 18px;
+    background: color-mix(in srgb, var(--page) 86%, var(--paper));
+    border: 1px solid var(--hair);
+  }
+
+  .sec-label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 8px;
+    letter-spacing: .18em;
+    font-weight: 600;
+    color: var(--faint);
+    padding-bottom: 8px;
+  }
+
+  .sec-label svg { display: block; opacity: .8; }
+
+  .hint {
+    font-size: 10px;
+    color: var(--faint);
+    padding: 8px 2px 0;
+  }
+
+  /* 01 — three pages */
+  .appearance {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 4px;
+    background: var(--paper);
+    border: 1px solid var(--hair);
+    border-radius: 14px;
+    padding: 4px;
+    transition: background .6s var(--ease);
+  }
+
+  .opt {
+    padding: 6px;
+    border-radius: 11px;
+    border: 1px solid transparent;
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    cursor: pointer;
+    transition: background .4s var(--ease), border-color .4s var(--ease), transform .4s var(--spring);
+  }
+
+  .opt:hover { background: var(--tint); }
+  .opt:active { transform: scale(.98); }
+  .opt.on { background: var(--tint); border-color: var(--tint-edge); }
+
+  .page-swatch {
+    position: relative;
+    height: 46px;
+    border-radius: 9px;
+    border: 1px solid var(--hair);
+    overflow: hidden;
+    background: var(--page-light-color);
+  }
+
+  .page-swatch.dark { background: var(--page-dark); border-color: rgba(252, 248, 241, .18); }
+
+  .page-swatch.system {
+    background: linear-gradient(90deg, var(--page-light-color) 0 50%, var(--page-dark) 50% 100%);
+  }
+
+  .page-swatch .bars {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 5px;
+    padding: 0 7px;
+  }
+
+  .page-swatch .bars span { height: 2.5px; border-radius: 2px; background: var(--ink-on-light); }
+  .page-swatch .bars span:nth-child(1) { width: 62%; }
+  .page-swatch .bars span:nth-child(2) { width: 42%; }
+  .page-swatch .bars span:nth-child(3) { width: 52%; }
+
+  .page-swatch.dark .bars span { background: var(--ink-on-dark); }
+  .page-swatch .bars.right { clip-path: inset(0 0 0 50%); }
+  .page-swatch .bars.right span { background: var(--ink-on-dark); }
+  .page-swatch .bars.left { clip-path: inset(0 50% 0 0); }
+
+  /* The ring is the app's accent on the page it surrounds: clay on paper,
+     cream clay on charcoal — not the page's theme, the swatch's own. */
+  .opt.on .page-swatch { box-shadow: 0 0 0 1.5px #8A5A3C; }
+  .opt.on .page-swatch.dark { box-shadow: 0 0 0 1.5px #E9BC96; }
+
+  .opt .row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    font-size: 10.5px;
+    font-weight: 500;
+    color: var(--ink);
+  }
+
+  .opt.on .row { color: var(--clay-ink); }
+  .opt .row svg { flex: none; color: var(--faint); }
+  .opt.on .row svg { color: var(--clay); }
+
+  /* 02 — the dial */
+  .dial-wrap { display: grid; gap: 10px; }
+
+  .dial {
+    display: flex;
+    gap: 3px;
+    padding: 3px;
+    background: var(--tint);
+    border: 1px solid var(--tint-edge);
+    border-radius: 999px;
+  }
+
+  .dial span {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    height: 28px;
+    border-radius: 999px;
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--faint);
+    transition: background .45s var(--ease), color .45s var(--ease);
+  }
+
+  .dial span.on {
+    background: var(--paper);
+    color: var(--clay-ink);
+    box-shadow: 0 1px 2px rgba(30, 20, 12, .14);
+  }
+
+  .dial svg { flex: none; }
+
+  .big-preview {
+    position: relative;
+    height: 84px;
+    border-radius: 12px;
+    border: 1px solid var(--hair);
+    overflow: hidden;
+    background: var(--page-light-color);
+  }
+
+  .big-preview.dark { background: var(--page-dark); border-color: rgba(252, 248, 241, .18); }
+
+  .big-preview .bars {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 7px;
+    padding: 0 12px;
+  }
+
+  .big-preview .bars span { height: 3px; border-radius: 2px; background: var(--ink-on-light); }
+  .big-preview .bars span:nth-child(1) { width: 54%; }
+  .big-preview .bars span:nth-child(2) { width: 76%; }
+  .big-preview .bars span:nth-child(3) { width: 38%; }
+
+  .big-preview.dark .bars span { background: var(--ink-on-dark); }
+
+  /* 03 — the split card */
+  .split {
+    position: relative;
+    height: 92px;
+    border-radius: 13px;
+    overflow: hidden;
+    border: 1px solid var(--hair);
+    background: linear-gradient(90deg, var(--page-light-color) 0 50%, var(--page-dark) 50% 100%);
+  }
+
+  .split .seamline {
+    position: absolute;
+    left: 50%;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background: rgba(25, 24, 20, .18);
+    mix-blend-mode: multiply;
+  }
+
+  .split .knob {
+    position: absolute;
+    top: 50%;
+    width: 18px;
+    height: 18px;
+    margin-top: -9px;
+    border-radius: 50%;
+    background: var(--paper);
+    border: 1px solid var(--tint-edge);
+    display: grid;
+    place-items: center;
+    box-shadow: 0 2px 6px rgba(30, 20, 12, .25);
+    transition: left .5s var(--spring), background .5s var(--ease);
+  }
+
+  .split .knob::after {
+    content: "";
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--clay);
+  }
+
+  .split .half-bars {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 16px;
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+  }
+
+  .split .half-bars span:first-child { color: rgba(25, 24, 20, .42); max-width: 34%; }
+  .split .half-bars span:last-child { color: rgba(247, 241, 229, .6); max-width: 34%; text-align: right; }
+
+  .split-legend {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 4px 0;
+    font-size: 9.5px;
+    color: var(--faint);
+  }
+
+  /* 04 — big rows */
+  .rows { display: grid; gap: 5px; }
+
+  .trow {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px;
+    border-radius: 11px;
+    border: 1px solid transparent;
+    transition: background .4s var(--ease), border-color .4s var(--ease);
+  }
+
+  .trow.on { background: var(--tint); border-color: var(--tint-edge); }
+
+  .trow .mini {
+    width: 92px;
+    height: 38px;
+    border-radius: 8px;
+    border: 1px solid var(--hair);
+    position: relative;
+    overflow: hidden;
+    flex: none;
+  }
+
+  .trow .mini b { position: absolute; display: block; height: 2.5px; border-radius: 2px; left: 8px; }
+  .trow .mini b:nth-child(1) { top: 12px; width: 52%; }
+  .trow .mini b:nth-child(2) { top: 20px; width: 34%; }
+  .trow .mini b:nth-child(3) { top: 28px; width: 44%; }
+
+  .trow .mini.light { background: var(--page-light-color); }
+  .trow .mini.light b { background: var(--ink-on-light); }
+  .trow .mini.dark { background: var(--page-dark); border-color: rgba(252, 248, 241, .18); }
+  .trow .mini.dark b { background: var(--ink-on-dark); }
+  .trow .mini.system { background: linear-gradient(90deg, var(--page-light-color) 0 50%, var(--page-dark) 50% 100%); }
+  .trow .mini.system b { background: rgba(150, 130, 108, .55); }
+
+  .trow .meta { display: grid; gap: 3px; flex: 1; }
+  .trow .meta strong { font-size: 12px; font-weight: 600; color: var(--ink); }
+  .trow .meta small { font-size: 9.5px; color: var(--faint); }
+  .trow.on .meta strong { color: var(--clay-ink); }
+
+  .trow .tick {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--clay);
+    color: var(--paper);
+    font-size: 8px;
+    display: grid;
+    place-items: center;
+    opacity: 0;
+    transition: opacity .35s var(--ease);
+  }
+
+  .trow.on .tick { opacity: 1; }
+
+  /* ── applied note ─────────────────────────────────────────────────── */
+
+  .applied {
+    max-width: 1120px;
+    margin: 52px auto 0;
+    padding: 30px 32px 32px;
+    border-radius: 26px;
+    background: var(--paper);
+    border: 1px solid var(--hair);
+    box-shadow: var(--shadow);
+    transition: background .6s var(--ease);
+  }
+
+  .applied h3 { margin: 12px 0 10px; font-size: 20px; letter-spacing: -.03em; font-weight: 650; }
+  .applied p { margin: 0 0 10px; font-size: 13px; line-height: 1.7; color: var(--body); max-width: 82ch; }
+
+  .applied code {
+    font-family: "Lucida", monospace;
+    font-size: 11.5px;
+    background: var(--tint);
+    border: 1px solid var(--tint-edge);
+    border-radius: 6px;
+    padding: 1px 6px;
+    color: var(--clay-ink);
+  }
+
+  footer {
+    max-width: 1120px;
+    margin: 40px auto 0;
+    display: flex;
+    justify-content: space-between;
+    gap: 18px;
+    flex-wrap: wrap;
+    font-size: 10px;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    color: var(--faint);
+  }
+
+  @media (max-width: 880px) {
+    body { padding: 40px 20px 80px; }
+    .grid { grid-template-columns: 1fr; }
+    .applied { padding: 24px 20px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="head">
+  <span class="eyebrow">Lucid · appearance</span>
+  <h1>Four ways to show <em>light, dark and neither</em>.</h1>
+  <p class="lede">
+    Three words cannot be understood without being tried. Each study below replaces the words
+    with a picture of the result — a page in the light that choice gives — and keeps the word
+    underneath for reading out. 01 is what the build does now; 02 to 04 are the bolder options.
+  </p>
+</header>
+
+<div class="bar">
+  <button class="btn" type="button" onclick="document.body.classList.toggle('night')">
+    <span class="dot"></span> Day / night
+  </button>
+  <p><b>01 is in the build.</b> The previews stay literal in both themes — a dark page must look dark even while the app is light.</p>
+</div>
+
+<main class="grid">
+
+  <!-- 01 -->
+  <article class="idea">
+    <div class="idx"><i>01</i> three pages · applied</div>
+    <h2>A page in each light.</h2>
+    <p class="why">
+      Three choices side by side, each a drawn page with three lines of text on it: paper by day,
+      charcoal at night, and System as the two halves of one page. The chosen one is outlined in
+      clay, its word takes the accent, and its mark follows.
+    </p>
+    <div class="study">
+      <div class="sec-label">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="7.4"/><path d="M12 4.6A7.4 7.4 0 0 1 12 19.4Z" fill="currentColor" stroke="none"/></svg>
+        APPEARANCE
+      </div>
+      <div class="appearance">
+        <div class="opt on">
+          <div class="page-swatch system">
+            <div class="bars left"><span></span><span></span><span></span></div>
+            <div class="bars right"><span></span><span></span><span></span></div>
+          </div>
+          <div class="row">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="7.4"/><path d="M12 4.6A7.4 7.4 0 0 1 12 19.4Z" fill="currentColor" stroke="none"/></svg>
+            System
+          </div>
+        </div>
+        <div class="opt">
+          <div class="page-swatch">
+            <div class="bars"><span></span><span></span><span></span></div>
+          </div>
+          <div class="row">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="4.1"/><path d="M12 3.2v1.9M12 18.9v1.9M3.2 12h1.9M18.9 12h1.9M5.8 5.8l1.3 1.3M16.9 16.9l1.3 1.3M18.2 5.8l-1.3 1.3M7.1 16.9l-1.3 1.3"/></svg>
+            Light
+          </div>
+        </div>
+        <div class="opt">
+          <div class="page-swatch dark">
+            <div class="bars"><span></span><span></span><span></span></div>
+          </div>
+          <div class="row">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M20.4 14.4A8.6 8.6 0 1 1 9.6 3.6a6.9 6.9 0 0 0 10.8 10.8Z"/></svg>
+            Dark
+          </div>
+        </div>
+      </div>
+      <div class="hint">Follows your phone's setting</div>
+    </div>
+    <p class="cost"><b>In the build</b><br>Drawn by <code>ThemeSwatch</code>; 46 dp, exact to the real radii, and literal in both themes.</p>
+  </article>
+
+  <!-- 02 -->
+  <article class="idea" id="opt-02">
+    <div class="idx"><i>02</i> the dial</div>
+    <h2>One control, one big preview.</h2>
+    <p class="why">
+      A single segmented pill with the three marks, over a large preview of the surface in force.
+      The card stays one line tall and the preview does the explaining — the calmest of the four,
+      and the best fit if the section has to stay small.
+    </p>
+    <div class="study">
+      <div class="sec-label">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="7.4"/><path d="M12 4.6A7.4 7.4 0 0 1 12 19.4Z" fill="currentColor" stroke="none"/></svg>
+        APPEARANCE
+      </div>
+      <div class="dial-wrap">
+        <div class="dial">
+          <span class="on">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="7.4"/><path d="M12 4.6A7.4 7.4 0 0 1 12 19.4Z" fill="currentColor" stroke="none"/></svg>
+            System
+          </span>
+          <span>
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="4.1"/><path d="M12 3.2v1.9M12 18.9v1.9M3.2 12h1.9M18.9 12h1.9M5.8 5.8l1.3 1.3M16.9 16.9l1.3 1.3M18.2 5.8l-1.3 1.3M7.1 16.9l-1.3 1.3"/></svg>
+            Light
+          </span>
+          <span>
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M20.4 14.4A8.6 8.6 0 1 1 9.6 3.6a6.9 6.9 0 0 0 10.8 10.8Z"/></svg>
+            Dark
+          </span>
+        </div>
+        <div class="big-preview">
+          <div class="bars"><span></span><span></span><span></span></div>
+        </div>
+      </div>
+      <div class="hint">Follows your phone's setting</div>
+    </div>
+    <p class="cost"><b>Cost</b><br>The preview has to re-render on pick, inside the same fade the page uses. One extra view, one more state to keep true.</p>
+  </article>
+
+  <!-- 03 -->
+  <article class="idea" id="opt-03">
+    <div class="idx"><i>03</i> the split card</div>
+    <h2>Day and night are the same card.</h2>
+    <p class="why">
+      One wide surface split down the middle — paper on the left, charcoal on the right — with a
+      knob that rests at left, centre or right. Choosing Light or Dark pulls the whole app toward
+      one half; System leaves it balanced on the seam.
+    </p>
+    <div class="study">
+      <div class="sec-label">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="7.4"/><path d="M12 4.6A7.4 7.4 0 0 1 12 19.4Z" fill="currentColor" stroke="none"/></svg>
+        APPEARANCE
+      </div>
+      <div class="split">
+        <div class="half-bars"><span>paper</span><span>charcoal</span></div>
+        <div class="seamline"></div>
+        <div class="knob" style="left: calc(50% - 9px)"></div>
+      </div>
+      <div class="split-legend"><span>Light</span><span>System</span><span>Dark</span></div>
+    </div>
+    <p class="cost"><b>Cost</b><br>Beautiful, and the least literal: a knob between two halves says "slide me" and these three answers are not a slider. Riskiest for anyone who has not met the app before.</p>
+  </article>
+
+  <!-- 04 -->
+  <article class="idea" id="opt-04">
+    <div class="idx"><i>04</i> big rows</div>
+    <h2>One row per answer, each with its own window.</h2>
+    <p class="why">
+      Keeps the list shape the card has now, but every row carries a wide preview of that surface
+      on the left and the mark plus the consequence on the right — "Follows your phone", "Always
+      light", "Always dark". Most explanatory, and the easiest to read with a screen reader.
+    </p>
+    <div class="study">
+      <div class="sec-label">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="7.4"/><path d="M12 4.6A7.4 7.4 0 0 1 12 19.4Z" fill="currentColor" stroke="none"/></svg>
+        APPEARANCE
+      </div>
+      <div class="rows">
+        <div class="trow on">
+          <div class="mini system"><b></b><b></b><b></b></div>
+          <div class="meta"><strong>System</strong><small>Follows your phone's setting</small></div>
+          <div class="tick">✓</div>
+        </div>
+        <div class="trow">
+          <div class="mini light"><b></b><b></b><b></b></div>
+          <div class="meta"><strong>Light</strong><small>Always light</small></div>
+          <div class="tick">✓</div>
+        </div>
+        <div class="trow">
+          <div class="mini dark"><b></b><b></b><b></b></div>
+          <div class="meta"><strong>Dark</strong><small>Always dark</small></div>
+          <div class="tick">✓</div>
+        </div>
+      </div>
+    </div>
+    <p class="cost"><b>Cost</b><br>The tallest of the four — about 190 dp — which pushes the permission section further down the page.</p>
+  </article>
+
+</main>
+
+<section class="applied">
+  <span class="eyebrow">In the build</span>
+  <h3>What idea 01 changed</h3>
+  <p>
+    The three text rows became three cells on one row, each with a <code>ThemeSwatch</code>: a
+    drawn page with a 9 dp corner, a hairline, and three text bars — paper with dark bars, charcoal
+    with cream, and System split down the middle with each half keeping its own ink, clipped at the
+    seam. The marks are the half-filled disc for System, a hairline sun for Light and the crescent
+    for Dark, all at 12 dp and tinted at runtime.
+  </p>
+  <p>
+    The chosen answer is said three ways that do not depend on each other: a clay outline on its
+    page, the accent tint and rim on its cell, and the accent on its word and mark. The hint line
+    under the card still spells the consequence out — "Light, wherever the phone goes" — and the
+    cell's content description still announces the choice for anyone listening rather than looking.
+  </p>
+  <p>
+    The swatch colours are the one place in the app that ignores the theme: a preview of dark has to
+    stay dark while the app is light, or it stops being a preview.
+  </p>
+</section>
+
+<footer>
+  <span>Lucid · appearance studies</span>
+  <span>paper, clay, one hairline</span>
+</footer>
+
+</body>
+</html>

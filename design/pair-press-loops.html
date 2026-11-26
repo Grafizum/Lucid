@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lucid — the pair card's press, four loops</title>
+<style>
+  @font-face {
+    font-family: "Lucida";
+    src: url("./fonts/PlusJakarta.ttf") format("truetype");
+    font-weight: 200 800;
+    font-display: swap;
+  }
+
+  :root {
+    --ease: cubic-bezier(.32, .72, 0, 1);
+    --loop: 3200ms;
+
+    --page: #EFE6D6;
+    --page-light: #FBF5E9;
+    --paper: #FCF8F1;
+    --ink: #191814;
+    --body: #6A6254;
+    --faint: #857B6C;
+    --clay: #8A5A3C;
+    --clay-ink: #6E4630;
+    --press: #E7DAC6;
+    --hair: rgba(25, 24, 20, .10);
+    --tint: rgba(164, 110, 75, .12);
+    --tint-edge: rgba(164, 110, 75, .25);
+    --card-shadow: 0 18px 40px -26px rgba(70, 48, 30, .5);
+  }
+
+  body.night {
+    --page: #171613;
+    --page-light: #23211D;
+    --paper: #2A2722;
+    --ink: #F7F1E5;
+    --body: #C2B9A6;
+    --faint: #B0A692;
+    --clay: #E9BC96;
+    --clay-ink: #F3D8BC;
+    --press: #474339;
+    --hair: rgba(252, 248, 241, .12);
+    --tint: rgba(233, 188, 150, .16);
+    --tint-edge: rgba(233, 188, 150, .28);
+    --card-shadow: 0 22px 50px -26px rgba(0, 0, 0, .85);
+  }
+
+  * { box-sizing: border-box; }
+
+  html { background: var(--page); transition: background .6s var(--ease); }
+
+  body {
+    margin: 0;
+    padding: 58px 40px 100px;
+    font-family: "Lucida", system-ui, sans-serif;
+    color: var(--ink);
+    background:
+      radial-gradient(120% 64% at 50% -10%, var(--page-light) 0%, rgba(251, 245, 233, 0) 58%),
+      var(--page);
+    transition: background .6s var(--ease), color .6s var(--ease);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 40;
+    opacity: .035;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/></filter><rect width='140' height='140' filter='url(%23n)'/></svg>");
+  }
+
+  .head { max-width: 1160px; margin: 0 auto; }
+
+  .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 9.5px;
+    letter-spacing: .22em;
+    text-transform: uppercase;
+    font-weight: 600;
+    color: var(--clay);
+    padding: 6px 13px;
+    border-radius: 999px;
+    border: 1px solid var(--tint-edge);
+    background: rgba(252, 248, 241, .6);
+  }
+
+  .eyebrow::before {
+    content: "";
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: var(--clay);
+    box-shadow: 0 0 0 3px var(--tint);
+  }
+
+  h1 {
+    margin: 22px 0 14px;
+    font-size: clamp(32px, 4.2vw, 48px);
+    line-height: 1.04;
+    letter-spacing: -.04em;
+    font-weight: 650;
+    max-width: 25ch;
+  }
+
+  h1 em { font-style: normal; color: var(--clay); }
+
+  .lede { margin: 0; max-width: 66ch; font-size: 15px; line-height: 1.7; color: var(--body); }
+
+  .bar {
+    max-width: 1160px;
+    margin: 28px auto 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+    padding-top: 20px;
+    border-top: 1px solid var(--hair);
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    height: 36px;
+    padding: 0 17px;
+    border-radius: 999px;
+    border: 1px solid var(--tint-edge);
+    background: var(--tint);
+    color: var(--clay-ink);
+    font-family: inherit;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .05em;
+    cursor: pointer;
+    transition: transform .45s var(--spring, cubic-bezier(.22,1.4,.36,1)), background .4s var(--ease);
+  }
+
+  .btn:active { transform: scale(.97); }
+
+  .btn .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+
+  body.slow { --loop: 6400ms; }
+
+  .bar p { margin: 0; font-size: 12px; color: var(--faint); }
+
+  /* ── the loops ───────────────────────────────────────────────────── */
+
+  .grid {
+    max-width: 1160px;
+    margin: 42px auto 0;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 30px 30px;
+  }
+
+  .loop {
+    background: var(--paper);
+    border: 1px solid var(--hair);
+    border-radius: 26px;
+    padding: 22px 24px 24px;
+    box-shadow: var(--card-shadow);
+    transition: background .6s var(--ease), border-color .6s var(--ease);
+  }
+
+  .loop .idx {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 9.5px;
+    letter-spacing: .2em;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: var(--faint);
+  }
+
+  .loop .idx i {
+    font-style: normal;
+    font-size: 10.5px;
+    letter-spacing: .04em;
+    color: var(--clay-ink);
+    background: var(--tint);
+    border: 1px solid var(--tint-edge);
+    border-radius: 999px;
+    padding: 2px 8px;
+  }
+
+  .loop h2 {
+    margin: 12px 0 8px;
+    font-size: 19px;
+    letter-spacing: -.025em;
+    font-weight: 650;
+  }
+
+  .loop .what { margin: 0 0 4px; font-size: 12px; line-height: 1.65; color: var(--body); min-height: 40px; }
+
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 12px 0 16px; }
+
+  .chips span {
+    font-size: 9.5px;
+    letter-spacing: .06em;
+    color: var(--body);
+    border: 1px solid var(--hair);
+    border-radius: 999px;
+    padding: 3px 9px;
+  }
+
+  /* the card under the loops; the sheet has its own slot below it, so a loop
+     can be watched as a press first and a picker second, not as one covering
+     the other */
+  .stage { position: relative; padding-bottom: 76px; }
+
+  .pair {
+    position: relative;
+    display: flex;
+    height: 140px;
+    border-radius: 16px;
+    background: var(--paper);
+    border: 1px solid var(--hair);
+    overflow: hidden;
+    transition: background .6s var(--ease);
+  }
+
+  .half {
+    position: relative;
+    flex: 1;
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .half.into { align-items: flex-end; text-align: right; }
+
+  .tag {
+    position: relative;
+    z-index: 2;
+    font-size: 8px;
+    letter-spacing: .16em;
+    font-weight: 700;
+    color: var(--faint);
+  }
+
+  .disc {
+    position: relative;
+    z-index: 2;
+    margin-top: 9px;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    font-size: 9.5px;
+    font-weight: 650;
+    color: var(--ink);
+    background: var(--tint);
+    border: 1px solid var(--tint-edge);
+  }
+
+  .half.into .disc { color: var(--clay-ink); }
+
+  .name {
+    position: relative;
+    z-index: 2;
+    margin-top: 9px;
+    font-size: 11.5px;
+    font-weight: 500;
+    color: var(--ink);
+    white-space: nowrap;
+  }
+
+  .wash {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    opacity: 0;
+    background: var(--press);
+  }
+
+  .half.from .wash, .half.from .shade { border-radius: 15px 0 0 15px; }
+  .half.into .wash, .half.into .shade { border-radius: 0 15px 15px 0; }
+
+  .shade {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    opacity: 0;
+    background:
+      linear-gradient(180deg, rgba(120, 92, 64, .14) 0%, transparent 26%),
+      linear-gradient(90deg, transparent 22%, rgba(120, 92, 64, .22) 100%);
+  }
+
+  body.night .shade {
+    background:
+      linear-gradient(180deg, rgba(0, 0, 0, .22) 0%, transparent 34%),
+      linear-gradient(90deg, transparent 26%, rgba(0, 0, 0, .30) 100%);
+  }
+
+  .seam {
+    position: absolute;
+    left: 50%;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background: var(--hair);
+    transform: translateX(-.5px);
+  }
+
+  .swap {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 28px;
+    height: 28px;
+    margin: -14px 0 0 -14px;
+    border-radius: 50%;
+    background: var(--paper);
+    border: 1px solid var(--tint-edge);
+    display: grid;
+    place-items: center;
+    font-size: 11px;
+    color: var(--clay);
+    z-index: 3;
+    transition: background .6s var(--ease);
+  }
+
+  /* the finger */
+  .tap {
+    position: absolute;
+    left: 22%;
+    top: 66%;
+    width: 11px;
+    height: 11px;
+    margin: -5px 0 0 -5px;
+    border-radius: 50%;
+    background: var(--clay);
+    opacity: 0;
+    z-index: 4;
+    box-shadow: 0 0 0 5px var(--tint);
+  }
+
+  /* the picker arriving */
+  .sheet {
+    position: absolute;
+    left: 22px;
+    right: 22px;
+    bottom: 20px;
+    border-radius: 16px;
+    background: var(--pipe, var(--paper));
+    border: 1px solid var(--hair);
+    padding: 11px 14px 10px;
+    opacity: 0;
+    transform: translateY(20px);
+    box-shadow: 0 -16px 30px -20px rgba(40, 28, 18, .45);
+    z-index: 5;
+  }
+
+  body.night .sheet { --pipe: #34302A; }
+
+  .sheet .sh {
+    font-size: 8px;
+    letter-spacing: .18em;
+    font-weight: 700;
+    color: var(--faint);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .sheet .sh b {
+    font-weight: 600;
+    letter-spacing: .04em;
+    color: var(--clay-ink);
+    background: var(--tint);
+    border: 1px solid var(--tint-edge);
+    border-radius: 999px;
+    padding: 2px 8px;
+  }
+
+  .sheet .row { font-size: 11px; color: var(--ink); padding: 7px 0 2px; }
+  .sheet .row.on { color: var(--clay); font-weight: 600; }
+
+  /* ── loop 01 — applied ─────────────────────────────────────────────── */
+
+  .v1 .wash { animation: v1wash var(--loop) infinite; }
+  .v1 .disc.from-disc { animation: v1disc var(--loop) infinite; }
+  .v1 .name.from-name { animation: v1name var(--loop) infinite; }
+  .v1 .tap { animation: v1tap var(--loop) infinite; }
+  .v1 .sheet { animation: v1sheet var(--loop) infinite; }
+
+  @keyframes v1wash {
+    0%, 9.5% { opacity: 0; }
+    13.5%, 20.5% { opacity: 1; }
+    33%, 100% { opacity: 0; }
+  }
+
+  @keyframes v1disc {
+    0%, 9.5% { transform: scale(1); }
+    13.5%, 20.5% { transform: scale(.94); }
+    33%, 100% { transform: scale(1); }
+  }
+
+  @keyframes v1name {
+    0%, 9.5% { color: var(--ink); }
+    13.5%, 20.5% { color: var(--clay-ink); }
+    33%, 100% { color: var(--ink); }
+  }
+
+  @keyframes v1sheet {
+    0%, 20% { opacity: 0; transform: translateY(22px); }
+    25%, 72% { opacity: 1; transform: translateY(0); }
+    80%, 100% { opacity: 0; transform: translateY(22px); }
+  }
+
+  @keyframes v1tap {
+    0%, 8% { opacity: 0; transform: scale(.5); }
+    10%, 12% { opacity: .45; transform: scale(1); }
+    20%, 100% { opacity: 0; }
+  }
+
+  /* ── loop 02 — key travel ──────────────────────────────────────────── */
+
+  .v2 .from { animation: v2half var(--loop) infinite; }
+  .v2 .wash { animation: v2wash var(--loop) infinite; }
+  .v2 .tap { animation: v1tap var(--loop) infinite; }
+  .v2 .sheet { animation: v1sheet var(--loop) infinite; }
+
+  @keyframes v2half {
+    0%, 9% { transform: translateY(0) scale(1); }
+    14%, 20% { transform: translateY(1px) scale(.975); }
+    35%, 100% { transform: translateY(0) scale(1); }
+  }
+
+  @keyframes v2wash {
+    0%, 9% { opacity: 0; }
+    14%, 20% { opacity: 1; }
+    35%, 100% { opacity: 0; }
+  }
+
+  /* ── loop 03 — ink only ────────────────────────────────────────────── */
+
+  .v3 .disc.from-disc { animation: v3disc var(--loop) infinite; }
+  .v3 .name.from-name { animation: v3name var(--loop) infinite; }
+  .v3 .tag.from-tag { animation: v3tag var(--loop) infinite; }
+  .v3 .tap { animation: v1tap var(--loop) infinite; }
+  .v3 .sheet { animation: v1sheet var(--loop) infinite; }
+
+  @keyframes v3disc {
+    0%, 9% { transform: scale(1); background: var(--tint); }
+    12%, 19% { transform: scale(.9); background: var(--tint-edge); }
+    30%, 100% { transform: scale(1); background: var(--tint); }
+  }
+
+  @keyframes v3name {
+    0%, 9% { color: var(--ink); }
+    12%, 19% { color: var(--clay); }
+    30%, 100% { color: var(--ink); }
+  }
+
+  @keyframes v3tag {
+    0%, 9% { color: var(--faint); }
+    12%, 19% { color: var(--clay); }
+    30%, 100% { color: var(--faint); }
+  }
+
+  /* ── loop 04 — light from the seam ─────────────────────────────────── */
+
+  .v4 .shade { animation: v4shade var(--loop) infinite; }
+  .v4 .from { animation: v4half var(--loop) infinite; }
+  .v4 .tap { animation: v1tap var(--loop) infinite; }
+  .v4 .sheet { animation: v1sheet var(--loop) infinite; }
+
+  @keyframes v4shade {
+    0%, 9% { opacity: 0; }
+    15%, 21% { opacity: 1; }
+    36%, 100% { opacity: 0; }
+  }
+
+  @keyframes v4half {
+    0%, 9% { box-shadow: none; }
+    15%, 21% { box-shadow: inset 0 2px 6px -3px rgba(60, 44, 28, .35); }
+    36%, 100% { box-shadow: none; }
+  }
+
+  /* the four loops start at different points, so they do not pulse in unison */
+  .v2 .from, .v2 .wash, .v2 .tap, .v2 .sheet { animation-delay: -1100ms; }
+  .v3 .disc, .v3 .name, .v3 .tag, .v3 .tap, .v3 .sheet { animation-delay: -1750ms; }
+  .v4 .shade, .v4 .from, .v4 .tap, .v4 .sheet { animation-delay: -2450ms; }
+
+  /* ── the applied note ─────────────────────────────────────────────── */
+
+  .applied {
+    max-width: 1160px;
+    margin: 54px auto 0;
+    padding: 30px 32px 32px;
+    border-radius: 26px;
+    background: var(--paper);
+    border: 1px solid var(--hair);
+    box-shadow: var(--card-shadow);
+    transition: background .6s var(--ease);
+  }
+
+  .applied h3 { margin: 12px 0 10px; font-size: 20px; letter-spacing: -.03em; font-weight: 650; }
+  .applied p { margin: 0 0 10px; font-size: 13px; line-height: 1.7; color: var(--body); max-width: 82ch; }
+  .applied code {
+    font-family: "Lucida", monospace;
+    font-size: 11.5px;
+    background: var(--tint);
+    border: 1px solid var(--tint-edge);
+    border-radius: 6px;
+    padding: 1px 6px;
+    color: var(--clay-ink);
+  }
+
+  .facts { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 14px; }
+
+  .facts span {
+    font-size: 10.5px;
+    letter-spacing: .04em;
+    color: var(--body);
+    border: 1px solid var(--hair);
+    border-radius: 999px;
+    padding: 5px 11px;
+    background: var(--page);
+  }
+
+  footer {
+    max-width: 1160px;
+    margin: 40px auto 0;
+    display: flex;
+    justify-content: space-between;
+    gap: 18px;
+    flex-wrap: wrap;
+    font-size: 10px;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    color: var(--faint);
+  }
+
+  @media (max-width: 860px) {
+    body { padding: 40px 20px 80px; }
+    .grid { grid-template-columns: 1fr; }
+    .applied { padding: 24px 20px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="head">
+  <span class="eyebrow">Lucid · the pair card</span>
+  <h1>Four loops for <em>pressing half a card</em>.</h1>
+  <p class="lede">
+    Each card below plays its own press on repeat — press, hold, picker, release — so you can
+    watch the whole beat instead of guessing at a still. Loop 01 is what the build does now;
+    the other three are there if you want a heavier or a quieter hand.
+  </p>
+</header>
+
+<div class="bar">
+  <button class="btn" type="button" onclick="document.body.classList.toggle('night')">
+    <span class="dot"></span> Day / night
+  </button>
+  <button class="btn" type="button" onclick="document.body.classList.toggle('slow')">
+    <span class="dot"></span> Half speed
+  </button>
+  <p>Loops run on their own; nothing to click inside a card.</p>
+</div>
+
+<main class="grid">
+
+  <!-- 01 -->
+  <article class="loop v1">
+    <div class="idx"><i>01</i> the half itself · applied</div>
+    <h2>The surface is the feedback.</h2>
+    <p class="what">
+      No box is drawn on the card. The half's own tint comes up under the thumb, the
+      medallion pinches, the name turns clay — then the picker arrives.
+    </p>
+    <div class="chips"><span>120 ms in</span><span>220 ms hold</span><span>400 ms out</span></div>
+    <div class="stage">
+      <div class="pair">
+        <div class="half from">
+          <span class="wash"></span>
+          <span class="tap"></span>
+          <span class="tag from-tag">FROM</span>
+          <span class="disc from-disc">DE</span>
+          <span class="name from-name">Auto recognize</span>
+        </div>
+        <div class="half into">
+          <span class="tag">INTO</span>
+          <span class="disc">EN</span>
+          <span class="name">English</span>
+        </div>
+        <div class="seam"></div>
+        <div class="swap">⇄</div>
+      </div>
+      <div class="sheet">
+        <div class="sh">TRANSLATE INTO <b>240</b></div>
+        <div class="row on">English ✓</div>
+        <div class="row">Deutsch · German</div>
+      </div>
+    </div>
+  </article>
+
+  <!-- 02 -->
+  <article class="loop v2">
+    <div class="idx"><i>02</i> key travel</div>
+    <h2>The half sinks like a key.</h2>
+    <p class="what">
+      The old idea, done properly: the half itself dips a pixel and shrinks by a
+      fortieth, with the tint inside it. Heavier, and it makes the card breathe.
+    </p>
+    <div class="chips"><span>140 ms in</span><span>200 ms hold</span><span>420 ms out</span></div>
+    <div class="stage">
+      <div class="pair">
+        <div class="half from">
+          <span class="wash"></span>
+          <span class="tap"></span>
+          <span class="tag">FROM</span>
+          <span class="disc">DE</span>
+          <span class="name">Auto recognize</span>
+        </div>
+        <div class="half into">
+          <span class="tag">INTO</span>
+          <span class="disc">EN</span>
+          <span class="name">English</span>
+        </div>
+        <div class="seam"></div>
+        <div class="swap">⇄</div>
+      </div>
+      <div class="sheet">
+        <div class="sh">TRANSLATE INTO <b>240</b></div>
+        <div class="row on">English ✓</div>
+        <div class="row">Deutsch · German</div>
+      </div>
+    </div>
+  </article>
+
+  <!-- 03 -->
+  <article class="loop v3">
+    <div class="idx"><i>03</i> ink only</div>
+    <h2>Nothing fills — the words answer.</h2>
+    <p class="what">
+      The quietest of the four: no tint at all. The label and the medallion take the
+      accent and pinch, so the card keeps its paper and only the words move.
+    </p>
+    <div class="chips"><span>90 ms in</span><span>180 ms hold</span><span>300 ms out</span></div>
+    <div class="stage">
+      <div class="pair">
+        <div class="half from">
+          <span class="tap"></span>
+          <span class="tag from-tag">FROM</span>
+          <span class="disc from-disc">DE</span>
+          <span class="name from-name">Auto recognize</span>
+        </div>
+        <div class="half into">
+          <span class="tag">INTO</span>
+          <span class="disc">EN</span>
+          <span class="name">English</span>
+        </div>
+        <div class="seam"></div>
+        <div class="swap">⇄</div>
+      </div>
+      <div class="sheet">
+        <div class="sh">TRANSLATE INTO <b>240</b></div>
+        <div class="row on">English ✓</div>
+        <div class="row">Deutsch · German</div>
+      </div>
+    </div>
+  </article>
+
+  <!-- 04 -->
+  <article class="loop v4">
+    <div class="idx"><i>04</i> light from the seam</div>
+    <h2>The half sits back into the card.</h2>
+    <p class="what">
+      No flat fill: a soft shade gathers against the seam and the card's top edge, as if
+      the half had been pushed a millimetre into the paper.
+    </p>
+    <div class="chips"><span>150 ms in</span><span>210 ms hold</span><span>380 ms out</span></div>
+    <div class="stage">
+      <div class="pair">
+        <div class="half from">
+          <span class="shade"></span>
+          <span class="tap"></span>
+          <span class="tag">FROM</span>
+          <span class="disc">DE</span>
+          <span class="name">Auto recognize</span>
+        </div>
+        <div class="half into">
+          <span class="tag">INTO</span>
+          <span class="disc">EN</span>
+          <span class="name">English</span>
+        </div>
+        <div class="seam"></div>
+        <div class="swap">⇄</div>
+      </div>
+      <div class="sheet">
+        <div class="sh">TRANSLATE INTO <b>240</b></div>
+        <div class="row on">English ✓</div>
+        <div class="row">Deutsch · German</div>
+      </div>
+    </div>
+  </article>
+
+</main>
+
+<section class="applied">
+  <span class="eyebrow">In the build</span>
+  <h3>What changed for loop 01</h3>
+  <p>
+    The feedback is no longer a rectangle laid over the half. <code>half_press_from</code> and
+    <code>half_press_into</code> now carry the card's own 16 dp on the three edges that are the
+    card's, and are square on the seam side, so the tint runs into the split and is cut by the
+    seam line instead of floating beside it. Their 1 dp ring is gone — that ring was the second
+    edge you were seeing inside the card's own hairline.
+  </p>
+  <p>
+    The half no longer scales away from the card either: at 0.966 it left a rim of paper around
+    the tint, which is what made the feedback look like a smaller box on the box. What moves now
+    is the medallion (0.94), the name's colour, and the tint's own fade — 120 ms down, 220 ms
+    held, 400 ms back up, with the picker arriving inside the hold.
+  </p>
+  <p>
+    And the press was nearly invisible: a 74 % beige over paper measured <b>1.15 : 1</b>. It is a
+    solid step of the same beige now — <b>1.30 : 1</b> by day, <b>1.51 : 1</b> at night — so the
+    state is carried by the surface, not by an outline.
+  </p>
+  <div class="facts">
+    <span>tint exact to the half</span>
+    <span>no second ring</span>
+    <span>no scale on the half</span>
+    <span>1.30 / 1.31 : 1</span>
+    <span>120 · 220 · 400 ms</span>
+  </div>
+</section>
+
+<footer>
+  <span>Lucid · pair press</span>
+  <span>paper, clay, one hairline</span>
+</footer>
+
+</body>
+</html>

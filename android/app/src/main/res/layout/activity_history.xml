@@ -1,0 +1,123 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/historyRoot"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/screen_canvas"
+    android:orientation="vertical"
+    android:paddingStart="24dp"
+    android:paddingTop="10dp"
+    android:paddingEnd="24dp"
+    android:paddingBottom="18dp">
+
+    <!-- The row is a fixed 44 dp, the same on every page that can go back, so
+         the arrow and the name are centred on one line instead of each one
+         finding its own idea of the middle. The chevron is an icon, not the
+         character "‹": a glyph sits on a baseline and never quite agrees with
+         the label beside it. It starts 4 dp higher than the home page's header
+         so that, with 10 dp of page padding above it, this name lands on the
+         very line the wordmark is drawn on. -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="44dp"
+        android:layout_marginTop="20dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:id="@+id/historyBack"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:layout_marginStart="-4dp"
+            android:clickable="true"
+            android:contentDescription="Back"
+            android:focusable="true"
+            android:padding="12dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/ic_back" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:fontFamily="@font/lucid_sans"
+            android:includeFontPadding="false"
+            android:letterSpacing="-0.01"
+            android:maxLines="1"
+            android:text="Translation history"
+            android:textColor="@color/screen_ink"
+            android:textFontWeight="600"
+            android:textSize="13sp" />
+
+        <!-- The way to wipe the log, on the page that is the log. Hidden when
+             there is nothing to wipe: a button that clears nothing is noise. -->
+        <TextView
+            android:id="@+id/historyClear"
+            android:layout_width="wrap_content"
+            android:layout_height="44dp"
+            android:layout_marginStart="8dp"
+            android:layout_weight="1"
+            android:clickable="true"
+            android:focusable="true"
+            android:fontFamily="@font/lucid_sans"
+            android:gravity="end|center_vertical"
+            android:paddingStart="10dp"
+            android:text="Clear all"
+            android:textColor="@color/screen_accent"
+            android:textFontWeight="500"
+            android:textSize="11.5sp" />
+    </LinearLayout>
+
+    <ScrollView
+        android:id="@+id/historyScroll"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:clipToPadding="false"
+        android:paddingBottom="8dp"
+        android:scrollbars="none">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="4dp"
+                android:fontFamily="@font/lucid_sans"
+                android:lineSpacingMultiplier="1.42"
+                android:text="What the lens has read, newest first. Kept on this phone, twenty at most. Swipe a read left to delete it."
+                android:textColor="@color/screen_muted"
+                android:textSize="12sp" />
+
+            <LinearLayout
+                android:id="@+id/historyList"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" />
+
+            <!-- An empty log is still a place: a card of the page's own paper
+                 with the answer centred in it, so the page reads as "nothing
+                 yet" rather than as a page that failed to load. -->
+            <TextView
+                android:id="@+id/historyEmpty"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:background="@drawable/card_bg"
+                android:fontFamily="@font/lucid_sans"
+                android:gravity="center"
+                android:lineSpacingMultiplier="1.45"
+                android:paddingStart="20dp"
+                android:paddingTop="26dp"
+                android:paddingEnd="20dp"
+                android:paddingBottom="26dp"
+                android:text="Nothing translated yet.\nPoint the lens at some text and every read lands here."
+                android:textColor="@color/screen_faint"
+                android:textSize="12sp"
+                android:visibility="gone" />
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>
