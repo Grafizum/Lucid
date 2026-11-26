@@ -8,7 +8,7 @@
 
 <sub>A <a href="https://github.com/grafizum">Grafizum</a> studio product</sub>
 
-[![Release](https://img.shields.io/github/v/release/grafizum/Lucid?label=release)](https://github.com/grafizum/Lucid/releases/latest)
+[![Release](https://img.shields.io/github/v/release/MatrixZockt/Lucid-ScreenTranslator?label=release)](https://github.com/MatrixZockt/Lucid-ScreenTranslator/releases/latest)
 [![Platform](https://img.shields.io/badge/platform-Android%207.0%2B-3ddc84)](#-install)
 [![Build](https://img.shields.io/badge/build-debug%20%C2%B7%20v1.3.2-e0a94f)](#-install)
 [![Engine](https://img.shields.io/badge/engine-online%20%2B%20on--device-6f9f86)](#-translation-engine)
@@ -54,7 +54,7 @@ Lucid is being tested right now and is heading to Google Play next — the store
 
 ## 📦 Install
 
-Grab **`Lucid-1.3.2-debug.apk`** from the [latest release](https://github.com/grafizum/Lucid/releases/latest) (90 MB, 32-bit and 64-bit ARM), open it on the phone, or with a USB cable:
+Grab **`Lucid-1.3.2-debug.apk`** from the [latest release](https://github.com/MatrixZockt/Lucid-ScreenTranslator/releases/latest) (90 MB, 32-bit and 64-bit ARM), open it on the phone, or with a USB cable:
 
 ```bash
 adb install -r Lucid-1.3.2-debug.apk
@@ -144,8 +144,8 @@ It is a permission, not a mode. With it on, the lens decides per read: the tree 
 Requirements: JDK 17, Android SDK with platform 36 and build-tools 36, and network access for the first Gradle run.
 
 ```bash
-git clone https://github.com/grafizum/Lucid.git
-cd Lucid/android
+git clone https://github.com/MatrixZockt/Lucid-ScreenTranslator.git
+cd Lucid-ScreenTranslator/android
 echo "sdk.dir=$HOME/Android/Sdk" > local.properties   # your SDK path
 ./gradlew assembleDebug
 # -> app/build/outputs/apk/debug/Lucid-v1.3.2-v8-debug.apk
