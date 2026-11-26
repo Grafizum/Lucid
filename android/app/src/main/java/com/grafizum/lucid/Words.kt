@@ -1,7 +1,6 @@
 package com.grafizum.lucid
 
 import org.json.JSONArray
-import java.net.URLEncoder
 
 /**
  * Word by word: which word means what.
@@ -118,17 +117,22 @@ object Words {
     }
 
     /**
+     * The source the request should name: the line's own language when it runs
+     * its words together, Auto when nothing is pinned or when it does not.
+     */
+    fun sourceOf(lang: String?): String = lang?.takeIf { crowded(it) } ?: "auto"
+
+    /**
      * One request for every word at once: the words are sent one per line, and
      * the engine hands back one line each.
      */
-    fun request(terms: List<String>, target: String, source: String? = null): String {
-        val query = terms.joinToString("\n")
-        val from = source?.takeIf { crowded(it) } ?: "auto"
-        return "https://translate.googleapis.com/translate_a/single" +
-            "?client=gtx&sl=" + URLEncoder.encode(from, "UTF-8") +
-            "&dt=t&tl=" + URLEncoder.encode(target, "UTF-8") +
-            "&q=" + URLEncoder.encode(query, "UTF-8")
-    }
+    fun params(terms: List<String>, target: String, source: String? = null): String =
+        TranslateNet.params(
+            query = terms.joinToString("\n"),
+            target = target,
+            source = sourceOf(source),
+            reading = false,
+        )
 
     /**
      * The meanings, one per word, or null when the engine did not answer with

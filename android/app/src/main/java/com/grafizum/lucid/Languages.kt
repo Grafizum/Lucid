@@ -11,7 +11,8 @@ import java.util.Locale
  * [Lang.onDevice] is the line between the two. A language without it is not a
  * lesser choice — the lens reads it whenever the online engine is allowed —
  * but it cannot be fetched for the offline page, so the page leaves it out and
- * Offline only says plainly that it has no model rather than pretending.
+ * the lens says plainly that On-device has no model for it rather than
+ * pretending.
  *
  * English names are the app's own labels; [native] is what the row shows first,
  * because that is the name someone looks for when the app's language is not

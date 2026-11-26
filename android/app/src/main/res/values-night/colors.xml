@@ -21,7 +21,14 @@
     <color name="screen_dot">#7A7160</color>
     <color name="screen_ok">#BCCE90</color>
     <color name="screen_ok_ink">#C3D398</color>
+    <!-- The slide's missing-switch line at night: the day rose turned up to a
+         dusty one, the step that clears the charcoal the way #8C3B2F clears
+         paper. Same muted family, not a signal red. -->
+    <color name="screen_warn_ink">#E0A294</color>
     <color name="screen_edge">#33FCF8F1</color>
+    <!-- A step stronger, for the one control that lifts off the card: the swap
+         ring on the pair's seam. -->
+    <color name="screen_edge_strong">#4DFCF8F1</color>
     <color name="screen_divider">#4DFCF8F1</color>
     <color name="screen_ink">#F7F1E5</color>
     <color name="screen_muted">#D8CEBA</color>
@@ -31,8 +38,35 @@
          shade lighter so the small chip labels clear 6:1 as the day ones do. -->
     <color name="screen_accent_ink">#F3D8BC</color>
     <color name="screen_accent_soft">#D8A87F</color>
-    <color name="screen_accent_fill">#3DE9BC96</color>
-    <color name="screen_accent_edge">#73E9BC96</color>
+    <!-- A chosen chip, a selected theme, an on switch: the tint at 30 % and its
+         rim at 60 %, a step up from the 24/45 it carried. On charcoal a 24 %
+         wash is a bruise rather than a surface, so the shape had to come from a
+         rim that was barely there, and the whole state read blass. The page's
+         own lightness is untouched — only the small objects standing on it are
+         drawn more firmly. -->
+    <color name="screen_accent_fill">#4DE9BC96</color>
+    <color name="screen_accent_edge">#99E9BC96</color>
+    <!-- The same button roles as the day page, one step firmer at night. The
+         tint goes from 35 % to 47 % and the rim from 45 % to 72 %, and the label
+         is cream instead of the accent ink: at 35 % the fill and the umber label
+         sat within a couple of points of each other, so the button was a smudge
+         with words in it rather than the one thing to press. It is still a tint
+         of the card and not a light object on it — the night page has not been
+         lightened, its buttons have been given an edge. -->
+    <color name="btn_primary_fill">#78E9BC96</color>
+    <color name="btn_primary_ink">#FFFCF8F1</color>
+    <color name="btn_primary_edge">#B8E9BC96</color>
+    <!-- The quiet answer as a surface of its own: a step above the card with a
+         30 % rim, so "Not now" and "Later" are buttons at night and not a line
+         of words waiting to be found. -->
+    <color name="btn_ghost_fill">#37332C</color>
+    <color name="btn_ghost_edge">#4DFCF8F1</color>
+    <!-- Under a thumb the charcoal card takes a step of light, not of shade: a
+         dark surface cannot be pressed darker and still read as pressed. Solid
+         rather than a 32 % film, and 1.5:1 above the card — a step you can see
+         on a screen this dark — so the press is the half itself and not a ring
+         drawn inside it. -->
+    <color name="screen_half_press">#FF474339</color>
     <color name="screen_shade">#000000</color>
     <color name="screen_well">#1B1916</color>
     <color name="screen_well_shade">#4D000000</color>
@@ -63,6 +97,10 @@
          lens opens at night is the dark page's own paper, not a separate palette. -->
     <color name="card_surface">#2A2722</color>
     <color name="card_edge">#33FCF8F1</color>
+    <!-- The band heads the sheet on charcoal too: a step up from the card, its
+         dots cream at the weight of a hairline rather than a texture. -->
+    <color name="card_band">#302D27</color>
+    <color name="card_dot">#1FFCF8F1</color>
     <color name="card_ink">#F7F1E5</color>
     <color name="card_muted">#D2C8B4</color>
     <color name="card_faint">#B0A692</color>
@@ -72,7 +110,40 @@
     <color name="card_danger">#E7AFA2</color>
     <color name="card_chip_fill">#1FFCF8F1</color>
     <color name="card_chip_edge">#33FCF8F1</color>
-    <color name="card_chip_accent_fill">#3DE9BC96</color>
-    <color name="card_chip_accent_edge">#73E9BC96</color>
+    <!-- The card's on-state, held to the same step as the page's: the picker's
+         tiles and the row already in force have to read as objects on charcoal,
+         not as a wash under their words. -->
+    <color name="card_chip_accent_fill">#4DE9BC96</color>
+    <color name="card_chip_accent_edge">#99E9BC96</color>
+
+    <!-- The deep-lift sheet at night: one step of charcoal above the card it
+         rises over — the chip's own surface — solid top to bottom, so no row of
+         the page ghosts under the last languages of the list. The card's own
+         charcoal was the wrong body here: against a card of the same colour the
+         sheet stopped reading as a sheet at all. -->
+    <color name="sheet_lift_top">#FF34302A</color>
+    <color name="sheet_lift_mid">#FD34302A</color>
+    <color name="sheet_lift_floor">#FF34302A</color>
+    <color name="sheet_lift_edge">#2EFCF8F1</color>
+
+    <!-- The question sheets at night: the charcoal voice they were drawn in,
+         untouched. Only the day side of these roles is new. -->
+    <color name="ask_surface">#23221E</color>
+    <color name="ask_card_edge">#1AFCF8F1</color>
+    <color name="ask_ink">#FCF8F1</color>
+    <color name="ask_body">#C2B9A6</color>
+    <color name="ask_faint">#A9A08E</color>
+    <color name="ask_label">#D3A582</color>
+    <color name="ask_primary_fill">@color/btn_primary_fill</color>
+    <color name="ask_primary_ink">@color/btn_primary_ink</color>
+    <color name="ask_secondary_fill">@color/screen_button</color>
+    <color name="ask_secondary_edge">@color/screen_edge</color>
+    <color name="ask_secondary_ink">@color/screen_ink</color>
+    <color name="ask_inset">#14FCF8F1</color>
+    <color name="ask_inset_edge">#1AFCF8F1</color>
+    <color name="ask_guide_screen">#1E1D19</color>
+    <color name="ask_guide_screen_edge">#2E2C27</color>
+    <color name="ask_guide_row">#24D3A582</color>
+    <color name="ask_guide_ghost">#12FCF8F1</color>
 
 </resources>

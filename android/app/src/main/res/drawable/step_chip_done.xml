@@ -1,8 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- The same step, done: filled with the page's olive. The numeral is drawn in
-     the canvas colour, which is dark on the light olive of the night theme and
-     light on the deep olive of the day theme. -->
+<!-- A numbered step that is already granted. It wears the same surface every
+     "on" in the app wears — the accent tint with its rim — so a done step, a
+     chosen surface and an allowed switch are one colour, not three. A solid disc
+     was a second on-colour of its own, and in the day theme it read as a black
+     button sitting in a row of quiet ones. -->
 <shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="oval">
-    <solid android:color="@color/screen_ok" />
+    <solid android:color="@color/screen_accent_fill" />
+    <stroke
+        android:width="1dp"
+        android:color="@color/screen_accent_edge" />
     <size android:width="18dp" android:height="18dp" />
 </shape>

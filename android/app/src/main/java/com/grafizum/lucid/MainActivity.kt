@@ -57,10 +57,9 @@ class MainActivity : AppCompatActivity() {
     private lateinit var startBtn: SwipeToStart
     private lateinit var stopX: FrameLayout
     private lateinit var stopXBtn: FrameLayout
-    private lateinit var offlineBtn: TextView
-    private lateinit var offlineHint: TextView
     private lateinit var modelsHint: TextView
     private lateinit var historyHint: TextView
+    private lateinit var lensHint: TextView
 
 
     /**
@@ -153,10 +152,9 @@ class MainActivity : AppCompatActivity() {
         autoHint = findViewById(R.id.autoHint)
         engBtn = findViewById(R.id.engBtn)
         engHint = findViewById(R.id.engHint)
-        offlineBtn = findViewById(R.id.offlineBtn)
-        offlineHint = findViewById(R.id.offlineHint)
         modelsHint = findViewById(R.id.modelsHint)
         historyHint = findViewById(R.id.historyHint)
+        lensHint = findViewById(R.id.lensHint)
         startBtn = findViewById(R.id.startBtn)
         stopX = findViewById(R.id.stopX)
         stopXBtn = findViewById(R.id.stopXBtn)
@@ -175,7 +173,7 @@ class MainActivity : AppCompatActivity() {
 
         // Every control answers a press the same way: it gives under the finger
         // and springs back. No ripples, no grey boxes — see Press.kt.
-        Press.attachAll(autoBtn, engBtn, offlineBtn, stopXBtn)
+        Press.attachAll(autoBtn, engBtn, stopXBtn)
 
         // The slide reads the way it is facing at the moment it lands, so one
         // control starts the lens and, from its other seat, switches it off.
@@ -184,13 +182,15 @@ class MainActivity : AppCompatActivity() {
         startBtn.onComplete = { done ->
             if (done == SwipeToStart.Mode.START) startLens() else stopLens()
         }
+        // The line is text, not a button: it keeps its look and only gains the
+        // tap. No ripple, no underline, no press — the page stays the page.
+        lensHint.setOnClickListener { askForMissingSwitch() }
         stopXBtn.setOnClickListener {
             stopXBtn.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
             stopLens()
         }
         autoBtn.setOnClickListener { toggleAuto() }
         engBtn.setOnClickListener { toggleEngine() }
-        offlineBtn.setOnClickListener { toggleOfflineOnly() }
         findViewById<View>(R.id.modelsRow).setOnClickListener { showModels() }
         findViewById<View>(R.id.historyRow).setOnClickListener {
             startActivity(Intent(this, HistoryActivity::class.java))
@@ -285,9 +285,6 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        // Back in the app: a card left over Settings has done its job either way,
-        // and it must never hang over this page.
-        SetupNudge.hide()
         // In front again: if a switch was flipped on the way back, carry on with
         // the next one; otherwise there is nothing left to watch.
         val finished = waitingFor
@@ -356,10 +353,10 @@ class MainActivity : AppCompatActivity() {
 
         // Android's own accessibility screen. There is no per-service page an app
         // is allowed to open — that one is guarded by a system permission — so
-        // what can be given is a card over the list, naming the section Lucid's
-        // row sits in on this phone. The page is also written down as the way
-        // back: the granted service returns here on its own, the switch on.
-        SetupNudge.show(this)
+        // the section Lucid's row sits in is written on the guide card just
+        // before it opens, in this phone's own words. The page is also written
+        // down as the way back: the granted service returns here on its own,
+        // with the switch on.
         AccessReturn.arm(this, javaClass)
         val opened = runCatching {
             accessibilityLauncher.launch(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
@@ -396,22 +393,36 @@ class MainActivity : AppCompatActivity() {
         // Neither switch can be worked around: without one the lens has nowhere
         // to sit, without the other it reads nothing. So this is a decision, said
         // once in a sheet, not a line that waits under the slide.
-        // The slide has already turned itself round for a lens that will not
-        // start, so it is told the truth again a beat later: nothing to stop.
+        if (askForMissingSwitch()) return
+
+        LensService.start(this)
+        startBtn.postDelayed({ refresh() }, 500)
+    }
+
+    /**
+     * The ask half of starting the lens, on its own: whichever switch is still
+     * off gets its sheet, and this answers whether it had to. The slide calls it,
+     * and so does the one line above the bar — that line is only ever on screen
+     * while a switch is missing, so a tap on it asks the same question the drag
+     * would, and never starts a lens that could not work.
+     *
+     * The slide has already turned itself round for a lens that will not start, so
+     * it is told the truth again a beat later: nothing to stop.
+     */
+    private fun askForMissingSwitch(): Boolean {
         if (!Settings.canDrawOverlays(this)) {
             askPermission(Ask.OVERLAY)
             startBtn.postDelayed({ refresh() }, 420)
-            return
+            return true
         }
 
         if (!LensAccessibilityService.isEnabled(this)) {
             askPermission(Ask.TEXT)
             startBtn.postDelayed({ refresh() }, 420)
-            return
+            return true
         }
 
-        LensService.start(this)
-        startBtn.postDelayed({ refresh() }, 500)
+        return false
     }
 
     /**
@@ -480,9 +491,23 @@ class MainActivity : AppCompatActivity() {
             Ask.CAPTURE -> "Pick Entire screen, then Start now \u2014 a single app will not do."
         }
         val note = dialog.findViewById<TextView>(R.id.guideNote)
-        // Sideloaded builds are greyed out until Android's own restriction is
-        // lifted, which is the one trap this screen has.
+        // Two things are worth knowing before the list opens: the section the
+        // row is under — so a long list is scrolled rather than searched — and
+        // that a sideloaded build is greyed out until Android's own restriction
+        // is lifted. Both are on this card because nothing of ours may stand
+        // over Settings itself: an app overlay is composited at reduced alpha
+        // there, so its words would read through the list behind them.
         note.visibility = if (ask == Ask.TEXT) View.VISIBLE else View.GONE
+        if (ask == Ask.TEXT) {
+            note.text = UiText.line(
+                this,
+                "Under %s — scroll down if it isn't there.",
+                SetupNudge.sectionPhrase(this),
+            ) + "\n" + UiText.line(
+                this,
+                "Greyed out? Open App info › ⋮ › Allow restricted settings first.",
+            )
+        }
 
         // Both Settings screens are lists, so the ringed row is the target; only
         // Android's own dialog has a button instead.
@@ -542,6 +567,14 @@ class MainActivity : AppCompatActivity() {
         applyEngine(next)
     }
 
+    /**
+     * The one switch that decides where a read happens.
+     *
+     * There used to be a second one — Offline only — that turned this off and
+     * greyed it out, so two controls said the same thing and one of them hid
+     * the other. On-device IS that promise now: with it on nothing leaves the
+     * phone, not the read and not the word list under it.
+     */
     private fun applyEngine(online: Boolean) {
         engBtn.text = if (online) "Online" else "On-device"
         engBtn.setBackgroundResource(if (online) R.drawable.chip_accent_bg else R.drawable.btn_ghost)
@@ -551,34 +584,9 @@ class MainActivity : AppCompatActivity() {
         engHint.text = if (online) {
             "Best quality \u2014 sent online to translate"
         } else {
-            "Offline models \u2014 nothing leaves the phone"
+            "Nothing leaves the phone"
         }
     }
-
-    /**
-     * Offline only. A promise rather than a preference: with it on, a read that
-     * would have to leave the phone says so instead of going, whatever ENGINE
-     * says — so ENGINE is dimmed while it is on, because it no longer decides.
-     */
-    private fun toggleOfflineOnly() {
-        val next = !Prefs.offlineOnly(this)
-        Prefs.setOfflineOnly(this, next)
-        applyOfflineOnly(next)
-    }
-
-    private fun applyOfflineOnly(on: Boolean) {
-        offlineBtn.text = if (on) "On" else "Off"
-        offlineBtn.setBackgroundResource(if (on) R.drawable.chip_accent_bg else R.drawable.btn_ghost)
-        offlineBtn.setTextColor(getColor(if (on) R.color.screen_accent_ink else R.color.screen_ink))
-        offlineHint.text = if (on) {
-            "On — nothing leaves the phone, whatever the engine"
-        } else {
-            "No read ever leaves the phone"
-        }
-        engBtn.alpha = if (on) 0.45f else 1f
-        engBtn.isEnabled = !on
-    }
-
     /** The row that says what is installed on the phone right now. */
     private fun refreshSidePanels() {
         RemoteModelManager.getInstance()
@@ -716,6 +724,11 @@ class MainActivity : AppCompatActivity() {
         val running = LensService.isLensVisible
         val lookMode = LensService.hasCapture
 
+        // One switch off is enough to stop the slide from starting the lens, so
+        // the line above the bar says so before the sheet behind the slide has
+        // to. Both on, it goes and the bar sits where it always did.
+        lensHint.visibility = if (canOverlay && textAccess) View.GONE else View.VISIBLE
+
         // The count is the whole row's promise: it says whether opening it is
         // worth the tap.
         val reads = Prefs.history(this).size
@@ -727,7 +740,6 @@ class MainActivity : AppCompatActivity() {
 
         applyAuto(Prefs.autoTranslate(this))
         applyEngine(Prefs.onlineEngine(this))
-        applyOfflineOnly(Prefs.offlineOnly(this))
         refreshSidePanels()
 
         // Off: the well sits left and drags right. On: it sits right, drags

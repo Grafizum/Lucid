@@ -15,22 +15,43 @@
          corner carries the language alone, as home does. -->
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="34dp"
-        android:gravity="center_vertical"
+        android:layout_height="wrap_content"
+        android:gravity="top"
         android:orientation="horizontal">
 
-        <TextView
-            android:id="@+id/welcomeLang"
+        <LinearLayout
             android:layout_width="wrap_content"
-            android:layout_height="30dp"
-            android:background="@drawable/btn_ghost"
-            android:fontFamily="@font/lucid_sans"
-            android:gravity="center"
-            android:paddingStart="14dp"
-            android:paddingEnd="14dp"
-            android:text="English"
-            android:textColor="@color/screen_ink"
-            android:textSize="10.5sp" />
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/welcomeLang"
+                android:layout_width="wrap_content"
+                android:layout_height="30dp"
+                android:background="@drawable/btn_ghost"
+                android:fontFamily="@font/lucid_sans"
+                android:gravity="center"
+                android:paddingStart="14dp"
+                android:paddingEnd="14dp"
+                android:text="English"
+                android:textColor="@color/screen_ink"
+                android:textSize="10.5sp" />
+
+            <!-- Translating, or the reason it cannot be: the words under this
+                 chip are the pack's, so the chip must not claim a language the
+                 page is not yet written in. -->
+            <TextView
+                android:id="@+id/welcomeLangState"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:fontFamily="@font/lucid_sans"
+                android:lineSpacingMultiplier="1.2"
+                android:maxWidth="230dp"
+                android:textColor="@color/screen_faint"
+                android:textSize="9.5sp"
+                android:visibility="gone" />
+        </LinearLayout>
 
     </LinearLayout>
 

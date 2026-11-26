@@ -24,6 +24,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.EditText
+import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.ScrollView
@@ -37,6 +38,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
+import java.util.Locale
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -80,13 +82,31 @@ class SettingsActivity : AppCompatActivity() {
     private lateinit var sub4: TextView
     private lateinit var permStatus: TextView
     private lateinit var targetName: TextView
+    private lateinit var sourceName: TextView
+    private lateinit var targetCode: TextView
+    private lateinit var sourceCode: TextView
     private lateinit var appLangName: TextView
     private lateinit var appLangHint: TextView
     private lateinit var appLangPack: ImageView
+    private lateinit var appLangState: TextView
 
-    /** The language being fetched right now, or null. One download at a time. */
-    private var fetching: String? = null
-    private var fetchJob: Job? = null
+    /**
+     * The pack the app language is waiting on. The fetch itself belongs to
+     * [AppLanguage], because picking a language rebuilds this page underneath
+     * the pick — this only has to look at where the pack got to.
+     */
+    private val packWatcher = object : AppLanguage.Watcher {
+        override fun onPackChanged(code: String, pack: AppLanguage.Pack, done: Int, total: Int) {
+            if (code != Prefs.uiLanguage(this@SettingsActivity)) return
+            paintAppLanguage()
+            // The page was built in English and the pack has just arrived: ask
+            // its own words for the translation now, not at the next visit.
+            if (pack == AppLanguage.Pack.READY) {
+                UiText.apply(this@SettingsActivity, findViewById(R.id.settingsRoot))
+            }
+        }
+    }
+
     private lateinit var appsWarn: TextView
     private lateinit var appsList: LinearLayout
     private lateinit var appsEmpty: TextView
@@ -165,9 +185,13 @@ class SettingsActivity : AppCompatActivity() {
         sub4 = findViewById(R.id.sub4)
         permStatus = findViewById(R.id.permStatus)
         targetName = findViewById(R.id.settingsTargetName)
+        sourceName = findViewById(R.id.settingsSourceName)
+        targetCode = findViewById(R.id.settingsTargetCode)
+        sourceCode = findViewById(R.id.settingsSourceCode)
         appLangName = findViewById(R.id.settingsAppLangName)
         appLangHint = findViewById(R.id.settingsAppLangHint)
         appLangPack = findViewById(R.id.settingsAppLangPack)
+        appLangState = findViewById(R.id.settingsAppLangState)
         appsWarn = findViewById(R.id.settingsAppsWarn)
         appsList = findViewById(R.id.settingsAppsList)
         appsEmpty = findViewById(R.id.appsEmpty)
@@ -181,7 +205,11 @@ class SettingsActivity : AppCompatActivity() {
         // Each heading carries the paragraph that used to sit under it: the
         // page stays a page of rows, and the explanation is a tap away.
         info(R.id.infoAppLang, "App language", "Two languages, two jobs. This one is the app itself — its tour, its buttons, its own words. English is written in; every other language is translated once by the same online engine the lens uses and then kept on this phone, which is what the arrow downloads. The card below it is the other question: the language a read comes out as, answered online every time, so nothing is ever downloaded for it.")
-        info(R.id.infoTarget, "Translate into", "This is the default for every app. If you pick a language on the lens while it sits over an app, that app keeps its own choice — a chat read into German, a browser into English — and every other app still uses this one.")
+        info(
+            R.id.infoTarget,
+            "Translate from and into",
+            "A read has two sides. From is Auto recognize by default: the lens works out the language of each line as it reads it, which is right almost every time. Pick a language there and every read starts from it — the answer for a screen too short or too mixed for the guess to be sure. Into is the default for every app. If you pick a language on the lens while it sits over an app, that app keeps its own choice — a chat read into German, a browser into English — and every other app still uses this one.",
+        )
         info(R.id.infoTheme, "Appearance", "The page's own light. System follows the phone, so the app changes when the phone does; Light and Dark hold the app where you put it. The lens, its card and the sheets it opens keep their own dressing either way — they have to read over whatever is underneath them.")
         info(
             R.id.infoPermissions,
@@ -194,36 +222,57 @@ class SettingsActivity : AppCompatActivity() {
             "Turn one on and the lens comes up over that app whenever it reaches the front — a chat, a game, a page you read every morning. Off is the app left alone. A switch only brings the lens up: nothing is read until you drag it onto something, and it still closes when you clear it. An app you have read into its own language shows a small cross on its row — tap it to forget that app's language and take the page's default back. Nothing else moves.",
         )
 
-        // App language: the row is the pick, the arrow is the download, and the
-        // tour is one tap away because the tour is where the words show.
+        // App language: the row is the pick and the arrow is the retry. The
+        // words are fetched the moment a language is picked, so nobody has to
+        // find the arrow to make the choice true.
         val appLang = findViewById<View>(R.id.settingsAppLang)
-        val appLangTour = findViewById<View>(R.id.settingsAppLangTour)
-        Press.attachAll(appLang, appLangPack, appLangTour)
+        Press.attachAll(appLang, appLangPack)
         appLang.setOnClickListener { showAppLanguageDialog() }
-        appLangPack.setOnClickListener { fetchAppLanguage() }
-        appLangTour.setOnClickListener {
-            startActivity(Intent(this, OnboardingActivity::class.java))
+        appLangPack.setOnClickListener {
+            AppLanguage.ensure(this, Prefs.uiLanguage(this))
+            paintAppLanguage()
         }
+        AppLanguage.watch(packWatcher)
 
-        // Translate into: one row, the language is the control.
+        // Translation: one card, two ends. Each end is the control, and the
+        // list each opens is the same list the lens opens. The seam between
+        // them is the third control: it swaps the pair.
         val target = findViewById<View>(R.id.settingsTarget)
-        Press.attach(target)
-        target.setOnClickListener { showLanguageDialog() }
+        val source = findViewById<View>(R.id.settingsSource)
+        val swap = findViewById<View>(R.id.settingsSwap)
+        // The two ends are the card's own controls: each sinks and takes the
+        // card's wash, and holds it long enough to be seen before its picker
+        // arrives. The ring is a small disc and only needs the app's ordinary
+        // give under a thumb.
+        PairPress.attach(
+            source,
+            findViewById(R.id.settingsSourceWash),
+            sourceCode,
+            sourceName,
+        ) { showSourceDialog() }
+        PairPress.attach(
+            target,
+            findViewById(R.id.settingsTargetWash),
+            targetCode,
+            targetName,
+        ) { showLanguageDialog() }
+        Press.attach(swap)
+        swap.setOnClickListener { swapLanguages() }
 
         // Appearance: three answers on one card, not a switch beside things that
-        // only change when the app changes them.
-        listOf(
-            R.id.themeSystem to ThemeChoice.SYSTEM,
-            R.id.themeLight to ThemeChoice.LIGHT,
-            R.id.themeDark to ThemeChoice.DARK,
-        ).forEach { (id, mode) ->
-            val row = findViewById<TextView>(id)
-            row.tag = mode
-            // The row's own word is the answer, so the label carries it too:
-            // a chosen row is announced as chosen, not just read out.
-            row.contentDescription = "${row.text} appearance"
-            Press.attach(row)
-            row.setOnClickListener { chooseTheme(mode) }
+        // only change when the app changes them. Each answer is a drawn page in
+        // its own light — see [ThemeSwatch] — with its mark and its word under
+        // it, so the card can be read at a glance and still be read out.
+        themeOptions().forEach { option ->
+            val cell = findViewById<View>(option.cell)
+            cell.tag = option.mode
+            val label = findViewById<TextView>(option.label).text
+            // The cell's own word is the answer, so the label carries it too:
+            // a chosen cell is announced as chosen, not just read out.
+            cell.contentDescription = "$label appearance"
+            findViewById<ThemeSwatch>(option.swatch).mode = option.mode
+            Press.attach(cell)
+            cell.setOnClickListener { chooseTheme(option.mode) }
         }
 
         // The four switches Android owns. Each button is the ask while the
@@ -263,9 +312,9 @@ class SettingsActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        // Back from Android's own screens: the switches may have moved. A card
-        // left over Settings has served its purpose and must not hover here.
-        SetupNudge.hide()
+        // Back from Android's own screens: the switches may have moved.
+        // A connection that came back is the app language arriving by itself.
+        AppLanguage.retryIfOnline(this, Prefs.uiLanguage(this))
         refresh()
         // A button added by hand in the shade reaches the app by the shade
         // binding it, so ask for that bind rather than waiting to be told.
@@ -279,7 +328,8 @@ class SettingsActivity : AppCompatActivity() {
         paintPermissions()
         paintTheme()
         paintAppLanguage()
-        targetName.text = Languages.nativeShort(Prefs.targetLanguage(this))
+        paintTarget()
+        paintSource()
         appsWarn.visibility =
             if (Settings.canDrawOverlays(this) && LensAccessibilityService.isEnabled(this)) {
                 View.GONE
@@ -292,15 +342,51 @@ class SettingsActivity : AppCompatActivity() {
         UiText.apply(this, findViewById(R.id.settingsRoot))
     }
 
+    /** The three choices, in the order the card draws them. */
+    private fun themeOptions(): List<ThemeOption> = listOf(
+        ThemeOption(
+            cell = R.id.themeSystem,
+            swatch = R.id.themeSystemSwatch,
+            label = R.id.themeSystemLabel,
+            mode = ThemeChoice.SYSTEM,
+        ),
+        ThemeOption(
+            cell = R.id.themeLight,
+            swatch = R.id.themeLightSwatch,
+            label = R.id.themeLightLabel,
+            mode = ThemeChoice.LIGHT,
+        ),
+        ThemeOption(
+            cell = R.id.themeDark,
+            swatch = R.id.themeDarkSwatch,
+            label = R.id.themeDarkLabel,
+            mode = ThemeChoice.DARK,
+        ),
+    )
+
+    /** The ids that make one appearance choice; [cell] is the control. */
+    private data class ThemeOption(
+        val cell: Int,
+        val swatch: Int,
+        val label: Int,
+        val mode: Int,
+    )
+
     /**
-     * The appearance card's three rows, with the one in force taken as a pill.
-     * The hint under the card says what the pick means out loud, because "System"
-     * on its own could be read either way.
+     * The appearance card, with the answer in force outlined and named in the
+     * accent — the outline is on its page and the colour on its word, two ways
+     * of saying the same thing that do not depend on each other. The page above
+     * the word is already a picture of the answer, so no second mark is needed
+     * beside it. The hint under the card says what the pick means out loud,
+     * because "System" on its own could be read either way.
      */
     private fun paintTheme() {
         val mode = ThemeChoice.mode(this)
-        listOf(R.id.themeSystem, R.id.themeLight, R.id.themeDark).forEach { id ->
-            findViewById<TextView>(id).isSelected = findViewById<TextView>(id).tag == mode
+        themeOptions().forEach { option ->
+            val on = option.mode == mode
+            findViewById<View>(option.cell).isSelected = on
+            findViewById<TextView>(option.label).isSelected = on
+            findViewById<ThemeSwatch>(option.swatch).chosen = on
         }
         findViewById<TextView>(R.id.themeHint).text = when (mode) {
             ThemeChoice.LIGHT -> "Light, wherever the phone goes"
@@ -331,7 +417,7 @@ class SettingsActivity : AppCompatActivity() {
         val canOverlay = Settings.canDrawOverlays(this)
         paintStep(dot1, canOverlay)
         btn1.text = if (canOverlay) "Allowed" else "Allow"
-        btn1.setTextColor(getColor(if (canOverlay) R.color.screen_ok_ink else R.color.screen_ink))
+        paintAnswer(btn1, canOverlay)
         btn1.isEnabled = !canOverlay
         sub1.text = if (canOverlay) {
             "On — the lens can sit over any app"
@@ -358,7 +444,7 @@ class SettingsActivity : AppCompatActivity() {
             !consented -> "Read and agree"
             else -> "Allow"
         }
-        btn2.setTextColor(getColor(if (textAccess) R.color.screen_ok_ink else R.color.screen_ink))
+        paintAnswer(btn2, textAccess)
         btn2.isEnabled = !textAccess
         sub2.text = if (textAccess) {
             "On — the lens can read the text under it"
@@ -375,7 +461,7 @@ class SettingsActivity : AppCompatActivity() {
             if (Capabilities.needsScreenShare || Prefs.captureFallback(this)) View.VISIBLE else View.GONE
         paintStep(dot3, lookMode)
         btn3.text = if (lookMode) "Allowed" else "Allow"
-        btn3.setTextColor(getColor(if (lookMode) R.color.screen_ok_ink else R.color.screen_ink))
+        paintAnswer(btn3, lookMode)
         btn3.isEnabled = !lookMode
         sub3.text = when {
             lookMode -> "On — the lens can read photos, video and hidden text"
@@ -387,7 +473,7 @@ class SettingsActivity : AppCompatActivity() {
 
         val quickButton = Prefs.tileAdded(this)
         btn4.text = if (quickButton) "Added" else "Add"
-        btn4.setTextColor(getColor(if (quickButton) R.color.screen_ok_ink else R.color.screen_ink))
+        paintAnswer(btn4, quickButton)
         btn4.isEnabled = !quickButton
         sub4.text = if (quickButton) {
             "In the shade — one tap turns the lens on"
@@ -397,14 +483,24 @@ class SettingsActivity : AppCompatActivity() {
     }
 
     /**
-     * A numbered step: the numeral alone while it is still to do, and a filled
-     * olive disc with the numeral knocked out of it once Android has granted it.
-     * Filled rather than merely tinted, so the two states are told apart by shape
-     * as much as colour — the page is read at a glance, often outdoors.
+     * A numbered step: the numeral alone, ringed in the accent, while it is still
+     * to do; once Android has granted it, the ring fills with the app's one "on"
+     * surface — the accent tint — and the numeral turns to accent ink.
      */
     private fun paintStep(chip: TextView, done: Boolean) {
         chip.setBackgroundResource(if (done) R.drawable.step_chip_done else R.drawable.step_chip_pending)
-        chip.setTextColor(getColor(if (done) R.color.screen_canvas else R.color.screen_accent))
+        chip.setTextColor(getColor(if (done) R.color.screen_accent_ink else R.color.screen_accent))
+    }
+
+    /**
+     * A permission's chip: one shape and one fill for both states, so the row is
+     * a row of the same object. What changes is the surface — the accent tint
+     * while it is on, the page's quiet beige while it is still to do — and the
+     * ink that sits on it. No second colour is introduced for a state.
+     */
+    private fun paintAnswer(chip: TextView, on: Boolean) {
+        chip.setBackgroundResource(if (on) R.drawable.chip_accent_bg else R.drawable.btn_ghost)
+        chip.setTextColor(getColor(if (on) R.color.screen_accent_ink else R.color.screen_ink))
     }
 
     /* ── the question marks ──────────────────────────────────────────── */
@@ -452,9 +548,11 @@ class SettingsActivity : AppCompatActivity() {
     }
 
     private fun openAccessibilitySettings() {
-        // The list this opens is the furthest an app may go; the card says which
-        // section holds Lucid's row, in the phone's own words.
-        SetupNudge.show(this)
+        // The list this opens is the furthest an app may go. Nothing of ours may
+        // stand over it — an app overlay is composited at reduced alpha there,
+        // so its words would read through the list behind them — and the name of
+        // the section that holds Lucid's row is said once, in the phone's own
+        // words, as the list arrives.
         // Turning it on is the answer to this page's question, so the service —
         // which is bound the moment the switch flips — brings this page back.
         AccessReturn.arm(this, javaClass)
@@ -463,6 +561,16 @@ class SettingsActivity : AppCompatActivity() {
         }
         if (opened.isFailure) {
             say(UiText.line(this, "Couldn't open Accessibility settings — find Lucid in Settings › Accessibility."))
+        } else {
+            Toast.makeText(
+                this,
+                UiText.line(
+                    this,
+                    "Under %s — scroll down if it isn't there.",
+                    SetupNudge.sectionPhrase(this),
+                ),
+                Toast.LENGTH_LONG,
+            ).show()
         }
     }
 
@@ -562,109 +670,252 @@ class SettingsActivity : AppCompatActivity() {
         val code = Prefs.uiLanguage(this)
         val name = Languages.nativeShort(code)
         val builtIn = code == "en"
-        val ready = UiText.has(this, code)
+        val pack = AppLanguage.pack(this, code)
+        val ready = pack == AppLanguage.Pack.READY
+        val fetching = pack == AppLanguage.Pack.FETCHING
         appLangName.text = name
         appLangPack.visibility = if (builtIn) View.GONE else View.VISIBLE
         appLangPack.setImageResource(if (ready) R.drawable.ic_check else R.drawable.ic_download)
-        appLangPack.alpha = if (fetching != null) 0.4f else 1f
-        appLangPack.isEnabled = !ready && fetching == null
+        appLangPack.alpha = if (fetching) 0.4f else 1f
+        appLangPack.isEnabled = !ready && !fetching
         appLangPack.contentDescription = when {
             ready -> "$name is on this phone"
             else -> "Download $name"
         }
         appLangHint.text = when {
             builtIn -> "The app's own words — English is built in."
-            fetching == code -> appLangHint.text
+            fetching -> UiText.t(this, "appLang.fetching", name)
             ready -> UiText.t(this, "appLang.onPhone", name)
             else -> UiText.t(this, "appLang.notOnPhone", name)
         }
-    }
-
-    private fun showAppLanguageDialog() {
-        val dialog = Dialog(this)
-        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-        dialog.setContentView(
-            // Named for what it is here: this is the app's own language, not the
-            // language a read comes out as. The row below opens that one.
-            LanguagePicker.build(this, Prefs.uiLanguage(this), title = "APP LANGUAGE") { lang ->
-                // Remembered and put in force: every screen, this one too, is
-                // redrawn in the chosen language as soon as it is picked.
-                AppLanguage.choose(this, lang.code)
-                dialog.dismiss()
-                paintAppLanguage()
-            },
-        )
-        dialog.window?.setLayout(
-            (resources.displayMetrics.widthPixels * 0.86f).toInt(),
-            WindowManager.LayoutParams.WRAP_CONTENT,
-        )
-        dialog.show()
+        paintAppLangState(code, pack)
     }
 
     /**
-     * Translates the app's word list into the chosen language, once.
-     *
-     * The work is a handful of small requests against the engine the lens
-     * already uses, so it is a download in the ordinary sense: Wi-Fi, a few
-     * seconds, and then it is on the phone for good. Progress is counted in
-     * lines rather than guessed at, and a language that cannot be answered
-     * leaves the row exactly as it was.
+     * The small line under the row: silent while the words are here, a count
+     * while they are being fetched, and — the one case that needs a person —
+     * the reason they are not. A language cannot be translated over a phone
+     * with no connection, so it says so where the choice was made. The words
+     * are [AppLanguage.notice]'s, so the tour says the same thing.
      */
-    private fun fetchAppLanguage() {
-        val code = Prefs.uiLanguage(this)
-        if (code == "en" || fetching != null || UiText.has(this, code)) return
-        fetching = code
-        paintAppLanguage()
-        appLangHint.text = UiText.t(this, "appLang.fetching", Languages.nativeShort(code))
-        fetchJob = CoroutineScope(Dispatchers.Main).launch {
-            val result = UiText.download(this@SettingsActivity, code) { done, total ->
-                appLangHint.text = UiText.t(
-                    this@SettingsActivity,
-                    "appLang.progress",
-                    Languages.nativeShort(code),
-                    done,
-                    total,
-                )
-            }
-            fetching = null
+    private fun paintAppLangState(code: String, pack: AppLanguage.Pack) {
+        val text = AppLanguage.notice(this, code)
+        appLangState.visibility = if (text == null) View.GONE else View.VISIBLE
+        if (text == null) return
+        appLangState.text = text
+        val icon = when (pack) {
+            AppLanguage.Pack.FETCHING -> 0
+            AppLanguage.Pack.FAILED ->
+                if (AppLanguage.online(this)) R.drawable.ic_download else R.drawable.ic_qs_wifi
+            else -> R.drawable.ic_download
+        }
+        appLangState.setCompoundDrawablesRelativeWithIntrinsicBounds(icon, 0, 0, 0)
+    }
+
+    private fun showAppLanguageDialog() {
+        // Named for what it is here: this is the app's own language, not the
+        // language a read comes out as. The row below opens that one.
+        pickerSheet("APP LANGUAGE", Prefs.uiLanguage(this)) { lang ->
+            // Fetched first, so the rebuild the choice causes already has the
+            // words to draw: the screen comes back in the language the chip
+            // says, not in English with a language's name on it.
+            AppLanguage.ensure(this, lang.code)
+            AppLanguage.choose(this, lang.code)
             paintAppLanguage()
-            if (isFinishing || isDestroyed) return@launch
-            result.onSuccess { count ->
-                say(UiText.t(this@SettingsActivity, "appLang.done", count, Languages.nativeShort(code)))
-                // The page is asked for its words again now that the pack
-                // exists: the lines it was built with are English until a pack
-                // answers them.
-                UiText.apply(this@SettingsActivity, findViewById(R.id.settingsRoot))
-            }.onFailure {
-                say(UiText.t(this@SettingsActivity, "appLang.failed"))
-            }
         }
     }
 
     override fun onDestroy() {
-        fetchJob?.cancel()
+        AppLanguage.unwatch(packWatcher)
         super.onDestroy()
     }
 
-    /* ── translate into ──────────────────────────────────────────────── */
+    /* ── translate from and into ─────────────────────────────────────── */
+
+    /**
+     * The from end: the language a read starts in, or the two words that say
+     * nothing is pinned and each read works it out itself.
+     */
+    private fun paintSource() {
+        val pinned = Prefs.sourceLanguage(this)
+        sourceName.text = pinned?.let { Languages.nativeShort(it) }
+            ?: UiText.line(this, "Auto recognize")
+        paintCode(sourceCode, pinned, accent = false)
+        // The seam is the swap. With nothing pinned there is nothing to swap a
+        // guess with, so the ring stays where it is and dims instead of going:
+        // the card keeps the one shape it has, and the control says by its own
+        // light that there is nothing to exchange yet.
+        val seam = findViewById<View>(R.id.settingsSwap)
+        seam.isClickable = pinned != null
+        seam.isFocusable = pinned != null
+        seam.contentDescription = if (pinned == null) null else "Swap the two languages"
+        // Only the glyph dims. Dimming the ring itself made it see-through, and
+        // the seam behind it showed straight through the circle.
+        findViewById<View>(R.id.settingsSwapGlyph).alpha = if (pinned == null) 0.45f else 1f
+        findViewById<View>(R.id.settingsSource).contentDescription =
+            if (pinned == null) {
+                "Translate from: auto recognize. Every read works its language out. Tap to pin one."
+            } else {
+                "Translate from ${Languages.label(pinned)}. Tap to change it."
+            }
+    }
+
+    /** The into end: the language every read comes out as. */
+    private fun paintTarget() {
+        val code = Prefs.targetLanguage(this)
+        targetName.text = Languages.nativeShort(code)
+        paintCode(targetCode, code, accent = true)
+        findViewById<View>(R.id.settingsTarget).contentDescription =
+            "Translate into ${Languages.label(code)}. Tap to change it."
+    }
+
+    /**
+     * The disc at each end: two letters of the language's code where there is a
+     * language, the word AUTO where the lens works the language out itself. A
+     * code is shorter than any name, so the card can carry the pair without a
+     * line of explanation under it.
+     */
+    private fun paintCode(disc: TextView, code: String?, accent: Boolean) {
+        val auto = code == null
+        disc.text = if (auto) "AUTO" else code.uppercase(Locale.ROOT).take(3)
+        // Three letters only ever come from a language code the picker chose;
+        // AUTO is four and has to sit inside the same 40 dp disc without
+        // touching its rim.
+        disc.textSize = when {
+            auto -> 8.5f
+            disc.text.length > 2 -> 10f
+            else -> 13f
+        }
+        disc.letterSpacing = if (auto) 0.03f else -0.01f
+        disc.setBackgroundResource(
+            if (accent) R.drawable.medallion_to else R.drawable.medallion_from,
+        )
+        disc.setTextColor(
+            ContextCompat.getColor(
+                this,
+                if (accent) R.color.screen_accent_ink else R.color.screen_ink,
+            ),
+        )
+    }
+
+    /**
+     * The seam's one job: the pair trades places. Only a pinned From can move,
+     * because Auto is not a language the other end could be set to.
+     */
+    private fun swapLanguages() {
+        val from = Prefs.sourceLanguage(this) ?: return
+        val into = Prefs.targetLanguage(this)
+        Prefs.setSourceLanguage(this, into)
+        Prefs.setTargetLanguage(this, from)
+        paintSource()
+        paintTarget()
+        say("${Languages.label(into)} → ${Languages.label(from)}")
+    }
+
+    /**
+     * The same list the lens opens, with Auto recognize at its head: it is the
+     * default, so it has to be reachable without a search.
+     */
+    private fun showSourceDialog() {
+        pickerSheet(
+            "TRANSLATE FROM",
+            Prefs.sourceLanguage(this) ?: "auto",
+            includeAuto = true,
+        ) { lang ->
+            val auto = lang.code == "auto"
+            Prefs.setSourceLanguage(this, if (auto) null else lang.code)
+            paintSource()
+            say(
+                if (auto) {
+                    UiText.line(this, "Auto recognize — the language is worked out on every read")
+                } else {
+                    UiText.line(this, "Reads start in %s", lang.label)
+                },
+            )
+        }
+    }
 
     private fun showLanguageDialog() {
+        pickerSheet("TRANSLATE INTO", Prefs.targetLanguage(this)) { lang ->
+            Prefs.setTargetLanguage(this, lang.code)
+            paintTarget()
+            Toast.makeText(
+                this,
+                UiText.line(this, "Translating into %s", lang.label),
+                Toast.LENGTH_SHORT,
+            ).show()
+        }
+    }
+
+    /**
+     * A language list, as the deep-lift sheet: anchored to the bottom edge of
+     * the page, wide as the page, and lifted off it by its own shadow rather
+     * than by a fill that stops dead at its border.
+     *
+     * The sheet is a sibling of the page, not part of it, so it carries the
+     * frame that leaves room for the shadow; the list it holds is the same list
+     * the lens opens. Picking a row closes the sheet, so no caller has to keep
+     * its own handle on it.
+     */
+    private fun pickerSheet(
+        title: String,
+        current: String,
+        includeAuto: Boolean = false,
+        onPick: (Languages.Lang) -> Unit,
+    ) {
         val dialog = Dialog(this)
         dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        val sheet = LanguagePicker.build(
+            this,
+            current,
+            title = title,
+            includeAuto = includeAuto,
+        ) { lang ->
+            onPick(lang)
+            dialog.dismiss()
+        }
+        sheet.setBackgroundResource(R.drawable.sheet_lift_bg)
+        // The long shadow is the depth: the gradient only says where the sheet
+        // is thin, and paper under it still reads through the lower third.
+        sheet.elevation = dp(22).toFloat()
         dialog.setContentView(
-            LanguagePicker.build(this, Prefs.targetLanguage(this)) { lang ->
-                Prefs.setTargetLanguage(this, lang.code)
-                targetName.text = Languages.label(lang.code)
-                Toast.makeText(
-                    this,
-                    UiText.line(this, "Translating into %s", lang.label),
-                    Toast.LENGTH_SHORT,
-                ).show()
-                dialog.dismiss()
+            FrameLayout(this).apply {
+                // A shadow is drawn outside the sheet's own bounds, so the frame
+                // has to give it room and has to stop clipping to its padding.
+                // The margins are the point: the sheet floats a clear step in
+                // from both sides and, since it is only a list rather than a
+                // page, well clear of the bottom edge too — docked to the last
+                // pixels of the screen it read as a drawer pulled out of it.
+                setPadding(dp(16), dp(30), dp(16), dp(64))
+                clipChildren = false
+                clipToPadding = false
+                addView(
+                    sheet,
+                    FrameLayout.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.WRAP_CONTENT,
+                    ),
+                )
             },
         )
+        dialog.window?.setGravity(Gravity.BOTTOM)
+        // The page stays readable under the sheet, so the scrim is a breath of
+        // shade rather than the dialog's default half-dark: what shows through
+        // the sheet's thin bottom is the page, not a grey of it.
+        dialog.window?.setDimAmount(0.14f)
+        // The study's glass is frosted. Android 12 can blur what is behind a
+        // window, which is the same thing for a sheet this shallow; older
+        // phones keep the gradient and simply see the page through it.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            dialog.window?.setBackgroundBlurRadius(dp(20))
+        }
+        // The search field is the reason most people open this sheet, and it
+        // sits at the top of it: a keyboard arriving would cover the
+        // very rows the search is for, so the sheet is asked to shrink above it
+        // rather than be pushed up the page.
+        dialog.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
         dialog.window?.setLayout(
-            (resources.displayMetrics.widthPixels * 0.86f).toInt(),
+            WindowManager.LayoutParams.MATCH_PARENT,
             WindowManager.LayoutParams.WRAP_CONTENT,
         )
         dialog.show()

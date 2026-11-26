@@ -65,6 +65,7 @@ class OnboardingActivity : AppCompatActivity() {
 
     private lateinit var scene: OnboardingScene
     private lateinit var language: TextView
+    private lateinit var langState: TextView
     private lateinit var title: TextView
     private lateinit var body: TextView
     private lateinit var dots: LinearLayout
@@ -73,6 +74,27 @@ class OnboardingActivity : AppCompatActivity() {
     private lateinit var skip: TextView
 
     private var index = 0
+
+    /**
+     * The corner chip's own story: a language being translated, the reason it
+     * cannot be, and the repaint the moment it lands.
+     *
+     * The words of the tour are the pack's, not the layout's, so choosing a
+     * language used to leave the chip saying Japanese over an English page
+     * until someone found the download in Settings. The fetch now starts with
+     * the pick, and this is what redraws the page when it finishes.
+     */
+    private val packWatcher = object : AppLanguage.Watcher {
+        override fun onPackChanged(code: String, pack: AppLanguage.Pack, done: Int, total: Int) {
+            if (code != Prefs.uiLanguage(this@OnboardingActivity)) return
+            paintLanguage()
+            if (pack == AppLanguage.Pack.READY) {
+                show(index, animate = false)
+                reserveHeights()
+                UiText.apply(this@OnboardingActivity, findViewById(R.id.obRoot))
+            }
+        }
+    }
 
     /** Set up was pressed with float-over still off; the next page is the list. */
     private var pendingAccessibility = false
@@ -114,6 +136,7 @@ class OnboardingActivity : AppCompatActivity() {
 
         scene = findViewById(R.id.obScene)
         language = findViewById(R.id.obLang)
+        langState = findViewById(R.id.obLangState)
         title = findViewById(R.id.obTitle)
         body = findViewById(R.id.obBody)
         dots = findViewById(R.id.obDots)
@@ -121,21 +144,18 @@ class OnboardingActivity : AppCompatActivity() {
         next = findViewById(R.id.obNext)
         skip = findViewById(R.id.obSkip)
 
-        // The CTA is the one clay surface on the page, the same trade the main
-        // screen makes for the slide's landing.
-        next.background = GradientDrawable().apply {
-            shape = GradientDrawable.RECTANGLE
-            cornerRadius = dp(15f)
-            setColor(ContextCompat.getColor(this@OnboardingActivity, R.color.clay_500))
-        }
+        // The CTA is the app's one primary button, not a second design of one:
+        // it wears the same file every other primary action wears, so the tour's
+        // Next and a sheet's Allow are the same object in the same colour.
+        next.setBackgroundResource(R.drawable.btn_primary)
         Press.attachAll(back, next, language, skip)
-        skip.text = words("tour.skip")
-        back.text = words("tour.back")
 
         // The app's language, in the corner. The pick made here is the one the
         // whole app is drawn in and the one a read comes out as — the same
         // switch Settings has, not a second setting that can drift from it.
         bindLanguage()
+        paintLanguage()
+        AppLanguage.watch(packWatcher)
         language.setOnClickListener { pickLanguage() }
 
         // The tour is the first place a decision about the app's light is worth
@@ -327,6 +347,7 @@ class OnboardingActivity : AppCompatActivity() {
     private fun bindActions() {
         val permission = index == pages.lastIndex
         val enabled = LensAccessibilityService.isEnabled(this)
+        skip.text = words("tour.skip")
         back.text = words("tour.back")
         back.visibility = if (index > 0) View.VISIBLE else View.INVISIBLE
         back.isEnabled = index > 0
@@ -359,6 +380,13 @@ class OnboardingActivity : AppCompatActivity() {
         language.text = Languages.nativeShort(Prefs.uiLanguage(this))
     }
 
+    /** The line under the chip, or nothing while the words are already here. */
+    private fun paintLanguage() {
+        val notice = AppLanguage.notice(this, Prefs.uiLanguage(this))
+        langState.visibility = if (notice == null) View.GONE else View.VISIBLE
+        langState.text = notice ?: ""
+    }
+
     /**
      * The app's language switch, opened from the chip: the pick is remembered and
      * the tour is rebuilt in it, on the page it was left on. Reads come out in it
@@ -371,8 +399,13 @@ class OnboardingActivity : AppCompatActivity() {
         dialog.setContentView(
             LanguagePicker.build(this, Prefs.uiLanguage(this), title = "APP LANGUAGE") { lang ->
                 Prefs.setTargetLanguage(this, lang.code)
+                // The words are fetched with the pick: a German chip over an
+                // English tour is the bug this closes. With no connection the
+                // corner says so instead of pretending the page changed.
+                AppLanguage.ensure(this, lang.code)
                 AppLanguage.choose(this, lang.code)
                 bindLanguage()
+                paintLanguage()
                 dialog.dismiss()
             },
         )
@@ -408,17 +441,39 @@ class OnboardingActivity : AppCompatActivity() {
             }
             return
         }
-        SetupNudge.show(this)
         // The last loop is this ask, so the switch being turned on is the end of
         // it: the service brings this page back with its button already saying
         // Start the lens.
         AccessReturn.arm(this, javaClass)
-        runCatching { startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)) }
-            .onFailure { finishOnboarding() }
+        val opened = runCatching { startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)) }
+        opened.onFailure { finishOnboarding() }
+        // Nothing of ours may stand over that list — an app overlay is drawn at
+        // reduced alpha there — so the section the row sits under is said once,
+        // as the list arrives, in the phone's own words.
+        if (opened.isSuccess) {
+            Toast.makeText(
+                this,
+                UiText.line(
+                    this,
+                    "Under %s — scroll down if it isn't there.",
+                    SetupNudge.sectionPhrase(this),
+                ),
+                Toast.LENGTH_LONG,
+            ).show()
+        }
+    }
+
+    override fun onDestroy() {
+        AppLanguage.unwatch(packWatcher)
+        super.onDestroy()
     }
 
     override fun onResume() {
         super.onResume()
+        // A pack may have landed while this page was away — or a connection may
+        // have, which is what the corner promised. Both are answered here.
+        paintLanguage()
+        AppLanguage.retryIfOnline(this, Prefs.uiLanguage(this))
         // Back from float-over: the list is the next step, and the card can now
         // sit over it.
         if (pendingAccessibility) {
@@ -426,9 +481,6 @@ class OnboardingActivity : AppCompatActivity() {
             if (Settings.canDrawOverlays(this)) {
                 next.postDelayed({ openAccessibilitySettings() }, 400L)
             }
-        } else {
-            // Back from the switch: nothing of ours belongs over this page.
-            SetupNudge.hide()
         }
         // Back from the switch: the last screen's buttons say what is left to
         // do, without restarting its loop.

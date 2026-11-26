@@ -11,7 +11,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/card_dark_bg"
+        android:background="@drawable/ask_card_bg"
         android:orientation="vertical"
         android:paddingStart="24dp"
         android:paddingTop="22dp"
@@ -25,7 +25,7 @@
             android:letterSpacing="0.2"
             android:text="Permission needed"
             android:textAllCaps="true"
-            android:textColor="@color/clay_300"
+            android:textColor="@color/ask_label"
             android:textSize="9sp" />
 
         <TextView
@@ -36,7 +36,7 @@
             android:fontFamily="@font/lucid_sans"
             android:letterSpacing="-0.02"
             android:text="The lens needs Text access"
-            android:textColor="@color/cream_50"
+            android:textColor="@color/ask_ink"
             android:textFontWeight="500"
             android:textSize="19sp" />
 
@@ -48,7 +48,7 @@
             android:fontFamily="@font/lucid_sans"
             android:lineSpacingMultiplier="1.45"
             android:text="Without it the lens still opens, but it reads nothing."
-            android:textColor="@color/sand_400"
+            android:textColor="@color/ask_body"
             android:textSize="11.5sp" />
 
         <!-- the screen, drawn -->
@@ -72,7 +72,7 @@
                 android:maxLines="1"
                 android:text="Display over other apps"
                 android:textAllCaps="true"
-                android:textColor="@color/sand_500"
+                android:textColor="@color/ask_faint"
                 android:textSize="8.5sp" />
 
             <View
@@ -111,7 +111,7 @@
                         android:fontFamily="@font/lucid_sans"
                         android:maxLines="1"
                         android:text="Lucid"
-                        android:textColor="@color/cream_50"
+                        android:textColor="@color/ask_ink"
                         android:textSize="10.5sp" />
 
                     <TextView
@@ -122,7 +122,7 @@
                         android:fontFamily="@font/lucid_sans"
                         android:maxLines="1"
                         android:text="Tap this to reach its switch"
-                        android:textColor="@color/sand_500"
+                        android:textColor="@color/ask_faint"
                         android:textSize="8.5sp" />
                 </LinearLayout>
             </FrameLayout>
@@ -148,14 +148,14 @@
                     android:layout_height="30dp"
                     android:layout_gravity="end|center_vertical"
                     android:layout_marginEnd="3dp"
-                    android:background="@drawable/btn_dark_solid"
+                    android:background="@drawable/btn_primary"
                     android:fontFamily="@font/lucid_sans"
                     android:gravity="center"
                     android:minWidth="104dp"
                     android:paddingStart="14dp"
                     android:paddingEnd="14dp"
                     android:text="Start now"
-                    android:textColor="@color/ink_900"
+                    android:textColor="@color/btn_primary_ink"
                     android:textFontWeight="500"
                     android:textSize="10.5sp" />
             </FrameLayout>
@@ -174,7 +174,7 @@
                 android:fontFamily="@font/lucid_sans"
                 android:gravity="end"
                 android:text="↑ the switch is here"
-                android:textColor="@color/clay_300"
+                android:textColor="@color/ask_label"
                 android:textSize="9sp" />
         </LinearLayout>
 
@@ -186,7 +186,7 @@
             android:fontFamily="@font/lucid_sans"
             android:lineSpacingMultiplier="1.35"
             android:text="Settings › Accessibility › Lucid"
-            android:textColor="@color/sand_500"
+            android:textColor="@color/ask_faint"
             android:textSize="9.5sp" />
 
         <TextView
@@ -197,7 +197,7 @@
             android:fontFamily="@font/lucid_sans"
             android:lineSpacingMultiplier="1.35"
             android:text="Greyed out? Open App info › ⋮ › Allow restricted settings first."
-            android:textColor="@color/clay_300"
+            android:textColor="@color/ask_label"
             android:textSize="9.5sp"
             android:visibility="gone" />
 
@@ -212,14 +212,14 @@
                 android:id="@+id/permLater"
                 android:layout_width="wrap_content"
                 android:layout_height="38dp"
-                android:background="@drawable/btn_dark_outline"
+                android:background="@drawable/btn_ghost"
                 android:fontFamily="@font/lucid_sans"
                 android:gravity="center"
                 android:minWidth="76dp"
                 android:paddingStart="16dp"
                 android:paddingEnd="16dp"
                 android:text="Not now"
-                android:textColor="@color/sand_300"
+                android:textColor="@color/ask_secondary_ink"
                 android:textFontWeight="500"
                 android:textSize="11.5sp" />
 
@@ -228,14 +228,14 @@
                 android:layout_width="wrap_content"
                 android:layout_height="38dp"
                 android:layout_marginStart="10dp"
-                android:background="@drawable/btn_dark_solid"
+                android:background="@drawable/btn_primary"
                 android:fontFamily="@font/lucid_sans"
                 android:gravity="center"
                 android:minWidth="96dp"
                 android:paddingStart="18dp"
                 android:paddingEnd="18dp"
                 android:text="Open settings"
-                android:textColor="@color/ink_900"
+                android:textColor="@color/btn_primary_ink"
                 android:textFontWeight="500"
                 android:textSize="11.5sp" />
         </LinearLayout>
