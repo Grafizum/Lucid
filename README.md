@@ -46,6 +46,8 @@ Lucid is not a split-screen translator and not a screenshot tool. It is a small 
 - **Two engines** — an online translation service when you have a connection, ML Kit models on-device when you want nothing to leave the phone.
 - **Japanese extras** — furigana-style readings above the kanji, and a short word-by-word list under the line.
 - **Photos and video read the same way (optional)** — with screen capture allowed, a surface with no text in the tree (a photo, a video frame, a game) is read from one still frame instead of the tree. Same lens, same card, same sentence: there is no second mode to learn.
+- **Light or dark, by hand** — the lens, the card and the highlight follow the theme you pick, not the phone's.
+- **Recent reads** — what the lens has translated is kept on this phone, newest first, on its own page.
 - **Quick-settings tile** — start and stop the lens from the shade, without opening the app.
 
 ## 📲 Coming to Google Play
@@ -73,11 +75,17 @@ Then press **Start the lens**.
 
 ## 🖼 Screenshots
 
-| The lens on a message — the card holds the translation | The app: permissions, language, engine |
+| The lens on a message — the card holds the translation | The app: the lens, and the pages behind it |
 | --- | --- |
-| <img src="docs/screenshots/chat.png" alt="Lucid's lens on a Spanish chat message with the English translation card open" width="420" /> | <img src="docs/screenshots/home.png" alt="Lucid's start screen with its permission rows, language and engine settings" width="420" /> |
+| <img src="docs/screenshots/chat.png" alt="Lucid's lens on a Spanish chat message with the English translation card open" width="420" /> | <img src="docs/screenshots/home-light.png" alt="Lucid's home screen: auto-translate, engine and offline-only switches, then offline models and translation history below them" width="420" /> |
 | **Tap the lens — the language list, saved for what comes next** | **Long-press — the lens pauses to a ghost until you wake it** |
 | <img src="docs/screenshots/languages.png" alt="The language picker open over a chat, listing English, Spanish, French, German, Portuguese, Italian and Dutch" width="420" /> | *A tap opens this list and saves the pick for everything the lens reads next; a long-press parks the lens until you long-press it again.* |
+
+**First run** — one screen and one tap before the lens can float:
+
+| Welcome — tap the lens to begin | The same home screen at night |
+| --- | --- |
+| <img src="docs/screenshots/welcome.png" alt="Lucid's welcome screen: the lens mark inside a breathing ring, with Tap the lens to begin under it" width="420" /> | <img src="docs/screenshots/home-dark.png" alt="Lucid's home screen in the dark palette, with the same lens switches and pages" width="420" /> |
 
 **Closer in** — the wash covers exactly the line that was read, and the card's footer says which engine answered:
 
