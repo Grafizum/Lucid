@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lucid — still open</title>
+<style>
+  @font-face {
+    font-family: "Lucida";
+    src: url("./fonts/PlusJakarta.ttf") format("truetype");
+    font-weight: 200 800;
+    font-display: swap;
+  }
+
+  :root {
+    --ease: cubic-bezier(.32, .72, 0, 1);
+    --page: #EFE6D6;
+    --page-light: #FBF5E9;
+    --paper: #FCF8F1;
+    --well: #F5EEE2;
+    --ink: #191814;
+    --body: #6A6254;
+    --faint: #857B6C;
+    --clay: #8A5A3C;
+    --clay-ink: #6E4630;
+    --hair: rgba(25, 24, 20, .12);
+    --tint: rgba(164, 110, 75, .13);
+    --tint-edge: rgba(164, 110, 75, .26);
+    --shadow: 0 1px 1px rgba(25, 24, 20, .04), 0 18px 40px -24px rgba(25, 24, 20, .28);
+    /* the two pages a swatch previews — literal in both themes */
+    --day-page: #FCF8F1;
+    --night-page: #23221E;
+    --ink-on-day: rgba(25, 24, 20, .62);
+    --ink-on-night: rgba(252, 248, 241, .58);
+  }
+
+  body.night {
+    --page: #171613;
+    --page-light: #23211D;
+    --paper: #26231F;
+    --well: #2E2B26;
+    --ink: #F7F1E5;
+    --body: #C2B9A6;
+    --faint: #B0A692;
+    --clay: #E9BC96;
+    --clay-ink: #F3D8BC;
+    --hair: rgba(252, 248, 241, .13);
+    --tint: rgba(233, 188, 150, .15);
+    --tint-edge: rgba(233, 188, 150, .28);
+    --shadow: 0 1px 1px rgba(0, 0, 0, .2), 0 18px 40px -24px rgba(0, 0, 0, .7);
+  }
+
+  * { box-sizing: border-box; }
+
+  html { background: var(--page); transition: background .5s var(--ease); }
+
+  body {
+    margin: 0;
+    padding: 58px 40px 110px;
+    font-family: "Lucida", system-ui, sans-serif;
+    color: var(--ink);
+    background:
+      radial-gradient(120% 60% at 50% -10%, var(--page-light) 0%, rgba(251, 245, 233, 0) 60%),
+      var(--page);
+    transition: background .5s var(--ease), color .5s var(--ease);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 60;
+    opacity: .03;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/></filter><rect width='140' height='140' filter='url(%23n)'/></svg>");
+  }
+
+  .wrap { max-width: 1040px; margin: 0 auto; }
+
+  .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 9.5px;
+    letter-spacing: .22em;
+    text-transform: uppercase;
+    font-weight: 600;
+    color: var(--clay);
+    padding: 6px 13px;
+    border-radius: 999px;
+    border: 1px solid var(--tint-edge);
+    background: var(--tint);
+  }
+
+  .eyebrow::before {
+    content: "";
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: var(--clay);
+  }
+
+  h1 {
+    margin: 22px 0 14px;
+    font-size: clamp(31px, 4.2vw, 47px);
+    line-height: 1.04;
+    letter-spacing: -.042em;
+    font-weight: 650;
+    max-width: 20ch;
+  }
+
+  h1 em { font-style: normal; color: var(--clay); }
+
+  .lede { margin: 0; max-width: 68ch; font-size: 14.5px; line-height: 1.7; color: var(--body); }
+  .lede b { color: var(--ink); font-weight: 600; }
+
+  .bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+    margin-top: 26px;
+    padding-top: 20px;
+    border-top: 1px solid var(--hair);
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    height: 36px;
+    padding: 0 17px;
+    border-radius: 999px;
+    border: 1px solid var(--tint-edge);
+    background: var(--tint);
+    color: var(--clay-ink);
+    font-family: inherit;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .05em;
+    text-decoration: none;
+    cursor: pointer;
+    transition: transform .45s var(--ease);
+  }
+
+  .btn:active { transform: scale(.97); }
+  .btn .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+  .btn.ghost { background: transparent; border-color: var(--hair); color: var(--body); }
+  .btn.ghost:hover { border-color: var(--tint-edge); color: var(--clay-ink); }
+
+  .bar p { margin: 0; font-size: 12px; color: var(--faint); }
+
+  /* ── the open list ──────────────────────────────────────────────── */
+
+  .open { display: grid; gap: 18px; margin-top: 34px; }
+
+  .card {
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    gap: 30px;
+    align-items: center;
+    padding: 26px 28px;
+    border-radius: 24px;
+    background: var(--paper);
+    border: 1px solid var(--hair);
+    box-shadow: var(--shadow);
+    transition: background .5s var(--ease), border-color .5s var(--ease),
+                transform .6s var(--ease), box-shadow .6s var(--ease);
+  }
+
+  .card:hover { transform: translateY(-2px); border-color: var(--tint-edge); }
+
+  .card .num {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 9.5px;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+    font-weight: 600;
+    color: var(--faint);
+  }
+
+  .card .num i {
+    font-style: normal;
+    color: var(--clay);
+    font-weight: 700;
+  }
+
+  .card .num .divider {
+    width: 14px;
+    height: 1px;
+    background: var(--hair);
+  }
+
+  .card h2 {
+    margin: 12px 0 10px;
+    font-size: clamp(19px, 2.1vw, 23px);
+    line-height: 1.16;
+    letter-spacing: -.028em;
+    font-weight: 650;
+    max-width: 24ch;
+  }
+
+  .card h2 em { font-style: normal; color: var(--clay); }
+
+  .card .why { margin: 0; font-size: 13.5px; line-height: 1.72; color: var(--body); max-width: 56ch; }
+
+  .card .cost {
+    margin: 14px 0 0;
+    font-size: 12px;
+    line-height: 1.6;
+    color: var(--faint);
+    max-width: 56ch;
+  }
+
+  .card .cost b {
+    color: var(--clay-ink);
+    font-weight: 600;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    font-size: 9.5px;
+    margin-right: 7px;
+  }
+
+  .card .go {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 16px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .05em;
+    color: var(--clay-ink);
+    text-decoration: none;
+  }
+
+  .card .go span { transition: transform .5s var(--ease); }
+  .card .go:hover span { transform: translateX(3px); }
+
+  .state {
+    margin-left: auto;
+    font-size: 9px;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: var(--faint);
+    padding: 5px 10px;
+    border-radius: 999px;
+    border: 1px solid var(--hair);
+  }
+
+  .state.now { color: var(--clay-ink); border-color: var(--tint-edge); background: var(--tint); }
+
+  /* ── previews ───────────────────────────────────────────────────── */
+
+  .study {
+    padding: 16px;
+    border-radius: 18px;
+    background: var(--tint);
+    border: 1px solid var(--tint-edge);
+  }
+
+  .study .sec-label {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 8.5px;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: var(--faint);
+    margin-bottom: 12px;
+  }
+
+  .study .hint {
+    margin-top: 10px;
+    font-size: 10px;
+    color: var(--faint);
+    text-align: center;
+    letter-spacing: .02em;
+  }
+
+  /* the dial */
+  .dial {
+    display: flex;
+    gap: 3px;
+    padding: 3px;
+    border-radius: 999px;
+    background: rgba(252, 248, 241, .6);
+    border: 1px solid var(--hair);
+  }
+
+  body.night .dial { background: rgba(25, 24, 20, .45); }
+
+  .dial span {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    height: 27px;
+    border-radius: 999px;
+    font-size: 9.5px;
+    font-weight: 600;
+    color: var(--faint);
+  }
+
+  .dial span.on {
+    background: var(--paper);
+    color: var(--clay-ink);
+    box-shadow: 0 1px 2px rgba(30, 20, 12, .14);
+  }
+
+  .big-preview {
+    position: relative;
+    height: 74px;
+    margin-top: 10px;
+    border-radius: 12px;
+    border: 1px solid var(--hair);
+    overflow: hidden;
+    background: var(--day-page);
+  }
+
+  .bars { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center; gap: 6px; padding: 0 12px; }
+  .bars span { height: 2.5px; border-radius: 2px; background: var(--ink-on-day); }
+  .bars span:nth-child(1) { width: 54%; }
+  .bars span:nth-child(2) { width: 36%; }
+  .bars span:nth-child(3) { width: 45%; }
+
+  /* the split card */
+  .split {
+    position: relative;
+    height: 88px;
+    border-radius: 13px;
+    overflow: hidden;
+    border: 1px solid var(--hair);
+    background: linear-gradient(90deg, var(--day-page) 0 50%, var(--night-page) 50% 100%);
+  }
+
+  .split .seamline {
+    position: absolute;
+    left: 50%;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background: rgba(25, 24, 20, .2);
+  }
+
+  .split .knob {
+    position: absolute;
+    top: 50%;
+    left: calc(50% - 9px);
+    width: 18px;
+    height: 18px;
+    margin-top: -9px;
+    border-radius: 50%;
+    background: #FCF8F1;
+    border: 1px solid rgba(164, 110, 75, .4);
+    box-shadow: 0 2px 6px rgba(30, 20, 12, .25);
+    display: grid;
+    place-items: center;
+  }
+
+  .split .knob::after {
+    content: "";
+    width: 4px; height: 4px;
+    border-radius: 50%;
+    background: #8A5A3C;
+  }
+
+  .split .half-bars {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 16px;
+    font-size: 8.5px;
+    font-weight: 600;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+  }
+
+  .split .half-bars span:first-child { color: rgba(25, 24, 20, .45); }
+  .split .half-bars span:last-child { color: rgba(252, 248, 241, .5); }
+
+  .split-legend {
+    display: flex;
+    justify-content: space-between;
+    padding: 9px 4px 0;
+    font-size: 9.5px;
+    color: var(--faint);
+  }
+
+  /* big rows */
+  .rows { display: grid; gap: 5px; }
+
+  .trow {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px;
+    border-radius: 11px;
+    border: 1px solid transparent;
+  }
+
+  .trow.on { background: var(--tint); border-color: var(--tint-edge); }
+
+  .trow .mini {
+    position: relative;
+    width: 84px;
+    height: 36px;
+    flex: none;
+    border-radius: 8px;
+    border: 1px solid var(--hair);
+    overflow: hidden;
+    background: var(--day-page);
+  }
+
+  .trow .mini.night { background: var(--night-page); }
+
+  .trow .mini.half { background: linear-gradient(90deg, var(--day-page) 0 50%, var(--night-page) 50% 100%); }
+
+  .trow .mini b {
+    position: absolute;
+    left: 8px;
+    height: 2px;
+    border-radius: 2px;
+    background: var(--ink-on-day);
+  }
+
+  .trow .mini b:nth-child(1) { top: 13px; width: 46%; }
+  .trow .mini b:nth-child(2) { top: 19px; width: 32%; }
+  .trow .mini b:nth-child(3) { top: 25px; width: 38%; }
+  .trow .mini.night b { background: var(--ink-on-night); }
+  .trow .mini.half b { background: rgba(25, 24, 20, .5); }
+
+  .trow .meta { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+  .trow .meta strong { font-size: 11.5px; font-weight: 600; color: var(--ink); }
+  .trow .meta small { font-size: 9.5px; color: var(--faint); }
+
+  .trow .tick {
+    margin-left: auto;
+    width: 15px; height: 15px;
+    border-radius: 50%;
+    background: var(--clay);
+    color: var(--paper);
+    font-size: 7.5px;
+    display: grid;
+    place-items: center;
+    opacity: 0;
+  }
+
+  .trow.on .tick { opacity: 1; }
+
+  /* the map */
+  .map {
+    position: relative;
+    height: 96px;
+    border-radius: 16px;
+    background:
+      radial-gradient(120% 140% at 62% 10%, var(--tint) 0%, rgba(164, 110, 75, 0) 60%),
+      var(--well);
+    border: 1px solid var(--hair);
+    overflow: hidden;
+  }
+
+  .map .dots {
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(var(--hair) 1px, transparent 1px);
+    background-size: 9px 9px;
+    opacity: .95;
+    mask-image: radial-gradient(78% 90% at 50% 40%, #000 30%, transparent 84%);
+  }
+
+  .map .pin {
+    position: absolute;
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--clay);
+    box-shadow: 0 0 0 4px var(--tint);
+    animation: pin 3.6s var(--ease) infinite;
+  }
+
+  .map .pin:nth-of-type(2) { animation-delay: .4s; }
+  .map .pin:nth-of-type(3) { animation-delay: .9s; }
+  .map .pin:nth-of-type(4) { animation-delay: 1.4s; }
+  .map .pin:nth-of-type(5) { animation-delay: 1.9s; }
+
+  @keyframes pin {
+    0%, 100% { transform: scale(1); opacity: .95; }
+    50% { transform: scale(1.35); opacity: 1; }
+  }
+
+  .map .maplabel {
+    position: absolute;
+    left: 14px;
+    bottom: 11px;
+    font-size: 8px;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: var(--faint);
+  }
+
+  .chips { display: flex; gap: 6px; margin-top: 10px; }
+
+  .chips span {
+    font-size: 9.5px;
+    font-weight: 500;
+    color: var(--ink);
+    background: var(--paper);
+    border: 1px solid var(--hair);
+    border-radius: 999px;
+    padding: 4px 10px;
+  }
+
+  .chips span.on { background: var(--tint); border-color: var(--tint-edge); color: var(--clay-ink); }
+
+  /* the rail, as it is in the build */
+  .band {
+    position: relative;
+    overflow: hidden;
+    border-radius: 16px;
+    border: 1px solid var(--hair);
+    background: var(--well);
+    padding: 11px 11px 9px;
+  }
+
+  .band .dots {
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(var(--hair) 1px, transparent 1px);
+    background-size: 9px 9px;
+    opacity: .95;
+  }
+
+  .band > * { position: relative; }
+
+  .bandhead { display: flex; align-items: center; gap: 9px; }
+
+  .bandhead .tile {
+    width: 27px; height: 27px;
+    flex: none;
+    display: grid;
+    place-items: center;
+    border-radius: 8px;
+    border: 1px solid var(--tint-edge);
+    background: var(--tint);
+    color: var(--clay);
+  }
+
+  .bandhead .ttl {
+    flex: 1;
+    font-size: 8.5px;
+    letter-spacing: .17em;
+    font-weight: 600;
+    color: var(--faint);
+  }
+
+  .bandhead .count {
+    font-size: 9px;
+    color: var(--clay-ink);
+    padding: 3px 8px;
+    border-radius: 999px;
+    border: 1px solid var(--tint-edge);
+    background: var(--tint);
+  }
+
+  .rail {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 8px;
+    font-size: 7.5px;
+    font-weight: 700;
+    letter-spacing: .04em;
+    color: var(--faint);
+  }
+
+  .rail b { color: var(--clay); }
+
+  /* ── footer ─────────────────────────────────────────────────────── */
+
+  footer {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 24px;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 46px;
+    padding-top: 22px;
+    border-top: 1px solid var(--hair);
+    font-size: 10.5px;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--faint);
+  }
+
+  footer a { color: var(--clay-ink); text-decoration: none; }
+  footer a:hover { text-decoration: underline; text-underline-offset: 3px; }
+
+  @media (max-width: 860px) {
+    body { padding: 40px 20px 80px; }
+    .card { grid-template-columns: 1fr; gap: 20px; padding: 22px; }
+    .study { order: 2; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <span class="eyebrow">Lucid · still open</span>
+  <h1>Only what is still <em>waiting on you</em>.</h1>
+  <p class="lede">
+    Five things, nothing else: the three appearance shapes that were not chosen, the one language
+    sheet idea that is not in the build, and the rail that went in this week without being looked at.
+    Everything already decided lives on the <b>full table</b>.
+  </p>
+
+  <div class="bar">
+    <button class="btn" type="button" onclick="document.body.classList.toggle('night')">
+      <span class="dot"></span> Day / night
+    </button>
+    <a class="btn ghost" href="index.html">Full table →</a>
+    <p>Previews stay literal in both themes — a dark page must look dark even while this one is light.</p>
+  </div>
+
+  <div class="open">
+
+    <!-- 01 ─────────────────────────────────────────────────────────── -->
+    <article class="card">
+      <div>
+        <div class="num"><i>01</i><span class="divider"></span>appearance<span class="state">open</span></div>
+        <h2>One control, one <em>big preview</em>.</h2>
+        <p class="why">
+          A single segmented pill with the three marks, over a large preview of the surface in
+          force. The section stays one line tall and the preview does the explaining — the
+          calmest of the four, and the best fit if Appearance has to keep its current height.
+        </p>
+        <p class="cost"><b>Cost</b>The preview has to re-render on pick, inside the same fade the
+          page already uses. One extra view, one more state to keep true.</p>
+        <a class="go" href="appearance-ideas.html#opt-02">Open the dial in the appearance study <span>→</span></a>
+      </div>
+      <div class="study">
+        <div class="sec-label">APPEARANCE</div>
+        <div class="dial">
+          <span class="on">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="7.4"/><path d="M12 4.6A7.4 7.4 0 0 1 12 19.4Z" fill="currentColor" stroke="none"/></svg>
+            System
+          </span>
+          <span>
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="4.1"/><path d="M12 3.2v1.9M12 18.9v1.9M3.2 12h1.9M18.9 12h1.9M5.8 5.8l1.3 1.3M16.9 16.9l1.3 1.3M18.2 5.8l-1.3 1.3M7.1 16.9l-1.3 1.3"/></svg>
+            Light
+          </span>
+          <span>
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M20.4 14.4A8.6 8.6 0 1 1 9.6 3.6a6.9 6.9 0 0 0 10.8 10.8Z"/></svg>
+            Dark
+          </span>
+        </div>
+        <div class="big-preview"><div class="bars"><span></span><span></span><span></span></div></div>
+        <div class="hint">Follows your phone's setting</div>
+      </div>
+    </article>
+
+    <!-- 02 ─────────────────────────────────────────────────────────── -->
+    <article class="card">
+      <div>
+        <div class="num"><i>02</i><span class="divider"></span>appearance<span class="state">open</span></div>
+        <h2>Day and night are the <em>same card</em>.</h2>
+        <p class="why">
+          One surface split down the middle — paper on the left, charcoal on the right — with a
+          knob that rests at left, centre or right. Light and Dark pull the whole app toward one
+          half; System leaves it balanced on the seam.
+        </p>
+        <p class="cost"><b>Cost</b>The least literal of the four: a knob between two halves says
+          “slide me”, and these three answers are not a slider. Riskiest for anyone who has not
+          met the app before.</p>
+        <a class="go" href="appearance-ideas.html#opt-03">Open the split card in the study <span>→</span></a>
+      </div>
+      <div class="study">
+        <div class="sec-label">APPEARANCE</div>
+        <div class="split">
+          <div class="half-bars"><span>paper</span><span>charcoal</span></div>
+          <div class="seamline"></div>
+          <div class="knob"></div>
+        </div>
+        <div class="split-legend"><span>Light</span><span>System</span><span>Dark</span></div>
+      </div>
+    </article>
+
+    <!-- 03 ─────────────────────────────────────────────────────────── -->
+    <article class="card">
+      <div>
+        <div class="num"><i>03</i><span class="divider"></span>appearance<span class="state">open</span></div>
+        <h2>One row per answer, each with its <em>own window</em>.</h2>
+        <p class="why">
+          Keeps the list shape the section has now, but every row carries a wide preview of that
+          surface with the consequence beside it — Follows your phone, Always light, Always dark.
+          The most explanatory of the four, and the easiest to read with a screen reader.
+        </p>
+        <p class="cost"><b>Cost</b>The tallest — about 190 dp — which pushes the permission
+          section further down the page.</p>
+        <a class="go" href="appearance-ideas.html#opt-04">Open the big rows in the study <span>→</span></a>
+      </div>
+      <div class="study">
+        <div class="sec-label">APPEARANCE</div>
+        <div class="rows">
+          <div class="trow on">
+            <div class="mini half"><b></b><b></b><b></b></div>
+            <div class="meta"><strong>System</strong><small>Follows your phone</small></div>
+            <div class="tick">✓</div>
+          </div>
+          <div class="trow">
+            <div class="mini"><b></b><b></b><b></b></div>
+            <div class="meta"><strong>Light</strong><small>Always light</small></div>
+          </div>
+          <div class="trow">
+            <div class="mini night"><b></b><b></b><b></b></div>
+            <div class="meta"><strong>Dark</strong><small>Always dark</small></div>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <!-- 04 ─────────────────────────────────────────────────────────── -->
+    <article class="card">
+      <div>
+        <div class="num"><i>04</i><span class="divider"></span>language sheet<span class="state">open</span></div>
+        <h2>A map of the languages you <em>already carry</em>.</h2>
+        <p class="why">
+          The title becomes the dotted field from your image — doing work instead of decorating:
+          one clay pin for every language whose words are downloaded, so the picture answers “how
+          much of the world does this phone speak” before a word is read. Chips of the last three
+          sit under it, above the search.
+        </p>
+        <p class="cost"><b>Cost</b>The pins need coordinates for a few hundred languages, and the
+          field has to stay honest for right-to-left scripts. That data does not exist yet — this
+          is the one of the three that cannot ship this week.</p>
+        <a class="go" href="language-sheet-ideas.html#opt-03">Open the map in the sheet study <span>→</span></a>
+      </div>
+      <div class="study">
+        <div class="sec-label">APP LANGUAGE</div>
+        <div class="map">
+          <div class="dots"></div>
+          <div class="pin" style="left:18%; top:42%"></div>
+          <div class="pin" style="left:42%; top:28%"></div>
+          <div class="pin" style="left:60%; top:50%"></div>
+          <div class="pin" style="left:72%; top:34%"></div>
+          <div class="pin" style="left:33%; top:64%"></div>
+          <div class="maplabel">3 languages on this phone</div>
+        </div>
+        <div class="chips"><span class="on">English</span><span>Deutsch</span><span>日本語</span></div>
+      </div>
+    </article>
+
+    <!-- 05 ─────────────────────────────────────────────────────────── -->
+    <article class="card">
+      <div>
+        <div class="num"><i>05</i><span class="divider"></span>language sheet<span class="state now">in the build</span></div>
+        <h2>The rail, inside the <em>dotted band</em>.</h2>
+        <p class="why">
+          What you asked for went in: the alphabet is now one strip in the sheet's own title. Press
+          a letter and the list jumps; the letter you are inside stays lit in clay; only letters
+          with a language behind them are drawn. The dots are the paper's texture — the pins and
+          the caption from your image are not in it.
+        </p>
+        <p class="cost"><b>Needs a look</b>It compiles and the sheet is shared by Settings, the
+          tour and the lens, but no device is attached here, so the band has only been checked at
+          full size and not on a phone.</p>
+        <a class="go" href="_band-check.html">See the band at full size <span>→</span></a>
+      </div>
+      <div class="study">
+        <div class="sec-label">TRANSLATE INTO</div>
+        <div class="band">
+          <div class="dots"></div>
+          <div class="bandhead">
+            <div class="tile">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7">
+                <circle cx="12" cy="12" r="8.4"/>
+                <path d="M3.6 12h16.8M12 3.6c2.4 2.3 3.7 5.3 3.7 8.4 0 3.1-1.3 6.1-3.7 8.4-2.4-2.3-3.7-5.3-3.7-8.4 0-3.1 1.3-6.1 3.7-8.4Z"/>
+              </svg>
+            </div>
+            <div class="ttl">TRANSLATE INTO</div>
+            <div class="count">240</div>
+          </div>
+          <div class="rail">
+            <span>A</span><span>B</span><span>C</span><span>D</span><span>E</span><span>F</span>
+            <span>G</span><b>H</b><span>I</span><span>J</span><span>K</span><span>L</span>
+            <span>M</span><span>N</span><span>O</span><span>P</span><span>Q</span><span>R</span>
+            <span>S</span><span>T</span><span>U</span><span>V</span><span>W</span><span>X</span>
+            <span>Y</span><span>Z</span>
+          </div>
+        </div>
+      </div>
+    </article>
+
+  </div>
+
+  <footer>
+    <span>Lucid · still open</span>
+    <span><a href="index.html">the full table →</a></span>
+  </footer>
+</div>
+
+</body>
+</html>

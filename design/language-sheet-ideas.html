@@ -1,0 +1,1010 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lucid — the language sheet, three ways</title>
+<style>
+  @font-face {
+    font-family: "Lucida";
+    src: url("./fonts/PlusJakarta.ttf") format("truetype");
+    font-weight: 200 800;
+    font-display: swap;
+  }
+
+  :root {
+    --ease: cubic-bezier(.32, .72, 0, 1);
+    --spring: cubic-bezier(.22, 1.4, .36, 1);
+
+    --page: #EFE6D6;
+    --page-light: #FBF5E9;
+    --paper: #FCF8F1;
+    --paper-deep: #F5EEE2;
+    --ink: #191814;
+    --body: #6A6254;
+    --faint: #857B6C;
+    --clay: #8A5A3C;
+    --clay-ink: #6E4630;
+    --tint: rgba(164, 110, 75, .12);
+    --tint-edge: rgba(164, 110, 75, .25);
+    --hair: rgba(25, 24, 20, .10);
+    --screen: #FCF8F1;
+    --screen-ghost: rgba(25, 24, 20, .07);
+    --bezel: rgba(211, 194, 181, .42);
+    --bezel-edge: rgba(25, 24, 20, .10);
+    --shadow: 0 30px 60px -28px rgba(70, 48, 30, .45), 0 2px 0 rgba(255, 255, 255, .55) inset;
+  }
+
+  body.night {
+    --page: #171613;
+    --page-light: #23211D;
+    --paper: #2A2722;
+    --paper-deep: #302D27;
+    --ink: #F7F1E5;
+    --body: #C2B9A6;
+    --faint: #B0A692;
+    --clay: #E9BC96;
+    --clay-ink: #F3D8BC;
+    --tint: rgba(233, 188, 150, .16);
+    --tint-edge: rgba(233, 188, 150, .28);
+    --hair: rgba(252, 248, 241, .12);
+    --screen: #201E1A;
+    --screen-ghost: rgba(252, 248, 241, .08);
+    --bezel: rgba(252, 248, 241, .08);
+    --bezel-edge: rgba(252, 248, 241, .12);
+    --shadow: 0 34px 70px -30px rgba(0, 0, 0, .8), 0 1px 0 rgba(255, 255, 255, .06) inset;
+  }
+
+  * { box-sizing: border-box; }
+
+  html { background: var(--page); transition: background .6s var(--ease); }
+
+  body {
+    margin: 0;
+    padding: 60px 40px 110px;
+    font-family: "Lucida", system-ui, sans-serif;
+    color: var(--ink);
+    background:
+      radial-gradient(120% 66% at 50% -12%, var(--page-light) 0%, rgba(251, 245, 233, 0) 58%),
+      var(--page);
+    transition: background .6s var(--ease), color .6s var(--ease);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* grain, fixed and inert — never on a scrolling box */
+  body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 40;
+    opacity: .035;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/></filter><rect width='140' height='140' filter='url(%23n)'/></svg>");
+  }
+
+  .head { max-width: 1180px; margin: 0 auto 20px; }
+
+  .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 9.5px;
+    letter-spacing: .22em;
+    text-transform: uppercase;
+    font-weight: 600;
+    color: var(--clay);
+    padding: 6px 13px;
+    border-radius: 999px;
+    border: 1px solid var(--tint-edge);
+    background: color-mix(in srgb, var(--paper) 72%, transparent);
+  }
+
+  .eyebrow::before {
+    content: "";
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--clay);
+    box-shadow: 0 0 0 3px var(--tint);
+  }
+
+  h1 {
+    margin: 22px 0 14px;
+    font-size: clamp(34px, 4.6vw, 52px);
+    line-height: 1.03;
+    letter-spacing: -.04em;
+    font-weight: 650;
+    max-width: 21ch;
+  }
+
+  h1 em { font-style: normal; color: var(--clay); }
+
+  .lede {
+    margin: 0;
+    max-width: 62ch;
+    font-size: 15px;
+    line-height: 1.7;
+    color: var(--body);
+  }
+
+  .bar {
+    max-width: 1180px;
+    margin: 30px auto 0;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 14px;
+    padding-top: 22px;
+    border-top: 1px solid var(--hair);
+  }
+
+  .toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    height: 38px;
+    padding: 0 18px 0 13px;
+    border-radius: 999px;
+    border: 1px solid var(--tint-edge);
+    background: var(--tint);
+    color: var(--clay-ink);
+    font-family: inherit;
+    font-size: 11.5px;
+    font-weight: 600;
+    letter-spacing: .04em;
+    cursor: pointer;
+    transition: transform .5s var(--spring), background .5s var(--ease), color .5s var(--ease);
+  }
+
+  .toggle:active { transform: scale(.97); }
+
+  .toggle .orb {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    border: 1px solid currentColor;
+    position: relative;
+    transition: box-shadow .5s var(--ease), background .5s var(--ease);
+    background: radial-gradient(circle at 32% 32%, color-mix(in srgb, currentColor) 0 38%, transparent 42%);
+  }
+
+  body.night .toggle .orb {
+    background: transparent;
+    box-shadow: inset -4px -2px 0 0 currentColor;
+  }
+
+  .bar p { margin: 0; font-size: 12.5px; color: var(--faint); letter-spacing: .01em; }
+
+  .bar p b { color: var(--body); font-weight: 600; }
+
+  /* ── the ideas ────────────────────────────────────────────────────── */
+
+  .idea {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 74px 0 8px;
+    display: grid;
+    grid-template-columns: 1fr 344px;
+    gap: 58px;
+    align-items: start;
+    border-top: 1px solid var(--hair);
+  }
+
+  .idea + .idea { margin-top: 74px; }
+
+  .idea.flip { grid-template-columns: 344px 1fr; }
+  .idea.flip .note { order: 2; }
+  .idea.flip .stage { order: 1; }
+
+  .note { padding-top: 6px; }
+
+  .note .idx {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 10px;
+    letter-spacing: .2em;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: var(--faint);
+  }
+
+  .note .idx i {
+    font-style: normal;
+    font-size: 11px;
+    letter-spacing: .04em;
+    color: var(--clay-ink);
+    background: var(--tint);
+    border: 1px solid var(--tint-edge);
+    border-radius: 999px;
+    padding: 3px 9px;
+  }
+
+  .note h2 {
+    margin: 16px 0 12px;
+    font-size: 27px;
+    line-height: 1.14;
+    letter-spacing: -.03em;
+    font-weight: 650;
+    max-width: 20ch;
+  }
+
+  .note h2 em { font-style: normal; color: var(--clay); }
+
+  .note .why {
+    margin: 0 0 20px;
+    font-size: 14px;
+    line-height: 1.7;
+    color: var(--body);
+    max-width: 46ch;
+  }
+
+  .points { margin: 0; padding: 0; list-style: none; display: grid; gap: 11px; }
+
+  .points li {
+    position: relative;
+    padding-left: 27px;
+    font-size: 13px;
+    line-height: 1.55;
+    color: var(--body);
+  }
+
+  .points li::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 8px;
+    width: 16px;
+    height: 1px;
+    background: var(--tint-edge);
+  }
+
+  .points b { color: var(--ink); font-weight: 600; }
+
+  .cost {
+    margin: 22px 0 0;
+    padding: 13px 15px;
+    border-radius: 14px;
+    background: var(--tint);
+    border: 1px solid var(--tint-edge);
+    font-size: 12px;
+    line-height: 1.6;
+    color: var(--clay-ink);
+  }
+
+  .cost b { letter-spacing: .1em; text-transform: uppercase; font-size: 9px; font-weight: 700; }
+
+  /* ── the phone ───────────────────────────────────────────────────── */
+
+  .stage { position: relative; }
+
+  .stage .wash {
+    position: absolute;
+    inset: -18px -14px 30px -14px;
+    border-radius: 46px;
+    background: radial-gradient(80% 70% at 50% 20%, var(--tint) 0%, transparent 70%);
+    opacity: .8;
+  }
+
+  .phone {
+    position: relative;
+    width: 344px;
+    height: 606px;
+    padding: 7px;
+    border-radius: 44px;
+    background: var(--bezel);
+    border: 1px solid var(--bezel-edge);
+    box-shadow: var(--shadow);
+    transition: background .6s var(--ease), box-shadow .6s var(--ease);
+  }
+
+  .screen {
+    position: relative;
+    overflow: hidden;
+    height: 100%;
+    border-radius: 37px;
+    background: var(--screen);
+    display: flex;
+    flex-direction: column;
+    transition: background .6s var(--ease);
+  }
+
+  .statusbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 20px 4px;
+    font-size: 9.5px;
+    font-weight: 600;
+    letter-spacing: .04em;
+    color: var(--ink);
+    opacity: .8;
+  }
+
+  .statusbar .bars { display: flex; gap: 3px; align-items: flex-end; }
+  .statusbar .bars i { width: 2.5px; background: currentColor; border-radius: 1px; }
+  .statusbar .bars i:nth-child(1) { height: 4px; }
+  .statusbar .bars i:nth-child(2) { height: 6px; }
+  .statusbar .bars i:nth-child(3) { height: 8px; }
+
+  .page { padding: 10px 16px 0; flex: 1; }
+
+  .pagehead {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--ink);
+    padding-bottom: 12px;
+  }
+
+  .pagehead .chev { font-size: 15px; color: var(--faint); line-height: 1; }
+
+  .label {
+    font-size: 8px;
+    letter-spacing: .19em;
+    font-weight: 600;
+    color: var(--faint);
+    padding: 15px 0 7px;
+  }
+
+  .ghostcard {
+    height: 52px;
+    border-radius: 13px;
+    background: var(--paper);
+    border: 1px solid var(--hair);
+    transition: background .6s var(--ease);
+  }
+
+  .ghostcard.tall { height: 74px; }
+
+  .ghostcard + .ghostcard { margin-top: 8px; }
+
+  .scrim {
+    position: absolute;
+    inset: 0;
+    background: rgba(18, 16, 12, .16);
+    backdrop-filter: blur(1.5px);
+  }
+
+  /* the sheet itself */
+  .sheet {
+    position: absolute;
+    left: 10px;
+    right: 10px;
+    bottom: 26px;
+    border-radius: 24px;
+    background: var(--paper);
+    border: 1px solid var(--hair);
+    box-shadow: 0 26px 50px -22px rgba(30, 20, 12, .5);
+    padding: 16px 14px 12px;
+    animation: sheetIn 1s var(--spring) both;
+    transition: background .6s var(--ease), border-color .6s var(--ease);
+  }
+
+  @keyframes sheetIn {
+    from { opacity: 0; transform: translateY(26px) scale(.985); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+
+  .sheet-head { display: flex; align-items: center; gap: 10px; }
+
+  .mark {
+    width: 30px;
+    height: 30px;
+    border-radius: 10px;
+    background: var(--tint);
+    border: 1px solid var(--tint-edge);
+    display: grid;
+    place-items: center;
+    color: var(--clay);
+    flex: none;
+  }
+
+  .mark svg { display: block; }
+
+  .sheet-head .eyebrow2 {
+    font-size: 8.5px;
+    letter-spacing: .2em;
+    font-weight: 700;
+    color: var(--faint);
+    flex: 1;
+  }
+
+  .count {
+    font-size: 9.5px;
+    font-weight: 600;
+    letter-spacing: .04em;
+    color: var(--clay-ink);
+    background: var(--tint);
+    border: 1px solid var(--tint-edge);
+    border-radius: 999px;
+    padding: 3px 9px;
+  }
+
+  .search {
+    margin-top: 12px;
+    height: 38px;
+    border-radius: 999px;
+    background: var(--screen-ghost);
+    border: 1px solid var(--hair);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0 13px;
+    font-size: 11.5px;
+    color: var(--faint);
+  }
+
+  .search svg { flex: none; opacity: .8; }
+
+  .sect {
+    font-size: 8px;
+    letter-spacing: .18em;
+    font-weight: 700;
+    color: var(--faint);
+    padding: 14px 2px 7px;
+  }
+
+  .row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 8px;
+    border-radius: 13px;
+    min-height: 44px;
+    transition: background .45s var(--ease), transform .45s var(--spring);
+  }
+
+  .row:hover { background: var(--screen-ghost); }
+
+  .row.sel {
+    background: var(--tint);
+    border: 1px solid var(--tint-edge);
+    padding: 5px 7px;
+  }
+
+  .tile {
+    width: 29px;
+    height: 29px;
+    border-radius: 9px;
+    background: var(--tint);
+    border: 1px solid var(--tint-edge);
+    display: grid;
+    place-items: center;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--clay);
+    flex: none;
+    letter-spacing: .02em;
+  }
+
+  .tile.word { font-size: 6.5px; letter-spacing: .09em; }
+
+  .names { display: grid; gap: 1px; min-width: 0; flex: 1; }
+  .names b { font-size: 12.5px; font-weight: 500; color: var(--ink); letter-spacing: -.01em; }
+  .names i { font-style: normal; font-size: 9px; color: var(--faint); letter-spacing: .01em; }
+  .row.sel .names b { color: var(--clay); }
+
+  .tick {
+    width: 17px;
+    height: 17px;
+    border-radius: 50%;
+    background: var(--clay);
+    color: var(--paper);
+    font-size: 8.5px;
+    display: grid;
+    place-items: center;
+    flex: none;
+  }
+
+  /* ── idea B extras ───────────────────────────────────────────────── */
+
+  .hero {
+    position: relative;
+    height: 76px;
+    margin: -16px -14px 12px;
+    border-radius: 23px 23px 0 0;
+    background:
+      radial-gradient(90% 120% at 18% 0%, var(--tint) 0%, transparent 62%),
+      var(--paper-deep);
+    border-bottom: 1px solid var(--hair);
+    display: flex;
+    align-items: center;
+    padding: 0 18px;
+    overflow: hidden;
+  }
+
+  .hero .glyphs {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    font-size: 40px;
+    line-height: 1;
+    letter-spacing: -.04em;
+    color: var(--clay);
+  }
+
+  .hero .glyphs span:last-child { font-size: 27px; color: var(--faint); opacity: .75; }
+
+  .hero .hero-note {
+    margin-left: auto;
+    text-align: right;
+    font-size: 8.5px;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--faint);
+    line-height: 1.7;
+    font-weight: 600;
+  }
+
+  .segments {
+    display: flex;
+    gap: 3px;
+    padding: 3px;
+    border-radius: 999px;
+    background: var(--screen-ghost);
+    border: 1px solid var(--hair);
+    margin-bottom: 4px;
+  }
+
+  .segments span {
+    flex: 1;
+    text-align: center;
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    padding: 6px 0;
+    border-radius: 999px;
+    color: var(--faint);
+  }
+
+  .segments span.on {
+    background: var(--paper);
+    color: var(--clay-ink);
+    box-shadow: 0 1px 2px rgba(30, 20, 12, .12);
+  }
+
+  .rail {
+    position: absolute;
+    right: 3px;
+    top: 168px;
+    bottom: 16px;
+    width: 15px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 7.5px;
+    font-weight: 700;
+    color: var(--faint);
+    opacity: .9;
+  }
+
+  .rail b { color: var(--clay); }
+
+  .list { padding-right: 18px; }
+
+  /* ── idea C extras ───────────────────────────────────────────────── */
+
+  .map {
+    position: relative;
+    height: 96px;
+    margin: -16px -14px 10px;
+    border-radius: 23px 23px 0 0;
+    background:
+      radial-gradient(120% 140% at 62% 10%, var(--tint) 0%, transparent 60%),
+      var(--paper-deep);
+    border-bottom: 1px solid var(--hair);
+    overflow: hidden;
+  }
+
+  .map .dots {
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(var(--hair) 1px, transparent 1px);
+    background-size: 9px 9px;
+    opacity: .9;
+    mask-image: radial-gradient(78% 90% at 50% 40%, #000 30%, transparent 82%);
+  }
+
+  .map .pin {
+    position: absolute;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--clay);
+    box-shadow: 0 0 0 4px var(--tint);
+    animation: pin 3.6s var(--ease) infinite;
+  }
+
+  .map .pin:nth-child(2) { animation-delay: .4s; }
+  .map .pin:nth-child(3) { animation-delay: .9s; }
+  .map .pin:nth-child(4) { animation-delay: 1.4s; }
+  .map .pin:nth-child(5) { animation-delay: 1.9s; }
+
+  @keyframes pin {
+    0%, 100% { transform: scale(1); opacity: .95; }
+    50% { transform: scale(1.35); opacity: 1; }
+  }
+
+  .map .maplabel {
+    position: absolute;
+    left: 16px;
+    bottom: 12px;
+    font-size: 8px;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: var(--faint);
+  }
+
+  .chips { display: flex; gap: 6px; margin: 10px 0 2px; }
+
+  .chips span {
+    font-size: 10px;
+    font-weight: 500;
+    color: var(--ink);
+    background: var(--paper);
+    border: 1px solid var(--hair);
+    border-radius: 999px;
+    padding: 5px 11px;
+  }
+
+  .chips span.on { background: var(--tint); border-color: var(--tint-edge); color: var(--clay-ink); }
+
+  /* ── the shipped note ───────────────────────────────────────────── */
+
+  .shipped {
+    max-width: 1180px;
+    margin: 96px auto 0;
+    padding: 34px 36px 36px;
+    border-radius: 28px;
+    background: var(--paper);
+    border: 1px solid var(--hair);
+    box-shadow: var(--shadow);
+    transition: background .6s var(--ease);
+  }
+
+  .shipped h3 {
+    margin: 12px 0 10px;
+    font-size: 21px;
+    letter-spacing: -.03em;
+    font-weight: 650;
+  }
+
+  .shipped p { margin: 0 0 18px; font-size: 13.5px; line-height: 1.75; color: var(--body); max-width: 78ch; }
+
+  .tokens { display: flex; flex-wrap: wrap; gap: 10px; }
+
+  .token {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 7px 13px 7px 7px;
+    border-radius: 999px;
+    border: 1px solid var(--hair);
+    background: var(--screen);
+    font-size: 10.5px;
+    letter-spacing: .04em;
+    color: var(--body);
+  }
+
+  .token i {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 1px solid var(--hair);
+    flex: none;
+  }
+
+  footer {
+    max-width: 1180px;
+    margin: 46px auto 0;
+    font-size: 10px;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    color: var(--faint);
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+
+  @media (max-width: 900px) {
+    body { padding: 40px 20px 80px; }
+    .idea, .idea.flip { grid-template-columns: 1fr; gap: 34px; }
+    .idea.flip .note { order: 1; }
+    .idea.flip .stage { order: 2; }
+    .stage { display: flex; justify-content: center; }
+    .phone { width: 100%; max-width: 360px; }
+    .shipped { padding: 26px 22px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="head">
+  <span class="eyebrow">Lucid · language sheet</span>
+  <h1>Three ways to open <em>a list of languages</em>.</h1>
+  <p class="lede">
+    The sheet was a heading and two hundred names. These are three answers to that — the
+    first is what now ships in the app; the other two are the versions to reach for when
+    the list wants more theatre. Every one of them floats clear of the bottom edge instead
+    of docking to it, and every one is built from the same paper, clay and hairline as the
+    rest of the app.
+  </p>
+</header>
+
+<div class="bar">
+  <button class="toggle" type="button" onclick="document.body.classList.toggle('night')">
+    <span class="orb"></span> Day / night
+  </button>
+  <p><b>Idea 01 is in the build.</b> Ideas 02 and 03 are studies.</p>
+</div>
+
+<!-- ══ 01 ═══════════════════════════════════════════════════════════════ -->
+
+<section class="idea">
+  <div class="note">
+    <div class="idx"><i>01</i> monogram index</div>
+    <h2>The list reads as a <em>dictionary</em>.</h2>
+    <p class="why">
+      A language's first letter becomes a tile in front of its name, set in clay on the
+      accent tint. The autonym sits above the name this phone calls it by, so the row is
+      instantly recognisable in either direction — a person looking for 日本語 sees the
+      character they know, not a translation of it.
+    </p>
+    <ul class="points">
+      <li><b>Tile, not flag.</b> A flag names a country; half these languages do not have one that would be honest.</li>
+      <li><b>Search is a control.</b> A round well with the magnifier drawn inside it, sunk a shade into the sheet.</li>
+      <li><b>The choice said twice.</b> Accent wash plus a clay medallion with a tick, so it never rests on colour alone.</li>
+    </ul>
+    <p class="cost"><b>Shipped</b><br>Raised 64 dp off the bottom edge, the sheet now floats like one more card on the page instead of a drawer pulled out of it.</p>
+  </div>
+
+  <div class="stage">
+    <div class="wash"></div>
+    <div class="phone">
+      <div class="screen">
+        <div class="statusbar"><span>9:41</span><span class="bars"><i></i><i></i><i></i></span></div>
+        <div class="page">
+          <div class="pagehead"><span class="chev">‹</span> Settings</div>
+          <div class="label">APP LANGUAGE</div>
+          <div class="ghostcard"></div>
+          <div class="label">TRANSLATION</div>
+          <div class="ghostcard tall"></div>
+          <div class="ghostcard"></div>
+        </div>
+        <div class="scrim"></div>
+
+        <div class="sheet">
+          <div class="sheet-head">
+            <span class="mark">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+                <circle cx="12" cy="12" r="7.4"/><path d="M4.6 12h14.8"/>
+                <path d="M12 4.6c-2.8 2.3-2.8 12.1 0 14.8 2.8-2.3 2.8-12.1 0-14.8Z"/>
+              </svg>
+            </span>
+            <span class="eyebrow2">TRANSLATE INTO</span>
+            <span class="count">240</span>
+          </div>
+
+          <div class="search">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round">
+              <circle cx="10.5" cy="10.5" r="6.3"/><path d="M15.3 15.3 20 20"/>
+            </svg>
+            Search 240 languages
+          </div>
+
+          <div class="sect">ON THIS PHONE · 3</div>
+          <div class="row sel">
+            <span class="tile">E</span>
+            <span class="names"><b>English</b></span>
+            <span class="tick">✓</span>
+          </div>
+          <div class="row">
+            <span class="tile">D</span>
+            <span class="names"><b>Deutsch</b><i>German</i></span>
+          </div>
+          <div class="row">
+            <span class="tile">E</span>
+            <span class="names"><b>Español</b><i>Spanish</i></span>
+          </div>
+
+          <div class="sect">MORE LANGUAGES</div>
+          <div class="row">
+            <span class="tile">日</span>
+            <span class="names"><b>日本語</b><i>Japanese</i></span>
+          </div>
+          <div class="row">
+            <span class="tile">ع</span>
+            <span class="names"><b>العربية</b><i>Arabic</i></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 02 ═══════════════════════════════════════════════════════════════ -->
+
+<section class="idea flip">
+  <div class="stage">
+    <div class="wash"></div>
+    <div class="phone">
+      <div class="screen">
+        <div class="statusbar"><span>9:41</span><span class="bars"><i></i><i></i><i></i></span></div>
+        <div class="page">
+          <div class="pagehead"><span class="chev">‹</span> Settings</div>
+          <div class="label">APP LANGUAGE</div>
+          <div class="ghostcard"></div>
+          <div class="label">TRANSLATION</div>
+          <div class="ghostcard tall"></div>
+        </div>
+        <div class="scrim"></div>
+
+        <div class="sheet">
+          <div class="hero">
+            <div class="glyphs"><span>A</span><span>文</span></div>
+            <div class="hero-note">the app's mark<br>drawn once</div>
+          </div>
+
+          <div class="segments">
+            <span class="on">On this phone</span>
+            <span>All 240</span>
+          </div>
+
+          <div class="list">
+            <div class="row sel">
+              <span class="names"><b>English</b><i>English</i></span>
+              <span class="tick">✓</span>
+            </div>
+            <div class="row">
+              <span class="names"><b>Deutsch</b><i>German</i></span>
+            </div>
+            <div class="row">
+              <span class="names"><b>Español</b><i>Spanish</i></span>
+            </div>
+            <div class="row">
+              <span class="names"><b>Türkçe</b><i>Turkish</i></span>
+            </div>
+            <div class="row">
+              <span class="names"><b>Português</b><i>Portuguese</i></span>
+            </div>
+            <div class="row">
+              <span class="names"><b>Français</b><i>French</i></span>
+            </div>
+          </div>
+
+          <div class="rail">
+            <span>A</span><span>C</span><span>D</span><span>E</span><b>È</b>
+            <span>F</span><span>G</span><span>I</span><span>J</span><span>K</span>
+            <span>P</span><span>R</span><span>S</span><span>T</span><span>Z</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="note">
+    <div class="idx"><i>02</i> alphabet rail</div>
+    <h2>Two hundred names, <em>one thumb</em>.</h2>
+    <p class="why">
+      The sheet opens on the app's own mark, then splits the question: what is already on
+      this phone, and everything else. A letter rail down the right edge turns a long scroll
+      into a gesture — hold a letter and the list jumps there.
+    </p>
+    <ul class="points">
+      <li><b>The hero is the brand.</b> Cream A and clay 文, drawn large, so the sheet is unmistakably Lucid's.</li>
+      <li><b>Segmented, not sectioned.</b> "On this phone" first — the common move — with all 240 one tap away.</li>
+      <li><b>Rows without tiles.</b> The names carry the weight, so the rail is the only ornament.</li>
+    </ul>
+    <p class="cost"><b>Cost</b><br>Needs a fast-scroll index and a second list state; roughly a day of work, and the rail is fiddly under a keyboard.</p>
+  </div>
+</section>
+
+<!-- ══ 03 ═══════════════════════════════════════════════════════════════ -->
+
+<section class="idea" id="opt-03">
+  <div class="note">
+    <div class="idx"><i>03</i> the world, softly</div>
+    <h2>A map that shows <em>which languages you already carry</em>.</h2>
+    <p class="why">
+      The header becomes a dotted field with a clay pin for every language whose words are
+      downloaded. It is the most graphic of the three and the most legible at a glance: the
+      picture answers "how much of the world does this phone speak" before a single word is
+      read.
+    </p>
+    <ul class="points">
+      <li><b>Pins, not borders.</b> No country outlines — just points of light on a quiet field.</li>
+      <li><b>Recent as chips.</b> The last three languages become tappable pills, above the search.</li>
+      <li><b>Quiet type.</b> The map carries the drama so the list underneath can stay plain.</li>
+    </ul>
+    <p class="cost"><b>Cost</b><br>The pins need real coordinates for a few hundred languages, and the map must stay honest for right-to-left scripts. Best kept for a marketing page until that data exists.</p>
+  </div>
+
+  <div class="stage">
+    <div class="wash"></div>
+    <div class="phone">
+      <div class="screen">
+        <div class="statusbar"><span>9:41</span><span class="bars"><i></i><i></i><i></i></span></div>
+        <div class="page">
+          <div class="pagehead"><span class="chev">‹</span> Settings</div>
+          <div class="label">APP LANGUAGE</div>
+          <div class="ghostcard"></div>
+          <div class="label">TRANSLATION</div>
+          <div class="ghostcard tall"></div>
+        </div>
+        <div class="scrim"></div>
+
+        <div class="sheet">
+          <div class="map">
+            <div class="dots"></div>
+            <div class="pin" style="left:18%; top:44%"></div>
+            <div class="pin" style="left:44%; top:30%"></div>
+            <div class="pin" style="left:63%; top:52%"></div>
+            <div class="pin" style="left:74%; top:36%"></div>
+            <div class="pin" style="left:33%; top:66%"></div>
+            <div class="maplabel">3 languages on this phone</div>
+          </div>
+
+          <div class="chips">
+            <span class="on">English</span><span>Deutsch</span><span>日本語</span>
+          </div>
+
+          <div class="search">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round">
+              <circle cx="10.5" cy="10.5" r="6.3"/><path d="M15.3 15.3 20 20"/>
+            </svg>
+            Search 240 languages
+          </div>
+
+          <div class="sect">MORE LANGUAGES</div>
+          <div class="row">
+            <span class="names"><b>Español</b><i>Spanish</i></span>
+          </div>
+          <div class="row">
+            <span class="names"><b>Français</b><i>French</i></span>
+          </div>
+          <div class="row">
+            <span class="names"><b>한국어</b><i>Korean</i></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ the shipped mechanics ═══════════════════════════════════════════ -->
+
+<section class="shipped">
+  <span class="eyebrow">In the build</span>
+  <h3>What idea 01 actually changed</h3>
+  <p>
+    The sheet gained a marked header with the list's size, a pill search well with the
+    magnifier inside it, monogram tiles on every row, the autonym over the phone's name, a
+    wash and a clay tick on the row in force, and 64 dp of air under it. The same list is
+    used by Settings, the tour and the lens, so all three moved together — and it still
+    reads on paper by day and on charcoal at night, because every colour is a card role
+    rather than a literal.
+  </p>
+  <div class="tokens">
+    <span class="token"><i style="background:#FCF8F1"></i> paper · FCF8F1</span>
+    <span class="token"><i style="background:#8A5A3C"></i> clay · 8A5A3C</span>
+    <span class="token"><i style="background:rgba(164,110,75,.12)"></i> tint · clay 12%</span>
+    <span class="token"><i style="background:#F5EEE2"></i> well · F5EEE2</span>
+    <span class="token"><i style="background:#191814"></i> ink · 191814</span>
+    <span class="token"><i style="background:#857B6C"></i> faint · 857B6C</span>
+  </div>
+</section>
+
+<footer>
+  <span>Lucid · sheet studies</span>
+  <span>paper, clay, one hairline</span>
+</footer>
+
+</body>
+</html>

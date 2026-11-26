@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lucid — the sheet at the bottom, four ways</title>
+<style>
+  @font-face {
+    font-family: "Lucida";
+    src: url("./fonts/PlusJakarta.ttf") format("truetype");
+    font-weight: 200 800;
+    font-display: swap;
+  }
+
+  :root {
+    --ease: cubic-bezier(.32, .72, 0, 1);
+  }
+
+  * { box-sizing: border-box; }
+
+  html { background: #EFE6D6; }
+
+  body {
+    margin: 0;
+    padding: 56px 40px 96px;
+    font-family: "Lucida", system-ui, sans-serif;
+    color: #191814;
+    background:
+      radial-gradient(120% 70% at 50% -10%, #FBF5E9 0%, rgba(251, 245, 233, 0) 60%),
+      #EFE6D6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .head { max-width: 1180px; margin: 0 auto 44px; }
+
+  .eyebrow {
+    display: inline-block;
+    font-size: 9.5px;
+    letter-spacing: .22em;
+    text-transform: uppercase;
+    font-weight: 600;
+    color: #8A5A3C;
+    padding: 6px 12px;
+    border-radius: 999px;
+    border: 1px solid rgba(164, 110, 75, .38);
+    background: rgba(252, 248, 241, .7);
+  }
+
+  h1 {
+    margin: 20px 0 12px;
+    font-size: 40px;
+    line-height: 1.05;
+    letter-spacing: -.035em;
+    font-weight: 650;
+    max-width: 24ch;
+  }
+
+  h1 em { font-style: normal; color: #8A5A3C; }
+
+  .lede {
+    margin: 0;
+    max-width: 68ch;
+    font-size: 15px;
+    line-height: 1.65;
+    color: #6A6254;
+  }
+
+  .grid {
+    max-width: 1180px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 44px 34px;
+    align-items: start;
+  }
+
+  .option { opacity: 0; transform: translateY(16px); animation: rise .9s var(--ease) forwards; }
+  .option:nth-child(1) { animation-delay: .04s; }
+  .option:nth-child(2) { animation-delay: .12s; }
+  .option:nth-child(3) { animation-delay: .2s; }
+  .option:nth-child(4) { animation-delay: .28s; }
+
+  @keyframes rise { to { opacity: 1; transform: translateY(0); } }
+
+  .tag { display: flex; align-items: baseline; gap: 10px; margin-bottom: 12px; }
+  .tag b { font-size: 11px; font-weight: 700; letter-spacing: .16em; color: #857B6C; }
+  .tag span { font-size: 15px; font-weight: 600; letter-spacing: -.015em; }
+
+  .study { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+  .frame {
+    padding: 6px;
+    border-radius: 26px;
+    background: rgba(211, 194, 181, .38);
+    border: 1px solid rgba(25, 24, 20, .08);
+    box-shadow: 0 1px 0 rgba(255, 255, 255, .6) inset;
+  }
+
+  .caption {
+    margin: 8px 2px 0;
+    font-size: 9px;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: #857B6C;
+  }
+
+  /* ── the screen under the sheet ─────────────────────────────────── */
+
+  .screen {
+    position: relative;
+    overflow: hidden;
+    border-radius: 20px;
+    padding: 15px 14px 16px;
+    min-height: 386px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .screen .behind { flex: 1; }
+
+  .label-row {
+    display: flex; align-items: center; gap: 6px;
+    margin: 2px 0 9px;
+    color: var(--faint);
+  }
+  .label-row svg { flex: none; }
+  .label-row span { font-size: 8px; letter-spacing: .18em; font-weight: 600; }
+
+  .split {
+    background: var(--card);
+    border: 1px solid var(--edge);
+    border-radius: 14px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    position: relative;
+  }
+  .half {
+    padding: 10px 10px 11px;
+    display: flex; flex-direction: column; align-items: flex-start; gap: 6px;
+  }
+  .half + .half { border-left: 1px solid var(--line); align-items: flex-end; text-align: right; }
+  .micro {
+    font-size: 7px; letter-spacing: .16em; text-transform: uppercase;
+    font-weight: 700; color: var(--faint);
+  }
+  .medallion {
+    width: 30px; height: 30px; border-radius: 999px;
+    display: grid; place-items: center;
+    background: var(--recess);
+    border: 1px solid var(--edge);
+    font-size: 10px; font-weight: 650; color: var(--ink);
+  }
+  .medallion.to {
+    background: var(--accent-fill);
+    border-color: var(--accent-hair);
+    color: var(--accent-ink);
+  }
+  .name { font-size: 11px; font-weight: 500; letter-spacing: -.01em; }
+
+  .rows { margin-top: 14px; display: grid; gap: 6px; }
+  .row-mini {
+    background: var(--card);
+    border: 1px solid var(--edge);
+    border-radius: 11px;
+    padding: 9px 11px;
+    font-size: 10.5px;
+    color: var(--muted);
+  }
+
+  /* ── the sheet itself ───────────────────────────────────────────── */
+
+  .sheet-wrap {
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    padding: 0 8px 8px;
+    pointer-events: none;
+  }
+
+  .sheet {
+    border-radius: 18px;
+    padding: 9px 9px 6px;
+    position: relative;
+    isolation: isolate;
+  }
+
+  .sheet-head {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 2px 7px 7px;
+  }
+  .sheet-head .micro { color: var(--accent); font-size: 7.5px; }
+  .sheet-head .side-note { font-size: 8.5px; color: var(--faint); }
+
+  .sheet-row {
+    display: flex; align-items: center; gap: 8px;
+    padding: 6px 7px;
+    border-radius: 10px;
+    font-size: 11px;
+  }
+  .sheet-row + .sheet-row { margin-top: 2px; }
+  .sheet-row .medallion { width: 21px; height: 21px; font-size: 8px; }
+  .sheet-row .tick { margin-left: auto; color: var(--accent); font-size: 10px; }
+  .sheet-row.is-current { background: var(--recess); }
+  .sheet-row.quiet { color: var(--muted); }
+
+  /* A · parchment glass — paper held at three quarters, so the card behind
+     reads through the sheet's lower half instead of stopping at it. */
+  .a .sheet {
+    background:
+      linear-gradient(180deg,
+        rgba(252, 248, 241, .90) 0%,
+        rgba(252, 248, 241, .74) 52%,
+        rgba(252, 248, 241, .54) 100%);
+    -webkit-backdrop-filter: blur(20px) saturate(120%);
+    backdrop-filter: blur(20px) saturate(120%);
+    border: 1px solid rgba(25, 24, 20, .10);
+    box-shadow:
+      0 1px 0 rgba(255, 255, 255, .75) inset,
+      0 -1px 0 rgba(255, 255, 255, .45) inset,
+      0 -26px 44px -30px rgba(60, 46, 34, .55),
+      0 -3px 12px -8px rgba(60, 46, 34, .30);
+  }
+
+  /* B · clay glass — the accent in the glass, so the sheet belongs to the pair
+     it came from. The tint sits in the fill, never on the text. */
+  .b .sheet {
+    background:
+      linear-gradient(180deg, rgba(164, 110, 75, .05) 0%, rgba(164, 110, 75, .14) 100%),
+      linear-gradient(180deg, rgba(252, 248, 241, .92) 0%, rgba(252, 248, 241, .58) 100%);
+    -webkit-backdrop-filter: blur(22px) saturate(135%);
+    backdrop-filter: blur(22px) saturate(135%);
+    border: 1px solid rgba(164, 110, 75, .34);
+    box-shadow:
+      0 1px 0 rgba(255, 255, 255, .8) inset,
+      0 -1px 0 rgba(164, 110, 75, .18) inset,
+      0 -30px 50px -32px rgba(60, 46, 34, .6),
+      0 -2px 10px -6px rgba(138, 90, 60, .22);
+  }
+
+  /* C · deep lift — near paper at the top, thinner at the bottom edge, and a
+     long shadow doing the depth instead of a fill. */
+  .c .sheet {
+    background:
+      linear-gradient(180deg,
+        rgba(252, 248, 241, .97) 0%,
+        rgba(252, 248, 241, .90) 58%,
+        rgba(252, 248, 241, .66) 100%);
+    -webkit-backdrop-filter: blur(12px) saturate(108%);
+    backdrop-filter: blur(12px) saturate(108%);
+    border: 1px solid rgba(25, 24, 20, .12);
+    box-shadow:
+      0 1px 0 rgba(255, 255, 255, .9) inset,
+      0 -1px 0 rgba(25, 24, 20, .05) inset,
+      0 -44px 60px -34px rgba(60, 46, 34, .65),
+      0 -6px 18px -10px rgba(60, 46, 34, .35);
+  }
+
+  /* D · frosted shell — the shell's beige in the glass, and the sheet itself
+     fades out at its bottom edge, so it dissolves into the page. */
+  .d .sheet {
+    background:
+      linear-gradient(180deg, rgba(211, 194, 181, .34) 0%, rgba(211, 194, 181, .52) 100%),
+      linear-gradient(180deg, rgba(252, 248, 241, .62) 0%, rgba(252, 248, 241, .34) 100%);
+    -webkit-backdrop-filter: blur(28px) saturate(125%);
+    backdrop-filter: blur(28px) saturate(125%);
+    border: 1px solid rgba(25, 24, 20, .09);
+    -webkit-mask-image: linear-gradient(180deg, #000 0%, #000 62%, rgba(0, 0, 0, .82) 84%, rgba(0, 0, 0, .38) 100%);
+    mask-image: linear-gradient(180deg, #000 0%, #000 62%, rgba(0, 0, 0, .82) 84%, rgba(0, 0, 0, .38) 100%);
+    box-shadow:
+      0 1px 0 rgba(255, 255, 255, .7) inset,
+      0 -24px 46px -30px rgba(60, 46, 34, .45);
+  }
+
+  /* ── light and dark ─────────────────────────────────────────────── */
+
+  .light {
+    --canvas: #F8F2E7;
+    --card: #FCF8F1;
+    --recess: #F1E9DA;
+    --edge: rgba(25, 24, 20, .08);
+    --line: rgba(199, 178, 164, .55);
+    --ink: #191814;
+    --muted: #6A6254;
+    --faint: #857B6C;
+    --accent: #8A5A3C;
+    --accent-ink: #6E4630;
+    --accent-fill: rgba(164, 110, 75, .20);
+    --accent-hair: rgba(164, 110, 75, .38);
+    background:
+      radial-gradient(130% 60% at 50% -8%, #FDF9F0 0%, rgba(253, 249, 240, 0) 62%),
+      var(--canvas);
+    color: var(--ink);
+  }
+
+  .dark {
+    --canvas: #131210;
+    --card: #2A2722;
+    --recess: #34302A;
+    --edge: rgba(252, 248, 241, .14);
+    --line: rgba(252, 248, 241, .22);
+    --ink: #F7F1E5;
+    --muted: #D8CEBA;
+    --faint: #C2B8A4;
+    --accent: #E9BC96;
+    --accent-ink: #F3D8BC;
+    --accent-fill: rgba(233, 188, 150, .24);
+    --accent-hair: rgba(233, 188, 150, .45);
+    background:
+      radial-gradient(130% 60% at 50% -8%, #221F1A 0%, rgba(34, 31, 26, 0) 62%),
+      var(--canvas);
+    color: var(--ink);
+  }
+
+  .dark .frame {
+    background: rgba(58, 56, 49, .55);
+    border-color: rgba(252, 248, 241, .10);
+    box-shadow: 0 1px 0 rgba(252, 248, 241, .08) inset;
+  }
+
+  /* the dark sheets: same glass, lit from the other side */
+  .dark.a .sheet {
+    background:
+      linear-gradient(180deg,
+        rgba(42, 39, 34, .92) 0%,
+        rgba(42, 39, 34, .78) 52%,
+        rgba(42, 39, 34, .56) 100%);
+    border-color: rgba(252, 248, 241, .16);
+    box-shadow:
+      0 1px 0 rgba(252, 248, 241, .13) inset,
+      0 -26px 44px -30px rgba(0, 0, 0, .85),
+      0 -3px 12px -8px rgba(0, 0, 0, .6);
+  }
+
+  .dark.b .sheet {
+    background:
+      linear-gradient(180deg, rgba(233, 188, 150, .07) 0%, rgba(233, 188, 150, .16) 100%),
+      linear-gradient(180deg, rgba(42, 39, 34, .93) 0%, rgba(42, 39, 34, .6) 100%);
+    border-color: rgba(233, 188, 150, .36);
+    box-shadow:
+      0 1px 0 rgba(252, 248, 241, .16) inset,
+      0 -30px 50px -32px rgba(0, 0, 0, .9),
+      0 -2px 10px -6px rgba(0, 0, 0, .55);
+  }
+
+  .dark.c .sheet {
+    background:
+      linear-gradient(180deg,
+        rgba(42, 39, 34, .97) 0%,
+        rgba(42, 39, 34, .90) 58%,
+        rgba(42, 39, 34, .66) 100%);
+    border-color: rgba(252, 248, 241, .18);
+    box-shadow:
+      0 1px 0 rgba(252, 248, 241, .20) inset,
+      0 -44px 60px -34px rgba(0, 0, 0, .95),
+      0 -6px 18px -10px rgba(0, 0, 0, .7);
+  }
+
+  .dark.d .sheet {
+    background:
+      linear-gradient(180deg, rgba(58, 56, 49, .40) 0%, rgba(58, 56, 49, .58) 100%),
+      linear-gradient(180deg, rgba(42, 39, 34, .66) 0%, rgba(42, 39, 34, .36) 100%);
+    border-color: rgba(252, 248, 241, .14);
+    box-shadow:
+      0 1px 0 rgba(252, 248, 241, .12) inset,
+      0 -24px 46px -30px rgba(0, 0, 0, .8);
+  }
+
+  /* ── notes ──────────────────────────────────────────────────────── */
+
+  .note {
+    margin: 14px 2px 0;
+    font-size: 12px;
+    line-height: 1.6;
+    color: #6A6254;
+  }
+  .note b { color: #191814; font-weight: 600; }
+
+  .foot {
+    max-width: 1180px;
+    margin: 60px auto 0;
+    padding-top: 22px;
+    border-top: 1px solid rgba(199, 178, 164, .55);
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 34px;
+    font-size: 12.5px;
+    line-height: 1.65;
+    color: #6A6254;
+  }
+  .foot h3 {
+    margin: 0 0 6px;
+    font-size: 10px;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+    color: #857B6C;
+  }
+  .foot b { color: #191814; font-weight: 600; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .option { animation: none; opacity: 1; transform: none; }
+  }
+
+  @media (max-width: 980px) {
+    body { padding: 36px 18px 64px; }
+    h1 { font-size: 30px; }
+    .grid { grid-template-columns: 1fr; gap: 36px; }
+    .foot { grid-template-columns: 1fr; gap: 22px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="head">
+  <span class="eyebrow">Settings · the picker sheet</span>
+  <h1>The box at the bottom, <em>held in glass</em>.</h1>
+  <p class="lede">
+    Four ways to carry the picker's surface. All of them keep the paper's warmth and the
+    card's hairline, and all of them are see-through enough that the card that opened
+    them still reads behind the sheet — the depth comes from a long shadow and a lit top
+    edge rather than from a flat, opaque fill.
+  </p>
+</header>
+
+<main class="grid">
+
+  <!-- A -->
+  <section class="option">
+    <div class="tag"><b>A</b><span>Parchment glass</span></div>
+    <div class="study">
+      <div>
+        <div class="frame"><div class="screen light a" id="a-light"></div></div>
+        <div class="caption">Light</div>
+      </div>
+      <div>
+        <div class="frame"><div class="screen dark a" id="a-dark"></div></div>
+        <div class="caption">Dark</div>
+      </div>
+    </div>
+    <p class="note">
+      <b>The default.</b> Paper held at three quarters over a 20 px frost, thinning to
+      just over half at the sheet's edge — so the card behind is still legible through
+      the bottom of the sheet, and the sheet still reads as the nearest surface.
+    </p>
+  </section>
+
+  <!-- B -->
+  <section class="option">
+    <div class="tag"><b>B</b><span>Clay glass</span></div>
+    <div class="study">
+      <div>
+        <div class="frame"><div class="screen light b" id="b-light"></div></div>
+        <div class="caption">Light</div>
+      </div>
+      <div>
+        <div class="frame"><div class="screen dark b" id="b-dark"></div></div>
+        <div class="caption">Dark</div>
+      </div>
+    </div>
+    <p class="note">
+      <b>Tied to the pair.</b> A wash of the accent sits inside the glass and the border
+      takes the accent hairline, so the sheet visibly came out of the clay card. The tint
+      stays in the fill: no text ever sits on it at full strength.
+    </p>
+  </section>
+
+  <!-- C -->
+  <section class="option">
+    <div class="tag"><b>C</b><span>Deep lift</span></div>
+    <div class="study">
+      <div>
+        <div class="frame"><div class="screen light c" id="c-light"></div></div>
+        <div class="caption">Light</div>
+      </div>
+      <div>
+        <div class="frame"><div class="screen dark c" id="c-dark"></div></div>
+        <div class="caption">Dark</div>
+      </div>
+    </div>
+    <p class="note">
+      <b>Most solid, most depth.</b> Nearly paper at the top and only a little thinner
+      at the bottom, with a 44 px shadow doing the work. Best legibility of the four;
+      the sheet is clearly a surface, not a veil.
+    </p>
+  </section>
+
+  <!-- D -->
+  <section class="option">
+    <div class="tag"><b>D</b><span>Frosted shell</span></div>
+    <div class="study">
+      <div>
+        <div class="frame"><div class="screen light d" id="d-light"></div></div>
+        <div class="caption">Light</div>
+      </div>
+      <div>
+        <div class="frame"><div class="screen dark d" id="d-dark"></div></div>
+        <div class="caption">Dark</div>
+      </div>
+    </div>
+    <p class="note">
+      <b>Quietest.</b> The shell's beige in the glass over a 28 px frost, and the sheet
+      fades out along its own bottom edge so it dissolves into the page instead of
+      ending on a line. The most see-through of the four at the bottom.
+    </p>
+  </section>
+
+</main>
+
+<footer class="foot">
+  <div>
+    <h3>What each one costs</h3>
+    A, B and D need a real backdrop blur. Android 12+ has one
+    (<b>RenderEffect</b>); older phones would get the same translucent fill without the
+    frost, which is still close because the fill carries most of the look. C needs no
+    blur at all and is the safe one on a slow phone.
+  </div>
+  <div>
+    <h3>Rules kept in all four</h3>
+    The sheet never floats free: it is inset from the screen's edge and keeps the card's
+    radius family. Its top edge is lit, its bottom edge is not. No text sits on a tint
+    that has not been measured against it — the accent stays in the fill and the rim,
+    never under 11 sp copy.
+  </div>
+</footer>
+
+<script>
+  // The screen behind every sheet: the same content, so the four surfaces are being
+  // judged against one background and not four.
+  const behind = `
+    <div class="behind">
+      <div class="label-row">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3">
+          <circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.6 2.6 2.6 15.4 0 18M12 3c-2.6 2.6-2.6 15.4 0 18"/>
+        </svg>
+        <span>TRANSLATION</span>
+      </div>
+      <div class="split">
+        <div class="half">
+          <span class="micro">From</span>
+          <span class="medallion">DE</span>
+          <span class="name">German</span>
+        </div>
+        <div class="half">
+          <span class="micro">Into</span>
+          <span class="medallion to">EN</span>
+          <span class="name">English</span>
+        </div>
+      </div>
+      <div class="rows">
+        <div class="row-mini">App may read this screen</div>
+        <div class="row-mini">Keep the last twelve reads</div>
+      </div>
+    </div>`;
+
+  const sheet = `
+    <div class="sheet-wrap">
+      <div class="sheet">
+        <div class="sheet-head">
+          <span class="micro">Translate from</span>
+          <span class="side-note">tap one</span>
+        </div>
+        <div class="sheet-row is-current">
+          <span class="medallion">AU</span><span class="name">Auto recognize</span>
+          <span class="tick">✓</span>
+        </div>
+        <div class="sheet-row">
+          <span class="medallion">DE</span><span class="name">German</span>
+        </div>
+        <div class="sheet-row">
+          <span class="medallion">JA</span><span class="name">Japanese</span>
+        </div>
+        <div class="sheet-row quiet">
+          <span class="medallion">FR</span><span class="name">French</span>
+        </div>
+      </div>
+    </div>`;
+
+  document.querySelectorAll('.screen').forEach((screen) => {
+    screen.innerHTML = behind + sheet;
+  });
+</script>
+
+</body>
+</html>
