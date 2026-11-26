@@ -10,7 +10,7 @@
 
 [![Release](https://img.shields.io/github/v/release/grafizum/Lucid?label=release)](https://github.com/grafizum/Lucid/releases/latest)
 [![Platform](https://img.shields.io/badge/platform-Android%207.0%2B-3ddc84)](#-install)
-[![Build](https://img.shields.io/badge/build-debug%20%C2%B7%20v1.0.0-e0a94f)](#-install)
+[![Build](https://img.shields.io/badge/build-debug%20%C2%B7%20v2.0.0-e0a94f)](#-install)
 [![Engine](https://img.shields.io/badge/engine-online%20%2B%20on--device-6f9f86)](#-translation-engine)
 [![Licence](https://img.shields.io/badge/licence-source--available-8a8271)](#-licence)
 
@@ -23,7 +23,7 @@
 ---
 
 > [!NOTE]
-> **Status: first release, debug build.** Android 7.0 or newer, on 32-bit and 64-bit ARM. It is verified on an Android 15 emulator and installs on a Galaxy S22+; some manufacturers kill accessibility services aggressively, and screen capture still asks Android to share the screen each session.
+> **Status: 2.0.0, debug build.** Android 7.0 or newer, on 32-bit and 64-bit ARM. Installs and runs on a Galaxy S22+ (Android 16) and on an Android 15 emulator; some manufacturers kill accessibility services aggressively, and screen capture still asks Android to share the screen each session.
 
 Lucid is not a split-screen translator and not a screenshot tool. It is a small glass lens that floats over every app: drag it like a cursor, and the moment it stops it reads the text underneath and puts the translation in a card beside it. Nothing is configured per app, and the card clears itself as soon as you touch anywhere else.
 
@@ -54,10 +54,10 @@ Lucid is being tested right now and is heading to Google Play next — the store
 
 ## 📦 Install
 
-Grab **`Lucid-1.0-debug.apk`** from the [latest release](https://github.com/grafizum/Lucid/releases/latest) (88 MB, 32-bit and 64-bit ARM), open it on the phone, or with a USB cable:
+Grab **`Lucid-2.0-debug.apk`** from the [latest release](https://github.com/grafizum/Lucid/releases/latest) (90 MB, 32-bit and 64-bit ARM), open it on the phone, or with a USB cable:
 
 ```bash
-adb install -r Lucid-1.0-debug.apk
+adb install -r Lucid-2.0-debug.apk
 ```
 
 It is a debug build, so Android asks you to allow installing from this source the first time. First launch asks for two switches, once:
@@ -148,7 +148,7 @@ git clone https://github.com/grafizum/Lucid.git
 cd Lucid/android
 echo "sdk.dir=$HOME/Android/Sdk" > local.properties   # your SDK path
 ./gradlew assembleDebug
-# -> app/build/outputs/apk/debug/Lucid-v1.0.0-v1-debug.apk
+# -> app/build/outputs/apk/debug/Lucid-v2.0.0-v7-debug.apk
 ```
 
 Stack: Kotlin, plain Android views (no Compose), an `AccessibilityService` for text, `TYPE_APPLICATION_OVERLAY` windows for the lens, the highlight and the card, ML Kit for translation (and OCR on captured pixels), and coroutines for the pipeline.
