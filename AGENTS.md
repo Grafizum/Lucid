@@ -17,6 +17,17 @@ pull request that grafizum approves.
 6. Merge as the owner: `gh pr merge <number> --squash --delete-branch`.
 7. Switch back: `gh auth switch --hostname github.com --user MatrixZockt`.
 
+## Deploys
+
+`main` is the live site. A push to `main` runs `.github/workflows/deploy.yml`, which
+uploads `./site` to the `lucid-legal` Worker at lucid.grafizum.com and then checks that the
+live privacy page came back — so merging a pull request publishes, within about a minute.
+Treat a PR as a release, not just a code review. There is no build step: whatever is in
+`./site` is what the world gets.
+
+The workflow needs the `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` repository
+secrets. If either is missing the run fails instead of passing quietly.
+
 ## What the branch protection means
 
 - A direct push to `main` is rejected: *changes must be made through a pull request*.
