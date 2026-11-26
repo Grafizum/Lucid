@@ -208,8 +208,16 @@ The Play Store listing needs a public privacy policy, so the app's legal pages l
 
 ## 🤝 Working on this repository
 
-`main` is protected: nothing lands on it without a pull request that **grafizum** has approved. Branches are pushed from a fork or a topic branch, the PR gets one approving review (a new push dismisses an old approval), and merged history stays linear.
+`main` is protected: nothing lands on it without a pull request that has an approving review from another account. Branches are pushed from a fork or a topic branch, the PR gets one approving review (a new push dismisses an old approval), and merged history stays linear.
 
 ## 🖥 The desktop prototype
 
 `desktop/` holds an earlier Electron version of the same idea for Linux/macOS/Windows (floating lens, one-shot capture, local Tesseract OCR, translation card). It works and has its own preview script, but the phone is what this project targets. Run it with `npm install && npm start` inside `desktop/`.
+
+## 📄 License
+
+Lucid is licensed under the **[GNU General Public License, version 3](LICENSE)** (GPLv3). You can use, study, share and modify it; a version you distribute must carry the same licence and its source, so nobody can take it and make it closed.
+
+## 🙏 Acknowledgments
+
+Thanks to [Grafizum](https://github.com/grafizum) for helping me manage this project and stay organized while building it.
