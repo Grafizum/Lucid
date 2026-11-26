@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lucid — the translation mark, both halves</title>
+<style>
+  @font-face {
+    font-family: "Lucida";
+    src: url("./fonts/PlusJakarta.ttf") format("truetype");
+    font-weight: 200 800;
+    font-display: swap;
+  }
+
+  :root {
+    --ease: cubic-bezier(.32, .72, 0, 1);
+    --page: #EFE6D6;
+    --page-light: #FBF5E9;
+    --paper: #FCF8F1;
+    --ink: #191814;
+    --body: #6A6254;
+    --faint: #857B6C;
+    --clay: #8A5A3C;
+    --clay-ink: #6E4630;
+    --hair: rgba(25, 24, 20, .12);
+    --tint: rgba(164, 110, 75, .13);
+    --tint-edge: rgba(164, 110, 75, .26);
+    --shadow: 0 1px 1px rgba(25, 24, 20, .04), 0 18px 40px -24px rgba(25, 24, 20, .28);
+    /* the two settings surfaces, literal */
+    --day-canvas: #F8F2E7;
+    --day-card: #FCF8F1;
+    --day-muted: #6A6254;
+    --day-faint: #857B6C;
+    --day-accent: #8A5A3C;
+    --night-canvas: #171613;
+    --night-card: #23221E;
+    --night-muted: #D8CEBA;
+    --night-faint: #C2B8A4;
+    --night-accent: #E9BC96;
+  }
+
+  * { box-sizing: border-box; }
+
+  html { background: var(--page); }
+
+  body {
+    margin: 0;
+    padding: 58px 40px 110px;
+    font-family: "Lucida", system-ui, sans-serif;
+    color: var(--ink);
+    background:
+      radial-gradient(120% 60% at 50% -10%, var(--page-light) 0%, rgba(251, 245, 233, 0) 60%),
+      var(--page);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 60;
+    opacity: .03;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/></filter><rect width='140' height='140' filter='url(%23n)'/></svg>");
+  }
+
+  .wrap { max-width: 1060px; margin: 0 auto; }
+
+  .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 9.5px;
+    letter-spacing: .22em;
+    text-transform: uppercase;
+    font-weight: 600;
+    color: var(--clay);
+    padding: 6px 13px;
+    border-radius: 999px;
+    border: 1px solid var(--tint-edge);
+    background: var(--tint);
+  }
+
+  .eyebrow::before {
+    content: "";
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: var(--clay);
+  }
+
+  h1 {
+    margin: 22px 0 14px;
+    font-size: clamp(31px, 4.2vw, 46px);
+    line-height: 1.04;
+    letter-spacing: -.042em;
+    font-weight: 650;
+    max-width: 22ch;
+  }
+
+  h1 em { font-style: normal; color: var(--clay); }
+
+  .lede { margin: 0; max-width: 70ch; font-size: 14.5px; line-height: 1.7; color: var(--body); }
+  .lede b { color: var(--ink); font-weight: 600; }
+  .lede code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 12px;
+    color: var(--clay-ink);
+    background: var(--tint);
+    padding: 1px 5px;
+    border-radius: 4px;
+  }
+
+  /* ── comparison ─────────────────────────────────────────────────── */
+
+  .board {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+    margin-top: 34px;
+  }
+
+  .col {
+    border-radius: 22px;
+    background: var(--paper);
+    border: 1px solid var(--hair);
+    box-shadow: var(--shadow);
+    padding: 16px 16px 18px;
+  }
+
+  .col .head {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+
+  .col .head i {
+    font-style: normal;
+    font-size: 9px;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: var(--clay);
+  }
+
+  .col .head span {
+    font-size: 9px;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    font-weight: 600;
+    color: var(--faint);
+  }
+
+  .cell {
+    border-radius: 14px;
+    border: 1px solid var(--hair);
+    padding: 16px 14px;
+    display: flex;
+    align-items: center;
+  }
+
+  .cell.day { background: var(--day-card); }
+  .cell.night { background: var(--night-card); border-color: rgba(252, 248, 241, .14); margin-top: 8px; }
+
+  /* the settings section heading, exactly as the row draws it:
+     15 dp mark, 7 dp gap, 8.5 sp label at .18 tracking in screen_faint */
+  .sechead { display: flex; align-items: center; }
+  .sechead svg { display: block; flex: none; margin-right: 7px; }
+  .sechead .label {
+    font-size: 8.5px;
+    letter-spacing: .18em;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+
+  .cell.day .label, .screen.day .label { color: var(--day-faint); }
+  .cell.night .label, .screen.night .label { color: var(--night-faint); }
+  .screen.day .sechead svg { color: var(--day-muted); }
+  .screen.night .sechead svg { color: var(--night-muted); }
+  .zoom .clay { color: var(--clay); }
+  .cell.day .mark { color: var(--day-muted); }
+  .cell.night .mark { color: var(--night-muted); }
+  .cell.day .mark .clay { color: var(--day-accent); }
+  .cell.night .mark .clay { color: var(--night-accent); }
+
+  .zoom {
+    margin-top: 14px;
+    border-radius: 14px;
+    border: 1px dashed var(--tint-edge);
+    background: var(--tint);
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    gap: 12px;
+    padding: 14px 10px 12px;
+  }
+
+  .zoom .big { color: var(--clay-ink); }
+  .zoom .cap {
+    font-size: 8px;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--faint);
+    align-self: center;
+    max-width: 7ch;
+    line-height: 1.5;
+  }
+
+  .col .verdict {
+    margin: 12px 0 0;
+    font-size: 12px;
+    line-height: 1.6;
+    color: var(--body);
+  }
+
+  .col .verdict b { color: var(--clay-ink); font-weight: 600; }
+
+  /* ── the row, in context ────────────────────────────────────────── */
+
+  .context {
+    margin-top: 34px;
+    border-radius: 24px;
+    background: var(--paper);
+    border: 1px solid var(--hair);
+    box-shadow: var(--shadow);
+    padding: 22px;
+  }
+
+  .context h2 {
+    margin: 0 0 4px;
+    font-size: 17px;
+    letter-spacing: -.02em;
+    font-weight: 650;
+  }
+
+  .context p { margin: 0 0 16px; font-size: 12.5px; line-height: 1.65; color: var(--body); max-width: 72ch; }
+
+  .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+  .screen {
+    border-radius: 18px;
+    padding: 18px 18px 22px;
+    border: 1px solid var(--hair);
+  }
+
+  .screen.day { background: var(--day-canvas); }
+  .screen.night { background: var(--night-canvas); border-color: rgba(252, 248, 241, .12); }
+
+  .screen .tag {
+    font-size: 8px;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+    font-weight: 700;
+    margin-bottom: 14px;
+  }
+
+  .screen.day .tag { color: var(--day-faint); }
+  .screen.night .tag { color: var(--night-faint); }
+
+  .screen .group {
+    border-radius: 14px;
+    padding: 12px 13px 15px;
+  }
+
+  .screen.day .group { background: var(--day-card); border: 1px solid rgba(25, 24, 20, .08); }
+  .screen.night .group { background: var(--night-card); border: 1px solid rgba(252, 248, 241, .1); }
+
+  .screen .group + .group { margin-top: 9px; }
+
+  .screen .group .sechead { margin-bottom: 12px; }
+
+  .postcard {
+    border-radius: 10px;
+    padding: 11px 12px;
+  }
+
+  .screen.day .postcard { background: rgba(228, 216, 206, .5); }
+  .screen.night .postcard { background: rgba(58, 56, 49, .55); }
+
+  .postcard .lbl {
+    font-size: 7.5px;
+    letter-spacing: .16em;
+    font-weight: 700;
+  }
+
+  .screen.day .postcard .lbl { color: var(--day-faint); }
+  .screen.night .postcard .lbl { color: var(--night-faint); }
+
+  .postcard .val {
+    font-size: 11px;
+    margin-top: 4px;
+  }
+
+  .screen.day .postcard .val { color: var(--day-muted); }
+  .screen.night .postcard .val { color: var(--night-muted); }
+
+  /* ── notes ──────────────────────────────────────────────────────── */
+
+  .notes {
+    margin-top: 26px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+
+  .note {
+    border-radius: 20px;
+    background: var(--paper);
+    border: 1px solid var(--hair);
+    padding: 20px 22px;
+  }
+
+  .note h3 {
+    margin: 0 0 8px;
+    font-size: 10px;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: var(--clay);
+  }
+
+  .note p { margin: 0; font-size: 12.5px; line-height: 1.7; color: var(--body); }
+  .note p + p { margin-top: 10px; }
+  .note b { color: var(--ink); font-weight: 600; }
+  .note code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 11px;
+    color: var(--clay-ink);
+  }
+
+  footer {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 24px;
+    justify-content: space-between;
+    margin-top: 40px;
+    padding-top: 22px;
+    border-top: 1px solid var(--hair);
+    font-size: 10.5px;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--faint);
+  }
+
+  footer a { color: var(--clay-ink); text-decoration: none; }
+  footer a:hover { text-decoration: underline; text-underline-offset: 3px; }
+
+  @media (max-width: 980px) {
+    body { padding: 40px 20px 80px; }
+    .board { grid-template-columns: repeat(2, 1fr); }
+    .notes, .pair { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <span class="eyebrow">Lucid · settings marks</span>
+  <h1>The translation mark, with <em>both halves</em>.</h1>
+  <p class="lede">
+    Today the row left of TRANSLATION wears 文 alone — the app's character, drawn as three strokes
+    and a dot. At <b>15 dp</b> those strokes close up and it reads as a stick figure, which is the
+    complaint. Below are three ways to put <b>A</b> beside it. Every mark on this page is drawn at
+    the size the row actually uses, in the same 24-unit box, with the same 1.5-unit hairline — so
+    what you see is the pixel size, not a scaled-up guess.
+  </p>
+
+  <div class="board">
+
+    <!-- now -->
+    <div class="col">
+      <div class="head"><span>as it is now</span></div>
+
+      <div class="cell day">
+        <div class="sechead">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" class="mark">
+            <circle cx="12" cy="3.4" r="1.4" fill="currentColor" stroke="none"/>
+            <path d="M5.4 9.1h13.2" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+            <path d="M12 10.1 7.3 19.6M12 10.1l4.7 9.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+          </svg>
+          <span class="label">TRANSLATION</span>
+        </div>
+      </div>
+
+      <div class="cell night">
+        <div class="sechead">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" class="mark">
+            <circle cx="12" cy="3.4" r="1.4" fill="currentColor" stroke="none"/>
+            <path d="M5.4 9.1h13.2" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+            <path d="M12 10.1 7.3 19.6M12 10.1l4.7 9.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+          </svg>
+          <span class="label">TRANSLATION</span>
+        </div>
+      </div>
+
+      <div class="zoom">
+        <div class="big">
+          <svg width="52" height="52" viewBox="0 0 24 24" fill="none">
+            <circle cx="12" cy="3.4" r="1.4" fill="currentColor" stroke="none"/>
+            <path d="M5.4 9.1h13.2" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+            <path d="M12 10.1 7.3 19.6M12 10.1l4.7 9.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <span class="cap">one script</span>
+      </div>
+      <p class="verdict">Legible, and the reason it was chosen. It never says <b>translate</b> — it says
+        “Chinese”, and the row already says the rest.</p>
+    </div>
+
+    <!-- 01 -->
+    <div class="col">
+      <div class="head"><i>01</i><span>A文 · one weight</span></div>
+
+      <div class="cell day">
+        <div class="sechead mark">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
+            <path d="M5.6 5.4 0.9 18.8M5.6 5.4l4.7 13.4M2.3 13.2h6.6" stroke="currentColor" stroke-width="1.45" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="17.6" cy="5.2" r="1.25" fill="currentColor" stroke="none"/>
+            <path d="M13.2 10.2h8.8" stroke="currentColor" stroke-width="1.45" stroke-linecap="round"/>
+            <path d="M17.6 11.1 14.2 18.8M17.6 11.1l3.4 7.7" stroke="currentColor" stroke-width="1.45" stroke-linecap="round"/>
+          </svg>
+          <span class="label">TRANSLATION</span>
+        </div>
+      </div>
+
+      <div class="cell night">
+        <div class="sechead mark">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
+            <path d="M5.6 5.4 0.9 18.8M5.6 5.4l4.7 13.4M2.3 13.2h6.6" stroke="currentColor" stroke-width="1.45" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="17.6" cy="5.2" r="1.25" fill="currentColor" stroke="none"/>
+            <path d="M13.2 10.2h8.8" stroke="currentColor" stroke-width="1.45" stroke-linecap="round"/>
+            <path d="M17.6 11.1 14.2 18.8M17.6 11.1l3.4 7.7" stroke="currentColor" stroke-width="1.45" stroke-linecap="round"/>
+          </svg>
+          <span class="label">TRANSLATION</span>
+        </div>
+      </div>
+
+      <div class="zoom">
+        <div class="big">
+          <svg width="52" height="52" viewBox="0 0 24 24" fill="none">
+            <path d="M5.6 5.4 0.9 18.8M5.6 5.4l4.7 13.4M2.3 13.2h6.6" stroke="currentColor" stroke-width="1.45" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="17.6" cy="5.2" r="1.25" fill="currentColor" stroke="none"/>
+            <path d="M13.2 10.2h8.8" stroke="currentColor" stroke-width="1.45" stroke-linecap="round"/>
+            <path d="M17.6 11.1 14.2 18.8M17.6 11.1l3.4 7.7" stroke="currentColor" stroke-width="1.45" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <span class="cap">two signs</span>
+      </div>
+      <p class="verdict">The mark's own pair, in one colour. Reads as “letters in, letters out” and ties
+        the row to the lens mark. A is slightly cramped at 15 dp.</p>
+    </div>
+
+    <!-- 02 -->
+    <div class="col">
+      <div class="head"><i>02</i><span>A ＋ 文 in clay</span></div>
+
+      <div class="cell day">
+        <div class="sechead mark">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
+            <g class="clay">
+              <circle cx="17.6" cy="5.2" r="1.25" fill="currentColor" stroke="none"/>
+              <path d="M13.2 10.2h8.8" stroke="currentColor" stroke-width="1.45" stroke-linecap="round"/>
+              <path d="M17.6 11.1 14.2 18.8M17.6 11.1l3.4 7.7" stroke="currentColor" stroke-width="1.45" stroke-linecap="round"/>
+            </g>
+            <path d="M5.6 5.4 0.9 18.8M5.6 5.4l4.7 13.4M2.3 13.2h6.6" stroke="currentColor" stroke-width="1.45" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span class="label">TRANSLATION</span>
+        </div>
+      </div>
+
+      <div class="cell night">
+        <div class="sechead mark">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
+            <g class="clay">
+              <circle cx="17.6" cy="5.2" r="1.25" fill="currentColor" stroke="none"/>
+              <path d="M13.2 10.2h8.8" stroke="currentColor" stroke-width="1.45" stroke-linecap="round"/>
+              <path d="M17.6 11.1 14.2 18.8M17.6 11.1l3.4 7.7" stroke="currentColor" stroke-width="1.45" stroke-linecap="round"/>
+            </g>
+            <path d="M5.6 5.4 0.9 18.8M5.6 5.4l4.7 13.4M2.3 13.2h6.6" stroke="currentColor" stroke-width="1.45" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span class="label">TRANSLATION</span>
+        </div>
+      </div>
+
+      <div class="zoom">
+        <div class="big">
+          <svg width="52" height="52" viewBox="0 0 24 24" fill="none">
+            <g class="clay">
+              <circle cx="17.6" cy="5.2" r="1.25" fill="currentColor" stroke="none"/>
+              <path d="M13.2 10.2h8.8" stroke="currentColor" stroke-width="1.45" stroke-linecap="round"/>
+              <path d="M17.6 11.1 14.2 18.8M17.6 11.1l3.4 7.7" stroke="currentColor" stroke-width="1.45" stroke-linecap="round"/>
+            </g>
+            <path d="M5.6 5.4 0.9 18.8M5.6 5.4l4.7 13.4M2.3 13.2h6.6" stroke="currentColor" stroke-width="1.45" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <span class="cap">one accent</span>
+      </div>
+      <p class="verdict">The 文 takes the accent, as it does in the lens mark. One more colour in a row
+        that is otherwise silent — and the only mark here that <b>cannot</b> be a tinted vector, so it
+        needs its own drawable for each theme.</p>
+    </div>
+
+    <!-- 03 -->
+    <div class="col">
+      <div class="head"><i>03</i><span>A ｜ 文, hairline</span></div>
+
+      <div class="cell day">
+        <div class="sechead mark">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
+            <path d="M5.4 5.4 0.7 18.8M5.4 5.4l4.7 13.4M2.1 13.2h6.6" stroke="currentColor" stroke-width="1.45" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M11.6 6.6v12" stroke="currentColor" stroke-width=".9" opacity=".45"/>
+            <circle cx="17.9" cy="5.2" r="1.25" fill="currentColor" stroke="none"/>
+            <path d="M13.6 10.2h8.6" stroke="currentColor" stroke-width="1.45" stroke-linecap="round"/>
+            <path d="M17.9 11.1 14.5 18.8M17.9 11.1l3.4 7.7" stroke="currentColor" stroke-width="1.45" stroke-linecap="round"/>
+          </svg>
+          <span class="label">TRANSLATION</span>
+        </div>
+      </div>
+
+      <div class="cell night">
+        <div class="sechead mark">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
+            <path d="M5.4 5.4 0.7 18.8M5.4 5.4l4.7 13.4M2.1 13.2h6.6" stroke="currentColor" stroke-width="1.45" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M11.6 6.6v12" stroke="currentColor" stroke-width=".9" opacity=".45"/>
+            <circle cx="17.9" cy="5.2" r="1.25" fill="currentColor" stroke="none"/>
+            <path d="M13.6 10.2h8.6" stroke="currentColor" stroke-width="1.45" stroke-linecap="round"/>
+            <path d="M17.9 11.1 14.5 18.8M17.9 11.1l3.4 7.7" stroke="currentColor" stroke-width="1.45" stroke-linecap="round"/>
+          </svg>
+          <span class="label">TRANSLATION</span>
+        </div>
+      </div>
+
+      <div class="zoom">
+        <div class="big">
+          <svg width="52" height="52" viewBox="0 0 24 24" fill="none">
+            <path d="M5.4 5.4 0.7 18.8M5.4 5.4l4.7 13.4M2.1 13.2h6.6" stroke="currentColor" stroke-width="1.45" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M11.6 6.6v12" stroke="currentColor" stroke-width=".9" opacity=".45"/>
+            <circle cx="17.9" cy="5.2" r="1.25" fill="currentColor" stroke="none"/>
+            <path d="M13.6 10.2h8.6" stroke="currentColor" stroke-width="1.45" stroke-linecap="round"/>
+            <path d="M17.9 11.1 14.5 18.8M17.9 11.1l3.4 7.7" stroke="currentColor" stroke-width="1.45" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <span class="cap">a hairline</span>
+      </div>
+      <p class="verdict">The divider does the work the accent does in 02, without a second colour — and
+        at 15 dp a 0.9-unit line is 0.6 dp, which the screen will drop on some densities.</p>
+    </div>
+
+  </div>
+
+  <!-- ── in the row ─────────────────────────────────────────────────── -->
+
+  <div class="context">
+    <h2>In the row, above the two ends of the pair.</h2>
+    <p>
+      The section heading sits above a card that already shows FROM and TO as two lines. Option 01 is
+      drawn here at 15 dp, 7 dp from the label, in the row's own colours: <code>screen_muted</code>
+      by day, sand at night.
+    </p>
+    <div class="pair">
+      <div class="screen day">
+        <div class="tag">day</div>
+        <div class="group">
+          <div class="sechead mark">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
+              <path d="M5.6 5.4 0.9 18.8M5.6 5.4l4.7 13.4M2.3 13.2h6.6" stroke="currentColor" stroke-width="1.45" stroke-linecap="round" stroke-linejoin="round"/>
+              <circle cx="17.6" cy="5.2" r="1.25" fill="currentColor" stroke="none"/>
+              <path d="M13.2 10.2h8.8" stroke="currentColor" stroke-width="1.45" stroke-linecap="round"/>
+              <path d="M17.6 11.1 14.2 18.8M17.6 11.1l3.4 7.7" stroke="currentColor" stroke-width="1.45" stroke-linecap="round"/>
+            </svg>
+            <span class="label">TRANSLATION</span>
+          </div>
+          <div class="postcard">
+            <div class="lbl">FROM</div>
+            <div class="val">Auto · detect</div>
+          </div>
+          <div class="postcard">
+            <div class="lbl">TO</div>
+            <div class="val">English</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="screen night">
+        <div class="tag">night</div>
+        <div class="group">
+          <div class="sechead mark">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
+              <path d="M5.6 5.4 0.9 18.8M5.6 5.4l4.7 13.4M2.3 13.2h6.6" stroke="currentColor" stroke-width="1.45" stroke-linecap="round" stroke-linejoin="round"/>
+              <circle cx="17.6" cy="5.2" r="1.25" fill="currentColor" stroke="none"/>
+              <path d="M13.2 10.2h8.8" stroke="currentColor" stroke-width="1.45" stroke-linecap="round"/>
+              <path d="M17.6 11.1 14.2 18.8M17.6 11.1l3.4 7.7" stroke="currentColor" stroke-width="1.45" stroke-linecap="round"/>
+            </svg>
+            <span class="label">TRANSLATION</span>
+          </div>
+          <div class="postcard">
+            <div class="lbl">FROM</div>
+            <div class="val">Auto · detect</div>
+          </div>
+          <div class="postcard">
+            <div class="lbl">TO</div>
+            <div class="val">English</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── notes ──────────────────────────────────────────────────────── -->
+
+  <div class="notes">
+    <div class="note">
+      <h3>What 15 dp costs</h3>
+      <p>
+        The row gives the mark <b>15 dp</b>, so each of two glyphs gets about 6.5 dp — a 24-unit
+        drawing squeezed to 13 dp of art. At that width the A's crossbar and the 文's dot are single
+        pixels, and the pair reads as “A with something after it” rather than as two characters.
+      </p>
+      <p>
+        It survives, but it is at the edge. Sixteen or seventeen dp — still inside the 22 dp line the
+        label occupies — buys back a whole pixel of stroke and is the cheaper half of this change.
+      </p>
+    </div>
+
+    <div class="note">
+      <h3>What I would build</h3>
+      <p>
+        <b>01, at 16 dp, one colour</b>, tinted at runtime like every other mark in the row — no
+        second drawable for night, no accent in a heading that has none.
+      </p>
+      <p>
+        Implementation is one file: <code>ic_sec_translate.xml</code> redrawn with the A and the 文
+        inside one 24-unit box at 1.45 stroke, plus a 1 dp size bump in
+        <code>activity_settings.xml</code>. Nothing else in the app refers to the old drawing.
+      </p>
+    </div>
+  </div>
+
+  <footer>
+    <span>Lucid · settings marks</span>
+    <span><a href="open.html">still open →</a> · <a href="index.html">the full table →</a></span>
+  </footer>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,978 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lucid — Translate from → into, three ways</title>
+<style>
+  @font-face {
+    font-family: "Lucida";
+    src: url("./fonts/PlusJakarta.ttf") format("truetype");
+    font-weight: 200 800;
+    font-display: swap;
+  }
+
+  :root {
+    --canvas: #F8F2E7;
+    --card: #FCF8F1;
+    --recess: #F1E9DA;
+    --chip: #E4D8CE;
+    --edge: rgba(25, 24, 20, .08);
+    --edge-strong: rgba(25, 24, 20, .14);
+    --line: rgba(199, 178, 164, .55);
+    --ink: #191814;
+    --muted: #6A6254;
+    --faint: #857B6C;
+    --accent: #8A5A3C;
+    --accent-ink: #6E4630;
+    --accent-fill: rgba(164, 110, 75, .20);
+    --accent-hair: rgba(164, 110, 75, .38);
+    --olive: #55603F;
+    --ease: cubic-bezier(.32, .72, 0, 1);
+  }
+
+  * { box-sizing: border-box; }
+
+  html { background: #EFE6D6; }
+
+  body {
+    margin: 0;
+    padding: 64px 40px 96px;
+    font-family: "Lucida", system-ui, sans-serif;
+    color: var(--ink);
+    background:
+      radial-gradient(120% 80% at 50% -10%, #FBF5E9 0%, rgba(251, 245, 233, 0) 60%),
+      #EFE6D6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 40;
+    opacity: .035;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/></filter><rect width='140' height='140' filter='url(%23n)'/></svg>");
+  }
+
+  .head { max-width: 1180px; margin: 0 auto 56px; }
+
+  .eyebrow {
+    display: inline-block;
+    font-size: 9.5px;
+    letter-spacing: .22em;
+    text-transform: uppercase;
+    font-weight: 600;
+    color: var(--accent);
+    padding: 6px 12px;
+    border-radius: 999px;
+    border: 1px solid var(--accent-hair);
+    background: rgba(252, 248, 241, .7);
+  }
+
+  h1 {
+    margin: 22px 0 14px;
+    font-size: 44px;
+    line-height: 1.04;
+    letter-spacing: -.035em;
+    font-weight: 650;
+    max-width: 22ch;
+  }
+
+  h1 em { font-style: normal; color: var(--accent); }
+
+  .lede {
+    margin: 0;
+    max-width: 62ch;
+    font-size: 15px;
+    line-height: 1.65;
+    color: var(--muted);
+  }
+
+  .grid {
+    max-width: 1180px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 34px;
+    align-items: start;
+  }
+
+  .option {
+    opacity: 0;
+    transform: translateY(18px);
+    animation: rise .9s var(--ease) forwards;
+  }
+  .option:nth-child(1) { animation-delay: .05s; }
+  .option:nth-child(2) { animation-delay: .16s; }
+  .option:nth-child(3) { animation-delay: .27s; }
+
+  @keyframes rise {
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .tag {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+
+  .tag b {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .16em;
+    color: var(--faint);
+  }
+
+  .tag span {
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: -.015em;
+  }
+
+  /* the phone */
+  .shell {
+    padding: 7px;
+    border-radius: 30px;
+    background: rgba(211, 194, 181, .38);
+    border: 1px solid var(--edge);
+    box-shadow: 0 1px 0 rgba(255, 255, 255, .6) inset;
+    transition: transform .7s var(--ease), box-shadow .7s var(--ease);
+  }
+
+  .option:hover .shell {
+    transform: translateY(-4px);
+    box-shadow: 0 1px 0 rgba(255, 255, 255, .6) inset, 0 26px 46px -30px rgba(60, 46, 34, .45);
+  }
+
+  .screen {
+    position: relative;
+    overflow: hidden;
+    border-radius: 24px;
+    background: var(--canvas);
+    border: 1px solid var(--edge);
+    padding: 16px 18px 20px;
+  }
+
+  .label-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin: 4px 0 9px;
+    color: var(--faint);
+  }
+
+  .label-row svg { flex: none; }
+
+  .label-row span {
+    font-size: 8.5px;
+    letter-spacing: .18em;
+    font-weight: 600;
+  }
+
+  .hint {
+    margin: 9px 2px 0;
+    font-size: 10.5px;
+    line-height: 1.45;
+    color: var(--faint);
+  }
+
+  .name { font-size: 13px; font-weight: 500; letter-spacing: -.01em; }
+  .micro {
+    font-size: 8px;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: var(--faint);
+  }
+
+  /* ── A · split card ────────────────────────────────────────────── */
+  .split {
+    position: relative;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    background: var(--card);
+    border: 1px solid var(--edge);
+    border-radius: 16px;
+    overflow: visible;
+  }
+
+  .half {
+    appearance: none;
+    border: 0;
+    background: transparent;
+    font: inherit;
+    color: inherit;
+    cursor: pointer;
+    padding: 14px 12px 15px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 9px;
+    text-align: left;
+    border-radius: 16px;
+    transition: background .5s var(--ease);
+  }
+
+  .half:hover { background: rgba(228, 216, 206, .4); }
+
+  .half + .half {
+    border-left: 1px solid var(--line);
+    align-items: flex-end;
+    text-align: right;
+  }
+
+  .medallion {
+    width: 40px;
+    height: 40px;
+    border-radius: 999px;
+    display: grid;
+    place-items: center;
+    background: var(--recess);
+    border: 1px solid var(--edge);
+    font-size: 13px;
+    font-weight: 650;
+    letter-spacing: -.01em;
+    color: var(--ink);
+  }
+
+  .medallion.to {
+    background: var(--accent-fill);
+    border-color: var(--accent-hair);
+    color: var(--accent-ink);
+  }
+
+  .medallion svg { display: block; }
+
+  .swap {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 33px;
+    height: 33px;
+    border-radius: 999px;
+    background: var(--card);
+    border: 1px solid var(--edge-strong);
+    display: grid;
+    place-items: center;
+    box-shadow: 0 1px 2px rgba(25, 24, 20, .07);
+    color: var(--accent);
+    transition: transform .5s var(--ease), box-shadow .3s var(--ease);
+  }
+
+  .swap.is-pressed {
+    transform: translate(-50%, -50%) scale(.9);
+    box-shadow: 0 0 0 rgba(25, 24, 20, 0);
+    transition: transform .12s cubic-bezier(.2, .8, .3, 1);
+  }
+
+  /* ── A · the press, before the picker ──────────────────────────── */
+  /*
+     A tap has to land before anything moves. The half sinks 1 px into the
+     card and takes the clay wash, the medallion presses in with it, and only
+     then does the picker grow out of the half that was tapped. The release is
+     slower than the press — the same asymmetry a real key has.
+  */
+  .half {
+    transition:
+      background .5s var(--ease),
+      transform .44s var(--ease),
+      box-shadow .44s var(--ease);
+  }
+
+  .half .medallion {
+    transition: transform .44s var(--ease), background .3s var(--ease);
+  }
+
+  .half.is-pressed {
+    transform: translateY(1px) scale(.966);
+    background: rgba(228, 216, 206, .74);
+    box-shadow: inset 0 1px 3px rgba(25, 24, 20, .11), inset 0 0 0 1px rgba(199, 178, 164, .28);
+    transition:
+      transform .13s cubic-bezier(.2, .8, .3, 1),
+      background .13s linear,
+      box-shadow .13s linear;
+  }
+
+  .half.is-pressed .medallion {
+    transform: scale(.92);
+    transition: transform .13s cubic-bezier(.2, .8, .3, 1);
+  }
+
+  .half.is-pressed .name { color: var(--accent-ink); }
+
+  /* the picker the press opens: a plate of the same clay, growing out of the
+     half that was tapped, so the eye never loses which side it belongs to */
+  /* the scrim and the plate it holds: the picker the app opens, kept inside
+     the phone so the card it was tapped on stays visible behind it */
+  .picker {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    display: flex;
+    align-items: flex-end;
+    padding: 9px;
+    background: rgba(25, 24, 20, 0);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .22s linear, background .3s linear;
+  }
+
+  .picker.is-open {
+    opacity: 1;
+    background: rgba(25, 24, 20, .16);
+    pointer-events: auto;
+  }
+
+  .picker-plate {
+    width: 100%;
+    padding: 5px;
+    border-radius: 14px;
+    background: var(--card);
+    border: 1px solid var(--edge-strong);
+    box-shadow:
+      0 1px 0 rgba(255, 255, 255, .8) inset,
+      0 22px 40px -26px rgba(60, 46, 34, .5),
+      0 3px 10px -6px rgba(60, 46, 34, .35);
+    transform: translateY(10px) scale(.97);
+    transition: transform .44s var(--ease);
+  }
+
+  .picker.is-open .picker-plate { transform: none; }
+
+  .picker-row {
+    appearance: none;
+    border: 0;
+    background: transparent;
+    font: inherit;
+    color: inherit;
+    width: 100%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 6px 8px;
+    border-radius: 9px;
+    text-align: left;
+    opacity: 0;
+    transform: translateY(-3px);
+    transition: background .2s linear;
+  }
+
+  .picker.is-open .picker-row {
+    animation: row-in .42s var(--ease) forwards;
+  }
+
+  .picker-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 3px 8px 6px;
+  }
+
+  .picker-head .micro { color: var(--accent); }
+
+  .picker-head .micro.into { color: var(--accent-ink); }
+
+  .picker-head .side-note {
+    font-size: 9.5px;
+    color: var(--faint);
+  }
+
+  @keyframes row-in {
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .picker-row:hover { background: var(--recess); }
+
+  .picker-row .medallion { width: 23px; height: 23px; font-size: 9.5px; }
+
+  .picker-row .name { font-size: 12px; }
+
+  .picker-row .tick {
+    margin-left: auto;
+    color: var(--accent);
+    opacity: 0;
+  }
+
+  .picker-row.is-current .tick { opacity: 1; }
+
+  .replay {
+    appearance: none;
+    font: inherit;
+    margin-top: 12px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    padding: 9px 15px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: -.005em;
+    color: var(--accent-ink);
+    background: rgba(252, 248, 241, .8);
+    border: 1px solid var(--accent-hair);
+    box-shadow: 0 1px 0 rgba(255, 255, 255, .7) inset;
+    transition: transform .3s var(--ease), background .3s linear, box-shadow .3s var(--ease);
+  }
+
+  .replay:hover { background: var(--card); }
+
+  .replay.is-pressed {
+    transform: translateY(1px) scale(.97);
+    background: var(--recess);
+    box-shadow: inset 0 1px 3px rgba(25, 24, 20, .12);
+    transition: transform .12s cubic-bezier(.2, .8, .3, 1), background .12s linear;
+  }
+
+  .replay svg { flex: none; }
+
+  .replay kbd {
+    font: inherit;
+    font-size: 9.5px;
+    letter-spacing: .1em;
+    color: var(--faint);
+    border: 1px solid var(--line);
+    border-radius: 5px;
+    padding: 1px 5px;
+  }
+
+  /* ── B · greeting tiles ────────────────────────────────────────── */
+  .pair {
+    display: grid;
+    grid-template-columns: 1fr 26px 1fr;
+    align-items: center;
+    gap: 0;
+  }
+
+  .tile {
+    appearance: none;
+    font: inherit;
+    color: inherit;
+    cursor: pointer;
+    background: var(--card);
+    border: 1px solid var(--edge);
+    border-radius: 18px;
+    padding: 13px 14px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    text-align: left;
+    transition: transform .6s var(--ease), border-color .6s var(--ease), background .6s var(--ease);
+  }
+
+  .tile:hover {
+    transform: translateY(-2px);
+    border-color: var(--edge-strong);
+  }
+
+  .tile.to {
+    background: linear-gradient(180deg, rgba(164, 110, 75, .10), rgba(164, 110, 75, .05)), var(--card);
+    border-color: var(--accent-hair);
+  }
+
+  .tile .micro { margin-bottom: 2px; }
+
+  .greeting {
+    font-size: 23px;
+    font-weight: 600;
+    letter-spacing: -.03em;
+    line-height: 1.15;
+    color: var(--ink);
+    display: flex;
+    align-items: center;
+    min-height: 30px;
+  }
+
+  .tile.to .greeting { color: var(--accent-ink); }
+
+  .tile-name {
+    font-size: 11px;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .gap-arrow {
+    display: grid;
+    place-items: center;
+    color: var(--accent);
+    opacity: .85;
+  }
+
+  /* ── C · code plates ───────────────────────────────────────────── */
+  .plates {
+    display: grid;
+    grid-template-columns: 1fr 34px 1fr;
+    align-items: stretch;
+  }
+
+  .plate {
+    appearance: none;
+    font: inherit;
+    color: inherit;
+    cursor: pointer;
+    background: var(--card);
+    border: 1px solid var(--edge);
+    border-radius: 14px;
+    padding: 12px 12px 11px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 10px;
+    text-align: left;
+    transition: border-color .6s var(--ease), background .6s var(--ease);
+  }
+
+  .plate:hover { border-color: var(--edge-strong); }
+
+  .plate.top { flex-direction: row; align-items: flex-start; gap: 8px; }
+
+  .code {
+    font-size: 27px;
+    font-weight: 650;
+    letter-spacing: -.04em;
+    line-height: .9;
+    color: var(--ink);
+  }
+
+  .plate.to .code { color: var(--accent-ink); }
+
+  .plate .arrow-down {
+    margin-top: 1px;
+    color: var(--faint);
+  }
+
+  .ribbon {
+    display: grid;
+    place-items: center;
+    align-self: center;
+    height: 34px;
+    margin: 0 -1px;
+    background: linear-gradient(180deg, #A46E4B, #8A5A3C);
+    color: #FCF8F1;
+    border-radius: 0;
+    clip-path: polygon(0 0, 72% 0, 100% 50%, 72% 100%, 0 100%, 16% 50%);
+    padding-left: 8px;
+  }
+
+  .note {
+    margin-top: 18px;
+    font-size: 12.5px;
+    line-height: 1.6;
+    color: var(--muted);
+  }
+
+  .note b {
+    color: var(--ink);
+    font-weight: 600;
+  }
+
+  .note ul {
+    margin: 8px 0 0;
+    padding: 0 0 0 16px;
+  }
+
+  .note li { margin-bottom: 4px; }
+
+  .foot {
+    max-width: 1180px;
+    margin: 72px auto 0;
+    padding-top: 26px;
+    border-top: 1px solid var(--line);
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 34px;
+    font-size: 12.5px;
+    line-height: 1.6;
+    color: var(--muted);
+  }
+
+  .foot h3 {
+    margin: 0 0 6px;
+    font-size: 10px;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+    color: var(--faint);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .option { animation: none; opacity: 1; transform: none; }
+    .shell, .tile, .half, .plate, .picker, .picker-row, .replay { transition: none; }
+    .half.is-pressed, .swap.is-pressed, .replay.is-pressed { transform: none; }
+    .picker.is-open .picker-row { animation: none; opacity: 1; transform: none; }
+  }
+
+  @media (max-width: 1080px) {
+    body { padding: 40px 20px 72px; }
+    h1 { font-size: 34px; }
+    .grid, .foot { grid-template-columns: 1fr; gap: 28px; }
+    .option { max-width: 420px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="head">
+  <span class="eyebrow">Settings · translation</span>
+  <h1>From and into, <em>side by side</em>.</h1>
+  <p class="lede">
+    Three directions for the same control: one glance shows the pair, one tap changes
+    either side, and the arrow in the middle is the direction the words travel. Each
+    option keeps the app's parchment and clay, and each is buildable from the layouts
+    already in the app — no new image assets.
+  </p>
+</header>
+
+<main class="grid">
+
+  <!-- A -->
+  <section class="option">
+    <div class="tag"><b>A</b><span>The split card</span></div>
+    <div class="shell">
+      <div class="screen">
+        <div class="label-row">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#857B6C" stroke-width="1.3">
+            <circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.6 2.6 2.6 15.4 0 18M12 3c-2.6 2.6-2.6 15.4 0 18"/>
+          </svg>
+          <span>TRANSLATION</span>
+        </div>
+
+        <div class="split">
+          <button class="half" data-side="from" aria-haspopup="listbox" aria-expanded="false">
+            <span class="micro">From</span>
+            <span class="medallion">DE</span>
+            <span class="name">German</span>
+          </button>
+          <button class="half" data-side="into" aria-haspopup="listbox" aria-expanded="false">
+            <span class="micro">Into</span>
+            <span class="medallion to">EN</span>
+            <span class="name">English</span>
+          </button>
+          <span class="swap" id="swap" title="Swap">
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.45" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 9h13M14 6l3 3-3 3M20 15H7M10 12l-3 3 3 3"/>
+            </svg>
+          </span>
+        </div>
+
+        <div class="picker" id="picker">
+          <div class="picker-plate" role="listbox" aria-label="Pick a language">
+            <div class="picker-head">
+              <span class="micro" id="pickerSide">From</span>
+              <span class="side-note">tap one</span>
+            </div>
+            <button class="picker-row is-current" role="option" aria-selected="true">
+              <span class="medallion">DE</span>
+              <span class="name">German</span>
+              <span class="tick">✓</span>
+            </button>
+            <button class="picker-row" role="option" aria-selected="false">
+              <span class="medallion">JA</span>
+              <span class="name">Japanese</span>
+              <span class="tick">✓</span>
+            </button>
+            <button class="picker-row" role="option" aria-selected="false">
+              <span class="medallion">FR</span>
+              <span class="name">French</span>
+              <span class="tick">✓</span>
+            </button>
+            <button class="picker-row" role="option" aria-selected="false">
+              <span class="medallion">ES</span>
+              <span class="name">Spanish</span>
+              <span class="tick">✓</span>
+            </button>
+          </div>
+        </div>
+
+        <p class="hint">Tap either half · the ring swaps them</p>
+      </div>
+    </div>
+    <button class="replay" id="replay" type="button">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M4 10a8 8 0 1 1 2.4 5.7"/><path d="M4 4v6h6"/>
+      </svg>
+      Replay the press
+      <kbd>R</kbd>
+    </button>
+
+    <p class="note">
+      <b>Calmest of the three.</b> One card, one hairline, one seam — it reads as a
+      single decision with two ends rather than two settings.
+      <ul>
+        <li>Each half is a 150 dp tap target, up from a 28 dp chip.</li>
+        <li>The swap ring is the only new control; it hides while From is on Auto.</li>
+        <li>The half sinks for 240 ms before the picker opens — the press is seen first.</li>
+      </ul>
+    </p>
+  </section>
+
+  <!-- B -->
+  <section class="option">
+    <div class="tag"><b>B</b><span>The greeting tiles</span></div>
+    <div class="shell">
+      <div class="screen">
+        <div class="label-row">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#857B6C" stroke-width="1.3">
+            <circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.6 2.6 2.6 15.4 0 18M12 3c-2.6 2.6-2.6 15.4 0 18"/>
+          </svg>
+          <span>TRANSLATION</span>
+        </div>
+
+        <div class="pair">
+          <button class="tile">
+            <span class="micro">From</span>
+            <span class="greeting">Hallo</span>
+            <span class="tile-name">German</span>
+          </button>
+          <span class="gap-arrow">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 12h15M14 7l5 5-5 5"/>
+            </svg>
+          </span>
+          <button class="tile to">
+            <span class="micro">Into</span>
+            <span class="greeting">Hello</span>
+            <span class="tile-name">English</span>
+          </button>
+        </div>
+
+        <p class="hint">A word from each language, so the pair is recognised before it is read</p>
+      </div>
+    </div>
+    <p class="note">
+      <b>Most readable at a glance.</b> Each side shows the language speaking for
+      itself — Hallo, Hello, こんにちは — which works for scripts a name can't
+      carry, and needs no flags.
+      <ul>
+        <li>Needs one greeting string per language, kept beside the name.</li>
+        <li>Long greetings (Tiếng Việt, Bahasa) shrink to the name only.</li>
+      </ul>
+    </p>
+  </section>
+
+  <!-- C -->
+  <section class="option">
+    <div class="tag"><b>C</b><span>The code plates</span></div>
+    <div class="shell">
+      <div class="screen">
+        <div class="label-row">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#857B6C" stroke-width="1.3">
+            <circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.6 2.6 2.6 15.4 0 18M12 3c-2.6 2.6-2.6 15.4 0 18"/>
+          </svg>
+          <span>TRANSLATION</span>
+        </div>
+
+        <div class="plates">
+          <button class="plate">
+            <span class="micro">From</span>
+            <span class="code">DE</span>
+            <span class="name">German</span>
+          </button>
+          <span class="ribbon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 12h14M13 7l5 5-5 5"/>
+            </svg>
+          </span>
+          <button class="plate to">
+            <span class="micro">Into</span>
+            <span class="code">EN</span>
+            <span class="name">English</span>
+          </button>
+        </div>
+
+        <p class="hint">Two letters, one direction — the fastest to scan, dullest to look at</p>
+      </div>
+    </div>
+    <p class="note">
+      <b>Most compact.</b> Departure-board logic: the code is the identity, the
+      ribbon is the direction, and the whole thing survives 20 languages of
+      translation without breaking.
+      <ul>
+        <li>Smallest of the three — frees height for the permission card.</li>
+        <li>Auto reads as <b style="color:var(--accent-ink)">AUTO</b> with a scan glyph.</li>
+      </ul>
+    </p>
+  </section>
+
+</main>
+
+<footer class="foot">
+  <div>
+    <h3>In every option</h3>
+    From stays on <b style="color:var(--ink)">Auto recognize</b> by default and shows the
+    same glyph wherever a language's identity would sit — ◎ with a small ripple. The
+    picker and the lens keep working exactly as they do now; only the row's body changes.
+  </div>
+  <div>
+    <h3>What it costs</h3>
+    A and C are pure layout: one new drawable for the swap ring or ribbon, plus two
+    click targets. B adds a greeting per language to <b style="color:var(--ink)">Languages.kt</b>,
+    which is data, not markup.
+  </div>
+  <div>
+    <h3>Tap targets</h3>
+    Today's chips are 28 dp tall. All three make the whole side of the card the
+    target — 64–76 dp tall — which is the change that makes this easier to change
+    on a phone with one hand.
+  </div>
+</footer>
+
+<script>
+(() => {
+  const split = document.querySelector('.split');
+  const halves = [...split.querySelectorAll('.half')];
+  const swap = document.getElementById('swap');
+  const picker = document.getElementById('picker');
+  const replay = document.getElementById('replay');
+
+  // How long the half is held down before the picker arrives. Long enough to be
+  // seen as a press, short enough that it never reads as a wait.
+  const SINK = 240;
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)');
+  let sinkTimer = null;
+  let openSide = null;
+  let runId = 0;
+
+  function press(el) {
+    el.style.transition = ''; // the class's own 130 ms sink, not the 440 ms rise
+    el.classList.remove('is-pressed');
+    void el.offsetWidth; // restart the sink from the top, on a replay as well
+    el.classList.add('is-pressed');
+  }
+
+  function release(el) {
+    el.classList.remove('is-pressed');
+  }
+
+  const pickerSide = document.getElementById('pickerSide');
+
+  function open(side) {
+    openSide = side;
+    pickerSide.textContent = side === 'from' ? 'From' : 'Into';
+    pickerSide.classList.toggle('into', side === 'into');
+    picker.querySelectorAll('.picker-row').forEach((row, i) => {
+      row.style.animationDelay = `${40 + i * 40}ms`;
+    });
+    picker.classList.add('is-open');
+    halves.forEach((h) => h.setAttribute('aria-expanded', h.dataset.side === side ? 'true' : 'false'));
+    const current = picker.querySelector('.is-current');
+    if (current) current.focus({ preventScroll: true });
+  }
+
+  function close() {
+    picker.classList.remove('is-open');
+    openSide = null;
+    halves.forEach((h) => h.setAttribute('aria-expanded', 'false'));
+  }
+
+  function choose(row) {
+    picker.querySelectorAll('.picker-row').forEach((r) => {
+      r.classList.toggle('is-current', r === row);
+      r.setAttribute('aria-selected', r === row ? 'true' : 'false');
+    });
+    const code = row.querySelector('.medallion').textContent.trim();
+    const name = row.querySelector('.name').textContent.trim();
+    const half = halves.find((h) => h.dataset.side === (openSide || 'from'));
+    if (half) {
+      half.querySelector('.medallion').textContent = code;
+      half.querySelector('.name').textContent = name;
+    }
+    close();
+  }
+
+  function tap(half) {
+    if (openSide) { close(); return; }
+    const side = half.dataset.side;
+    press(half);
+    clearTimeout(sinkTimer);
+    sinkTimer = setTimeout(() => {
+      open(side);
+      release(half);
+    }, reduced.matches ? 0 : SINK);
+  }
+
+  halves.forEach((half) => {
+    half.addEventListener('pointerdown', () => {
+      if (openSide) return;
+      press(half);
+    });
+    half.addEventListener('pointerup', () => {
+      if (openSide) return;
+      // A press that is let go before the picker opened still opens it: the
+      // hand has already decided, and waiting for a second tap is the thing
+      // that makes a control feel deaf.
+    });
+    half.addEventListener('pointerleave', () => {
+      if (!openSide) release(half);
+    });
+    half.addEventListener('click', (event) => {
+      event.stopPropagation();
+      tap(half);
+    });
+  });
+
+  swap.addEventListener('pointerdown', () => swap.classList.add('is-pressed'));
+  swap.addEventListener('pointerup', () => swap.classList.remove('is-pressed'));
+  swap.addEventListener('pointerleave', () => swap.classList.remove('is-pressed'));
+  swap.addEventListener('click', () => swap.classList.remove('is-pressed'));
+
+  picker.addEventListener('click', (event) => {
+    const row = event.target.closest('.picker-row');
+    if (row) { choose(row); return; }
+    // A press outside the plate is the sheet's own way out, the same as a
+    // press outside a dialog in the app.
+    if (!event.target.closest('.picker-plate')) close();
+    event.stopPropagation();
+  });
+
+  document.addEventListener('click', (event) => {
+    if (!openSide) return;
+    if (event.target.closest('.split') || event.target.closest('#picker') || event.target.closest('#replay')) return;
+    close();
+  });
+
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && openSide) close();
+    if (event.key.toLowerCase() === 'r' && !event.metaKey && !event.ctrlKey) playReplay();
+  });
+
+  /** The whole sequence, on demand: sink, hold, picker, hold, close. */
+  function playReplay() {
+    const run = ++runId;
+    clearTimeout(sinkTimer);
+    close();
+
+    const half = halves[0];
+    replay.classList.remove('is-pressed');
+    void replay.offsetWidth;
+    replay.classList.add('is-pressed');
+    setTimeout(() => replay.classList.remove('is-pressed'), 180);
+
+    press(half);
+    setTimeout(() => {
+      if (run !== runId) return;
+      open('from');
+      release(half);
+    }, reduced.matches ? 0 : SINK);
+
+    setTimeout(() => {
+      if (run !== runId) return;
+      close();
+    }, 2100);
+  }
+
+  replay.addEventListener('click', (event) => {
+    event.stopPropagation();
+    playReplay();
+  });
+})();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>band check</title>
+<style>
+  @font-face {
+    font-family: "Lucida";
+    src: url("./fonts/PlusJakarta.ttf") format("truetype");
+    font-weight: 200 800;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: #EFE6D6;
+    font-family: "Lucida", system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  .stage { padding: 24px; }
+  .zoom { transform: scale(3); transform-origin: 0 0; width: 320px; }
+
+  /* the card as the overlay sheet draws it: 320 dp wide, 16 dp of padding */
+  .sheet {
+    width: 320px;
+    background: #FCF8F1;
+    border: 1px solid rgba(25, 24, 20, .08);
+    border-radius: 18px;
+    padding: 16px;
+  }
+
+  .band {
+    position: relative;
+    border-radius: 18px;
+    border: 1px solid rgba(25, 24, 20, .078);
+    background-color: #F5EEE2;
+    background-image: radial-gradient(rgba(106, 98, 84, .16) 0.75px, transparent 0.8px);
+    background-size: 9px 9px;
+    background-position: 4.5px 4.5px;
+    padding: 11px 12px 10px;
+  }
+
+  .title { display: flex; align-items: center; height: 32px; }
+  .tile {
+    width: 32px; height: 32px;
+    border-radius: 10px;
+    background: rgba(164, 110, 75, .10);
+    border: 1px solid rgba(164, 110, 75, .22);
+    display: grid; place-items: center;
+    margin-right: 11px;
+    flex: none;
+  }
+  .tile svg { width: 17px; height: 17px; color: #8A5A3C; }
+  .label {
+    flex: 1;
+    font-size: 9.5px;
+    letter-spacing: .18em;
+    font-weight: 500;
+    color: #857B6C;
+  }
+  .count {
+    height: 22px;
+    padding: 0 10px;
+    border-radius: 999px;
+    background: rgba(164, 110, 75, .12);
+    border: 1px solid rgba(164, 110, 75, .22);
+    color: #6E4630;
+    font-size: 10px;
+    display: grid; place-items: center;
+  }
+
+  /* the rail: 264 dp of band inside, 22 dp tall, one slot per letter */
+  .rail {
+    margin-top: 6px;
+    height: 22px;
+    display: grid;
+    grid-template-columns: repeat(26, 1fr);
+    align-items: center;
+  }
+  .rail span {
+    font-size: 8.5px;
+    font-weight: 500;
+    color: #857B6C;
+    text-align: center;
+    letter-spacing: .04em;
+    line-height: 1;
+    position: relative;
+  }
+  .rail span.active { color: #8A5A3C; font-weight: 600; }
+  .rail span.pressed { color: #8A5A3C; }
+  .rail span.pressed::before {
+    content: "";
+    position: absolute;
+    inset: 50% auto auto 50%;
+    width: 9px; height: 9px;
+    margin: -4.5px 0 0 -4.5px;
+    border-radius: 50%;
+    background: rgba(138, 90, 60, .13);
+    z-index: -1;
+  }
+
+  .search {
+    margin-top: 13px;
+    height: 42px;
+    border-radius: 12px;
+    background: rgba(25, 24, 20, .045);
+    display: flex; align-items: center;
+    padding: 0 12px;
+    gap: 8px;
+    color: #857B6C;
+    font-size: 13px;
+  }
+
+  .list { margin-top: 5px; }
+  .sec {
+    font-size: 9px;
+    letter-spacing: .18em;
+    color: #857B6C;
+    padding: 14px 2px 6px;
+  }
+  .row { display: flex; align-items: center; min-height: 46px; padding: 5px 8px; }
+  .row .letter {
+    width: 30px; height: 30px; margin-right: 11px;
+    border-radius: 9px;
+    background: rgba(164, 110, 75, .10);
+    border: 1px solid rgba(164, 110, 75, .22);
+    display: grid; place-items: center;
+    color: #8A5A3C; font-size: 12.5px;
+  }
+  .row .names b { display: block; font-size: 13px; font-weight: 500; color: #191814; line-height: 1.25; }
+  .row .names i { display: block; font-style: normal; font-size: 9.5px; color: #857B6C; }
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="zoom">
+    <div class="sheet">
+      <div class="band">
+        <div class="title">
+          <div class="tile">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7">
+              <circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.6 3.8 5.7 3.8 9S14.5 18.4 12 21c-2.5-2.6-3.8-5.7-3.8-9S9.5 5.6 12 3Z"/>
+            </svg>
+          </div>
+          <div class="label">TRANSLATE INTO</div>
+          <div class="count">240</div>
+        </div>
+        <div class="rail">
+          <span>A</span><span>B</span><span>C</span><span>D</span><span>E</span>
+          <span>F</span><span>G</span><span class="active">H</span><span>I</span><span>J</span>
+          <span>K</span><span>L</span><span>M</span><span>N</span><span>O</span>
+          <span>P</span><span>Q</span><span>R</span><span>S</span><span>T</span>
+          <span>U</span><span>V</span><span>W</span><span>X</span><span>Y</span><span>Z</span>
+        </div>
+      </div>
+
+      <div class="search">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <circle cx="11" cy="11" r="6.4"/><path d="M15.8 15.8 20 20"/>
+        </svg>
+        Search 240 languages
+      </div>
+
+      <div class="list">
+        <div class="sec">ON THIS PHONE · 3</div>
+        <div class="row">
+          <div class="letter">E</div>
+          <div class="names"><b>English</b></div>
+        </div>
+        <div class="row">
+          <div class="letter">ハ</div>
+          <div class="names"><b>日本語</b><i>Japanese</i></div>
+        </div>
+        <div class="sec">MORE LANGUAGES</div>
+        <div class="row">
+          <div class="letter">N</div>
+          <div class="names"><b>Nederlands</b><i>Dutch</i></div>
+        </div>
+        <div class="row">
+          <div class="letter">P</div>
+          <div class="names"><b>Português</b><i>Portuguese</i></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>
