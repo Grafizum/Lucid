@@ -29,17 +29,17 @@ Lucid is not a split-screen translator and not a screenshot tool. It is a small 
 
 ## 🧭 How it works
 
-<img src="docs/screenshots/how-it-works.png" alt="Three steps: the lens resting on a chat message, the card translating it, then the translated card beside the mint-highlighted line" width="900" />
+<img src="docs/screenshots/how-it-works.png" alt="Three steps: the lens resting on a chat message, the card translating it, then the translated card beside the washed line" width="900" />
 
 1. **Drag it anywhere.** A small lens floats over every app — no split screen, no picking an app, no screenshot button. Whatever is under it when you let go is what it reads: the whole sentence, not just the word the lens happens to sit on.
 2. **It reads in place.** The words come from Android's accessibility tree, not from the framebuffer: the exact string plus the bounds of every character, which is why the highlight can sit on the glyphs instead of a rectangle around them.
-3. **The translation arrives beside it.** The line it read is washed in mint, one band per line, and the card holds the meaning with the language on each side. A press anywhere else takes both away — and the touch still reaches the app underneath.
+3. **The translation arrives beside it.** The line it read is washed in sand, one band per line, and the card holds the meaning with the language on each side. A press anywhere else takes both away — and the touch still reaches the app underneath.
 
 ## ✨ Features
 
 - **Reads the text, not the pixels** — it asks Android's accessibility tree what is at the point under the lens, so the highlight sits exactly on the words and no screen recording is involved.
 - **Works over any app** — chat apps, browsers, PDFs, settings, even a game's UI: if the app publishes text, the lens reads it.
-- **Translates in place** — the card opens beside the text you pointed at, with the read sentence washed in mint, one band per line, ending where the sentence ends.
+- **Translates in place** — the card opens beside the text you pointed at, with the read sentence washed in sand, one band per line, ending where the sentence ends.
 - **Touch anywhere and it is gone** — the card and the highlight clear together, and the touch still reaches the app underneath. That holds mid-read too: pressing outside drops the read instead of making you wait for an answer you no longer want.
 - **Tap for languages** — the lens opens the language list; the pick is saved for everything it reads next. A tap never reads.
 - **Long-press to pause** — the lens fades to a ghost until you long-press again.
@@ -75,25 +75,36 @@ Then press **Start the lens**.
 
 ## 🖼 Screenshots
 
-| The lens on a message — the card holds the translation | The app: the lens, and the pages behind it |
-| --- | --- |
-| <img src="docs/screenshots/chat.png" alt="Lucid's lens on a Spanish chat message with the English translation card open" width="420" /> | <img src="docs/screenshots/home-light.png" alt="Lucid's home screen: auto-translate, engine and offline-only switches, then offline models and translation history below them" width="420" /> |
-| **Tap the lens — the language list, saved for what comes next** | **Long-press — the lens pauses to a ghost until you wake it** |
-| <img src="docs/screenshots/languages.png" alt="The language picker open over a chat, listing English, Spanish, French, German, Portuguese, Italian and Dutch" width="420" /> | *A tap opens this list and saves the pick for everything the lens reads next; a long-press parks the lens until you long-press it again.* |
+<table>
+  <tr>
+    <td align="center" width="50%"><b>The lens on a message</b><br><sub>The card holds the translation, the read line is washed</sub></td>
+    <td align="center" width="50%"><b>Tap the lens</b><br><sub>The language list, saved for everything it reads next</sub></td>
+  </tr>
+  <tr>
+    <td><img src="docs/screenshots/chat.png" alt="Lucid's lens on a Spanish chat message with the English translation card open beside it" /></td>
+    <td><img src="docs/screenshots/languages.png" alt="The language list open over a chat: English ticked, then Español, Deutsch, Français, Italiano and Português" /></td>
+  </tr>
+</table>
 
-**First run** — one screen and one tap before the lens can float:
+<p align="center"><sub>A long-press parks the lens as a ghost until you long-press it again.</sub></p>
 
-| Welcome — tap the lens to begin | The same home screen at night |
-| --- | --- |
-| <img src="docs/screenshots/welcome.png" alt="Lucid's welcome screen: the lens mark inside a breathing ring, with Tap the lens to begin under it" width="420" /> | <img src="docs/screenshots/home-dark.png" alt="Lucid's home screen in the dark palette, with the same lens switches and pages" width="420" /> |
+**The app** — one screen to start, every switch in one place, light or dark by hand:
+
+<p align="center">
+  <img src="docs/screenshots/app-screens.png" alt="Three phones: Lucid's welcome screen, the home screen in the light palette, and the same home screen at night" width="900" />
+</p>
 
 **Closer in** — the wash covers exactly the line that was read, and the card's footer says which engine answered:
 
-<img src="docs/screenshots/close-up.png" alt="Close-up of the lens on a highlighted Spanish line and the translation card with its online · Spanish footer" width="600" />
+<p align="center">
+  <img src="docs/screenshots/close-up.png" alt="Close-up of the lens on a washed Spanish line and the translation card with its online · Spanish footer" width="620" />
+</p>
 
 **Two surfaces at once** — the app behind, a translated chat in front:
 
-<img src="docs/screenshots/duo.png" alt="Lucid's start screen and a chat with the translation card, on two phones" width="740" />
+<p align="center">
+  <img src="docs/screenshots/duo.png" alt="Lucid's home screen and a chat with the translation card, on two phones" width="760" />
+</p>
 
 ## 🎯 How it reads your screen
 
@@ -126,7 +137,7 @@ The engine hands back the reading of the whole sentence in Latin letters (`Kono 
 
 The respelling is a conversion, not a dictionary: particles are matched by sound (は is spoken わ) and long vowels spelled out (ō → おう, so 学校 → がっこう). It knows that "nihon" is にほん, never that 日本 is read that way. On-device mode publishes no reading at all, so the card is plain there — this needs **ENGINE: Online**.
 
-Japanese is also written without spaces, so underneath the original the card grows a short list — one word per line, the word in mint, its meaning beside it:
+Japanese is also written without spaces, so underneath the original the card grows a short list — one word per line, the word in clay, its meaning beside it:
 
 ```
 日本語        Japanese
@@ -139,7 +150,7 @@ The split comes from the writing itself, not from a dictionary of the language: 
 
 Both chips in the card are live: tap the target chip (`English ▾`) to translate the same text into another language, or the source chip (`Japanese ▾`, which also offers *Auto detect*) if the language was guessed wrong. The sheet dims the screen and closes itself when you pick.
 
-The change applies to **that card only** — the footer gains a `temporary` marker and the target chip loses its mint fill. Nothing is saved: drag the lens to the next thing and it translates into the language chosen in the app again. For a change that sticks, tap the lens itself — that list saves what you pick — or use `TRANSLATE INTO → Change` in the app.
+The change applies to **that card only** — the footer gains a `temporary` marker and the target chip loses its clay fill. Nothing is saved: drag the lens to the next thing and it translates into the language chosen in the app again. For a change that sticks, tap the lens itself — that list saves what you pick — or use `TRANSLATE INTO → Change` in the app.
 
 ### Screen capture (optional)
 
@@ -177,7 +188,7 @@ android/                      the app
     MainActivity.kt              permissions + start/stop the lens
     LensService.kt               foreground service: bubble, selection, card, pipeline
     LensAccessibilityService.kt  "what text is at this point?" via the a11y tree
-    HighlightView.kt             the mint selection wash, one band per line
+    HighlightView.kt             the sand selection wash, one band per line
     Romaji.kt                    romaji -> hiragana, for the readings
     Furigana.kt                  lines a reading up with the kanji it belongs to
     RubyTextView.kt              keeps room above the line and draws that kana there
