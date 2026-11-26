@@ -27,6 +27,22 @@ import androidx.core.view.WindowInsetsCompat
 class WelcomeActivity : AppCompatActivity() {
 
     private lateinit var language: TextView
+    private lateinit var langState: TextView
+
+    /**
+     * The chip's own story, and the reason this page has one: picking a language
+     * fetches its words, and the page is written in them once they land. Without
+     * this the chip said 日本語 over an English welcome.
+     */
+    private val packWatcher = object : AppLanguage.Watcher {
+        override fun onPackChanged(code: String, pack: AppLanguage.Pack, done: Int, total: Int) {
+            if (code != Prefs.uiLanguage(this@WelcomeActivity)) return
+            paintLanguage()
+            if (pack == AppLanguage.Pack.READY) {
+                UiText.apply(this@WelcomeActivity, findViewById(R.id.welcomeRoot))
+            }
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         // The theme goes on before anything is drawn, so the page never flashes
@@ -39,7 +55,10 @@ class WelcomeActivity : AppCompatActivity() {
         ThemeFade.reveal(this)
 
         language = findViewById(R.id.welcomeLang)
+        langState = findViewById(R.id.welcomeLangState)
         bindLanguage()
+        paintLanguage()
+        AppLanguage.watch(packWatcher)
         Press.attach(language)
         language.setOnClickListener { pickLanguage() }
 
@@ -72,11 +91,31 @@ class WelcomeActivity : AppCompatActivity() {
         UiText.apply(this, root)
     }
 
+    override fun onDestroy() {
+        AppLanguage.unwatch(packWatcher)
+        super.onDestroy()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // Back on this page with a connection: the language the corner said
+        // could not be fetched is fetched now, without asking again.
+        paintLanguage()
+        AppLanguage.retryIfOnline(this, Prefs.uiLanguage(this))
+    }
+
     /** The chip's word: the app's language, short enough for a chip. */
     private fun bindLanguage() {
         // The label alone: the chip is a button, and an arrow beside a name at
         // this size only ever read as noise.
         language.text = Languages.nativeShort(Prefs.uiLanguage(this))
+    }
+
+    /** The line under the chip, or nothing while the words are already here. */
+    private fun paintLanguage() {
+        val notice = AppLanguage.notice(this, Prefs.uiLanguage(this))
+        langState.visibility = if (notice == null) View.GONE else View.VISIBLE
+        langState.text = notice ?: ""
     }
 
     /**
@@ -89,8 +128,12 @@ class WelcomeActivity : AppCompatActivity() {
         dialog.setContentView(
             LanguagePicker.build(this, Prefs.uiLanguage(this), title = "APP LANGUAGE") { lang ->
                 Prefs.setTargetLanguage(this, lang.code)
+                // Fetched with the pick, so the welcome is written in the
+                // language the chip names instead of English under a new name.
+                AppLanguage.ensure(this, lang.code)
                 AppLanguage.choose(this, lang.code)
                 bindLanguage()
+                paintLanguage()
                 dialog.dismiss()
             },
         )

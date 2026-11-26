@@ -19,7 +19,7 @@
         android:layout_height="wrap_content"
         android:fontFamily="@font/lucid_sans"
         android:text="What Text access does"
-        android:textColor="@color/cream_50"
+        android:textColor="@color/ask_ink"
         android:textSize="12.5sp" />
 
     <TextView
@@ -29,7 +29,7 @@
         android:fontFamily="@font/lucid_sans"
         android:lineSpacingMultiplier="1.45"
         android:text="Lucid reads the words that sit under its lens so it can translate them. It reads only what is under the lens, never the rest of the screen, and keeps no copy."
-        android:textColor="@color/sand_400"
+        android:textColor="@color/ask_body"
         android:textSize="10.5sp" />
 
     <TextView
@@ -39,7 +39,7 @@
         android:fontFamily="@font/lucid_sans"
         android:lineSpacingMultiplier="1.45"
         android:text="With ENGINE set to Online, those words are sent to an online translation service, with the rest of that screen as context, to be translated. With On-device, nothing leaves the phone."
-        android:textColor="@color/sand_400"
+        android:textColor="@color/ask_body"
         android:textSize="10.5sp" />
 
     <LinearLayout
@@ -53,14 +53,14 @@
             android:id="@+id/consentAgree"
             android:layout_width="wrap_content"
             android:layout_height="38dp"
-            android:background="@drawable/btn_dark_solid"
+            android:background="@drawable/btn_primary"
             android:fontFamily="@font/lucid_sans"
             android:gravity="center"
             android:minWidth="76dp"
             android:paddingStart="18dp"
             android:paddingEnd="18dp"
             android:text="I agree"
-            android:textColor="@color/ink_900"
+            android:textColor="@color/btn_primary_ink"
             android:textFontWeight="500"
             android:textSize="11.5sp" />
 
@@ -69,14 +69,14 @@
             android:layout_width="wrap_content"
             android:layout_height="38dp"
             android:layout_marginStart="10dp"
-            android:background="@drawable/btn_dark_outline"
+            android:background="@drawable/btn_ghost"
             android:fontFamily="@font/lucid_sans"
             android:gravity="center"
             android:minWidth="76dp"
             android:paddingStart="16dp"
             android:paddingEnd="16dp"
             android:text="Not now"
-            android:textColor="@color/sand_300"
+            android:textColor="@color/ask_secondary_ink"
             android:textFontWeight="500"
             android:textSize="11.5sp" />
     </LinearLayout>

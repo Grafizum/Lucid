@@ -62,13 +62,13 @@
             android:layout_height="42dp"
             android:layout_marginStart="8dp"
             android:layout_weight="1"
-            android:background="@drawable/btn_accent_solid"
+            android:background="@drawable/btn_primary"
             android:clickable="true"
             android:focusable="true"
             android:fontFamily="@font/lucid_sans"
             android:gravity="center"
             android:text="Leave"
-            android:textColor="@color/screen_canvas"
+            android:textColor="@color/btn_primary_ink"
             android:textFontWeight="600"
             android:textSize="12.5sp" />
     </LinearLayout>

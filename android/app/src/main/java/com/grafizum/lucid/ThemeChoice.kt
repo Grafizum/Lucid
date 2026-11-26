@@ -49,4 +49,26 @@ object ThemeChoice {
         else -> (context.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) ==
             Configuration.UI_MODE_NIGHT_YES
     }
+
+    /**
+     * The same context, read through the app's own light.
+     *
+     * An activity gets the choice put on by AppCompat before anything is
+     * inflated. A service, a card, or any view built from the application
+     * context does not: it resolves @color through the *phone's* setting. That is
+     * how a paper page ended up under a dark card, and a dark card's cream labels
+     * ended up sitting on paper. Everything drawn outside an activity reads its
+     * colours through this one call, so there is a single answer to "which theme
+     * is the app in" and no surface can invent a second one.
+     */
+    fun themed(context: Context): Context {
+        val config = Configuration(context.resources.configuration)
+        val night = if (isDark(context)) {
+            Configuration.UI_MODE_NIGHT_YES
+        } else {
+            Configuration.UI_MODE_NIGHT_NO
+        }
+        config.uiMode = (config.uiMode and Configuration.UI_MODE_NIGHT_MASK.inv()) or night
+        return context.createConfigurationContext(config)
+    }
 }

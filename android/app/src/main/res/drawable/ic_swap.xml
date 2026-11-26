@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The pair's own control: two arrows running opposite ways, drawn thin like
+     the rest of the page's glyphs. Tinted by the view that shows it. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="16dp"
+    android:height="16dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+
+    <path
+        android:pathData="M4,9 L17,9"
+        android:strokeWidth="1.7"
+        android:strokeColor="#191814"
+        android:strokeLineCap="round" />
+
+    <path
+        android:pathData="M14,6 L17,9 L14,12"
+        android:strokeWidth="1.7"
+        android:strokeColor="#191814"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+
+    <path
+        android:pathData="M20,15 L7,15"
+        android:strokeWidth="1.7"
+        android:strokeColor="#191814"
+        android:strokeLineCap="round" />
+
+    <path
+        android:pathData="M10,12 L7,15 L10,18"
+        android:strokeWidth="1.7"
+        android:strokeColor="#191814"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+</vector>

@@ -93,7 +93,7 @@ class TourAndLensGesturesTest {
 
     /* ── the page's new rows ──────────────────────────────────────────── */
 
-    /** Offline only and the model list both inflate on the page. */
+    /** The model list inflates, and the engine row is the only privacy switch. */
     @Test
     fun thePageCarriesTheNewPrivacyRows() {
         lateinit var page: View
@@ -101,7 +101,10 @@ class TourAndLensGesturesTest {
             page = LayoutInflater.from(themed()).inflate(R.layout.activity_main, null)
         }
 
-        assertNotNull("no Offline only row", page.findViewById<View>(R.id.offlineBtn))
+        // Offline only used to sit under Engine and turn it off. It is the
+        // On-device state of Engine itself now, so the second row is gone.
+        val offlineRow = page.resources.getIdentifier("offlineBtn", "id", page.context.packageName)
+        assertEquals("a second offline switch came back", 0, offlineRow)
         assertNotNull("no offline models row", page.findViewById<View>(R.id.modelsRow))
         assertNotNull("the engine row lost its hint", page.findViewById<View>(R.id.engHint))
 

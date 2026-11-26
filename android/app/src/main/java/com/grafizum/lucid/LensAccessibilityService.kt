@@ -211,9 +211,6 @@ class LensAccessibilityService : AccessibilityService() {
         instance = this
         Log.i("LucidA11y", "connected (pid ${android.os.Process.myPid()})")
         LensState.publish()
-        // The switch landed: the card that pointed at it is done, and it must
-        // not be left floating over the list it was pointing into.
-        SetupNudge.hide()
         // The rules are watched from here as well as from the events below: a
         // phone that hands out window events is answered the instant the app
         // arrives, and one that stays quiet still gets there within a beat.
