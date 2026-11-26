@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lucid — the design table</title>
+<style>
+  @font-face {
+    font-family: "Lucida";
+    src: url("./fonts/PlusJakarta.ttf") format("truetype");
+    font-weight: 200 800;
+    font-display: swap;
+  }
+
+  :root {
+    --ease: cubic-bezier(.32, .72, 0, 1);
+    --page: #EFE6D6;
+    --page-light: #FBF5E9;
+    --paper: #FCF8F1;
+    --ink: #191814;
+    --body: #6A6254;
+    --faint: #857B6C;
+    --clay: #8A5A3C;
+    --clay-ink: #6E4630;
+    --hair: rgba(25, 24, 20, .12);
+    --tint: rgba(164, 110, 75, .13);
+    --tint-edge: rgba(164, 110, 75, .26);
+  }
+
+  body.night {
+    --page: #171613;
+    --page-light: #23211D;
+    --paper: #26231F;
+    --ink: #F7F1E5;
+    --body: #C2B9A6;
+    --faint: #B0A692;
+    --clay: #E9BC96;
+    --clay-ink: #F3D8BC;
+    --hair: rgba(252, 248, 241, .13);
+    --tint: rgba(233, 188, 150, .15);
+    --tint-edge: rgba(233, 188, 150, .28);
+  }
+
+  * { box-sizing: border-box; }
+
+  html { background: var(--page); transition: background .5s var(--ease); }
+
+  body {
+    margin: 0;
+    padding: 58px 40px 100px;
+    font-family: "Lucida", system-ui, sans-serif;
+    color: var(--ink);
+    background:
+      radial-gradient(120% 60% at 50% -10%, var(--page-light) 0%, rgba(251, 245, 233, 0) 60%),
+      var(--page);
+    transition: background .5s var(--ease), color .5s var(--ease);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 60;
+    opacity: .03;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/></filter><rect width='140' height='140' filter='url(%23n)'/></svg>");
+  }
+
+  .wrap { max-width: 1080px; margin: 0 auto; }
+
+  .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 9.5px;
+    letter-spacing: .22em;
+    text-transform: uppercase;
+    font-weight: 600;
+    color: var(--clay);
+    padding: 6px 13px;
+    border-radius: 999px;
+    border: 1px solid var(--tint-edge);
+    background: var(--tint);
+  }
+
+  .eyebrow::before {
+    content: "";
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: var(--clay);
+  }
+
+  h1 {
+    margin: 22px 0 14px;
+    font-size: clamp(32px, 4.4vw, 50px);
+    line-height: 1.03;
+    letter-spacing: -.042em;
+    font-weight: 650;
+    max-width: 22ch;
+  }
+
+  h1 em { font-style: normal; color: var(--clay); }
+
+  .lede { margin: 0; max-width: 70ch; font-size: 15px; line-height: 1.7; color: var(--body); }
+
+  .bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+    margin-top: 26px;
+    padding-top: 20px;
+    border-top: 1px solid var(--hair);
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    height: 36px;
+    padding: 0 17px;
+    border-radius: 999px;
+    border: 1px solid var(--tint-edge);
+    background: var(--tint);
+    color: var(--clay-ink);
+    font-family: inherit;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .05em;
+    cursor: pointer;
+    text-decoration: none;
+    transition: transform .45s var(--ease);
+  }
+
+  .btn:active { transform: scale(.97); }
+  .btn .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+
+  .bar p { margin: 0; font-size: 12px; color: var(--faint); }
+  .bar p b { color: var(--body); font-weight: 600; }
+
+  h2.section {
+    margin: 46px 0 14px;
+    font-size: 10px;
+    letter-spacing: .2em;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: var(--faint);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  h2.section::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: var(--hair);
+  }
+
+  .list { display: grid; gap: 8px; }
+
+  a.row {
+    display: grid;
+    grid-template-columns: 34px 1fr auto;
+    align-items: center;
+    gap: 18px;
+    padding: 17px 20px 17px 16px;
+    border-radius: 16px;
+    border: 1px solid var(--hair);
+    background: var(--paper);
+    color: inherit;
+    text-decoration: none;
+    transition: transform .4s var(--ease), border-color .35s var(--ease), background .35s var(--ease);
+  }
+
+  a.row:hover {
+    transform: translateY(-2px);
+    border-color: var(--tint-edge);
+    background: color-mix(in srgb, var(--paper) 84%, var(--clay));
+  }
+
+  a.row:active { transform: translateY(0) scale(.995); }
+
+  .num {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .08em;
+    color: var(--faint);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .row:hover .num { color: var(--clay); }
+
+  .who { display: grid; gap: 4px; }
+  .who strong { font-size: 15.5px; font-weight: 600; letter-spacing: -.02em; }
+  .who span { font-size: 12px; line-height: 1.55; color: var(--body); }
+
+  .meta { display: flex; align-items: center; gap: 10px; }
+
+  .state {
+    font-size: 9px;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    font-weight: 700;
+    padding: 4px 9px;
+    border-radius: 999px;
+    border: 1px solid var(--hair);
+    color: var(--faint);
+    white-space: nowrap;
+  }
+
+  .state.wait {
+    color: var(--clay-ink);
+    background: var(--tint);
+    border-color: var(--tint-edge);
+  }
+
+  .arrow {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    color: var(--faint);
+    border: 1px solid var(--hair);
+    transition: transform .4s var(--ease), color .35s var(--ease), border-color .35s var(--ease);
+  }
+
+  .row:hover .arrow { transform: translateX(3px); color: var(--clay); border-color: var(--tint-edge); }
+
+  footer {
+    display: flex;
+    justify-content: space-between;
+    gap: 18px;
+    flex-wrap: wrap;
+    margin-top: 46px;
+    padding-top: 20px;
+    border-top: 1px solid var(--hair);
+    font-size: 10px;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    color: var(--faint);
+  }
+
+  @media (max-width: 760px) {
+    body { padding: 40px 18px 80px; }
+    a.row { grid-template-columns: 22px 1fr; gap: 12px; padding: 15px 14px; }
+    .meta { grid-column: 2; justify-content: flex-start; margin-top: 6px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <span class="eyebrow">Lucid · design table</span>
+  <h1>Every study, on one <em>local page</em>.</h1>
+  <p class="lede">
+    Each row is a page in this folder, opened straight from localhost — nothing here ships and
+    nothing here is a mockup of a screen that does not exist. The rows marked
+    <b>waits on you</b> hold numbered options and have not been decided; the rest are either in the
+    build already or kept as the record of a decision that was made.
+  </p>
+
+  <div class="bar">
+    <button class="btn" type="button" onclick="document.body.classList.toggle('night')">
+      <span class="dot"></span> Day / night
+    </button>
+    <a class="btn" href="open.html">Still open →</a>
+    <p><b>Pages open in place.</b> Serve root: <b>design/</b> · port <b>8099</b>.</p>
+  </div>
+
+  <h2 class="section">Waits on a pick</h2>
+  <div class="list">
+
+    <a class="row" href="pair-press-loops.html">
+      <span class="num">01</span>
+      <span class="who">
+        <strong>The pair card's press</strong>
+        <span>Four loops for the feedback when half a card is pressed — the surface filling, a key's travel, ink only, light from the seam. Loop 01 is what ships.</span>
+      </span>
+      <span class="meta"><span class="state wait">4 loops</span><span class="arrow">→</span></span>
+    </a>
+
+    <a class="row" href="appearance-ideas.html">
+      <span class="num">02</span>
+      <span class="who">
+        <strong>The appearance card</strong>
+        <span>Four ways to show light, dark and neither: three pages, a dial with one big preview, a split card with a knob, or big rows with their own windows. 01 is in the build.</span>
+      </span>
+      <span class="meta"><span class="state wait">4 ways</span><span class="arrow">→</span></span>
+    </a>
+
+    <a class="row" href="language-sheet-ideas.html">
+      <span class="num">03</span>
+      <span class="who">
+        <strong>The language sheet</strong>
+        <span>Three ways to open a list of two hundred names: a dictionary page, a thumb-first column, or a map of the languages already carried. 01 is in the build.</span>
+      </span>
+      <span class="meta"><span class="state wait">3 ways</span><span class="arrow">→</span></span>
+    </a>
+
+    <a class="row" href="swipe-options.html">
+      <span class="num">04</span>
+      <span class="who">
+        <strong>The slide that starts the lens</strong>
+        <span>Five shapes for the control you drag: pressed well, raised card, charcoal bar, tray with a core, or nothing but the words.</span>
+      </span>
+      <span class="meta"><span class="state wait">5 ways</span><span class="arrow">→</span></span>
+    </a>
+
+    <a class="row" href="sheet-surfaces.html">
+      <span class="num">05</span>
+      <span class="who">
+        <strong>The sheet at the bottom</strong>
+        <span>Four surfaces for the panel that carries the read: paper on paper, a lifted plate, a hairline box, or a deeper sheet. Cost and rules compared for each.</span>
+      </span>
+      <span class="meta"><span class="state wait">4 ways</span><span class="arrow">→</span></span>
+    </a>
+
+    <a class="row" href="delete-shapes.html">
+      <span class="num">06</span>
+      <span class="who">
+        <strong>The way out of the lens</strong>
+        <span>Five shapes poking out of the bottom edge to stop a read: half disc, drawer lip, dock tab, peak, sheet handle.</span>
+      </span>
+      <span class="meta"><span class="state wait">5 shapes</span><span class="arrow">→</span></span>
+    </a>
+
+    <a class="row" href="translation-pair.html">
+      <span class="num">07</span>
+      <span class="who">
+        <strong>From and into, side by side</strong>
+        <span>Three arrangements of the two ends of the pair card, with tap targets and costs measured.</span>
+      </span>
+      <span class="meta"><span class="state wait">3 ways</span><span class="arrow">→</span></span>
+    </a>
+
+    <a class="row" href="night-study.html">
+      <span class="num">08</span>
+      <span class="who">
+        <strong>Night, reconsidered</strong>
+        <span>Four dark themes, and three arguments about the corner mark, the switch, and whether night is one layer or two.</span>
+      </span>
+      <span class="meta"><span class="state wait">4 nights</span><span class="arrow">→</span></span>
+    </a>
+
+    <a class="row" href="palette-candidates.html">
+      <span class="num">09</span>
+      <span class="who">
+        <strong>Replacing the gold beige</strong>
+        <span>Four candidate palettes — greige, rosy taupe, oat, bone — with contrast measured against the current one.</span>
+      </span>
+      <span class="meta"><span class="state wait">4 palettes</span><span class="arrow">→</span></span>
+    </a>
+
+    <a class="row" href="app-screens.html">
+      <span class="num">10</span>
+      <span class="who">
+        <strong>The home screen's middle</strong>
+        <span>Four colour middles for the whole first screen, each with the field, the tray and the pair card on it.</span>
+      </span>
+      <span class="meta"><span class="state wait">4 middles</span><span class="arrow">→</span></span>
+    </a>
+
+    <a class="row" href="decisions.html">
+      <span class="num">11</span>
+      <span class="who">
+        <strong>Seven choices before the next build</strong>
+        <span>Opens with the questions themselves: where the light switch lives, how much of the tray moves in, what "recently used" is allowed to mean, and four more.</span>
+      </span>
+      <span class="meta"><span class="state wait">7 questions</span><span class="arrow">→</span></span>
+    </a>
+
+    <a class="row" href="home-and-dark-review.html">
+      <span class="num">12</span>
+      <span class="who">
+        <strong>Home &amp; dark, before we change them</strong>
+        <span>Seven questions about the first screen and the night page, each with the current state drawn next to the alternative.</span>
+      </span>
+      <span class="meta"><span class="state wait">7 questions</span><span class="arrow">→</span></span>
+    </a>
+  </div>
+
+  <h2 class="section">The record</h2>
+  <div class="list">
+
+    <a class="row" href="lucid-screens.html">
+      <span class="num">13</span>
+      <span class="who">
+        <strong>The same app, printed on parchment</strong>
+        <span>The full set of screens redrawn in the parchment palette, for comparing one against the other.</span>
+      </span>
+      <span class="meta"><span class="state">reference</span><span class="arrow">→</span></span>
+    </a>
+
+    <a class="row" href="lucid-rules-history.html">
+      <span class="num">14</span>
+      <span class="who">
+        <strong>Rules and recent reads</strong>
+        <span>Where the rules live — in the sheet, on their own page, in Android Settings — and where history is read from.</span>
+      </span>
+      <span class="meta"><span class="state">reference</span><span class="arrow">→</span></span>
+    </a>
+
+    <a class="row" href="lucid-palette.html">
+      <span class="num">15</span>
+      <span class="who">
+        <strong>Parchment &amp; Charcoal</strong>
+        <span>The palette itself: the roles, the measured contrast of each pair, and the mark.</span>
+      </span>
+      <span class="meta"><span class="state">reference</span><span class="arrow">→</span></span>
+    </a>
+
+    <a class="row" href="lucid-before-after.html">
+      <span class="num">16</span>
+      <span class="who">
+        <strong>What to check, before and after</strong>
+        <span>The pass list used after a visual change: light against dark, which apps open the lens, recent reads, a long translation, sentence by sentence.</span>
+      </span>
+      <span class="meta"><span class="state">checklist</span><span class="arrow">→</span></span>
+    </a>
+
+    <a class="row" href="lucid-neumorph.html">
+      <span class="num">17</span>
+      <span class="who">
+        <strong>The same paper, pressed</strong>
+        <span>What soft UI would do to this surface, what it costs in contrast, and where it would be worth using.</span>
+      </span>
+      <span class="meta"><span class="state">exploration</span><span class="arrow">→</span></span>
+    </a>
+
+    <a class="row" href="setup-sheet.html">
+      <span class="num">18</span>
+      <span class="who">
+        <strong>Two switches, asked once</strong>
+        <span>The setup sheet that takes overlay and lens permission in one visit, then turns into a button that says what happened.</span>
+      </span>
+      <span class="meta"><span class="state">in the build</span><span class="arrow">→</span></span>
+    </a>
+
+    <a class="row" href="icon-sheet.html">
+      <span class="num">19</span>
+      <span class="who">
+        <strong>The mark</strong>
+        <span>The lens mark at the size the title uses and the size the home screen uses, on both pages.</span>
+      </span>
+      <span class="meta"><span class="state">reference</span><span class="arrow">→</span></span>
+    </a>
+  </div>
+
+  <footer>
+    <span>Lucid · design table</span>
+    <span>served from design/ · 127.0.0.1:8099</span>
+  </footer>
+</div>
+
+</body>
+</html>
