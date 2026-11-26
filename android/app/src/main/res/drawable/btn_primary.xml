@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The one heavier answer, wherever it is asked: the accent tint, one step
+     deeper than a state chip's, with the same rim and the same accent ink — so
+     it is the family the engine switch, the chosen theme and the language chip
+     already belong to, only the heavier member of it. Every primary button in
+     the app is this file: a sheet's Allow, a prompt's Clear and the tour's Next
+     are one object in one set of colours. Its words take
+     @color/btn_primary_ink. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
+    <solid android:color="@color/btn_primary_fill" />
+    <corners android:radius="999dp" />
+    <stroke
+        android:width="1dp"
+        android:color="@color/btn_primary_edge" />
+</shape>

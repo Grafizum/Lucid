@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The light half of the appearance choice: a sun, drawn at the same hairline
+     weight as the marks beside it so the three read as one set. The tint is set
+     at runtime, like the moon's, so a chosen answer can take the accent. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="20dp"
+    android:height="20dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M12,12 m-4.1,0 a4.1,4.1 0 1,0 8.2,0 a4.1,4.1 0 1,0 -8.2,0"
+        android:strokeColor="@color/screen_ink"
+        android:strokeWidth="1.7" />
+
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M12,3.2 V5.1 M12,18.9 V20.8 M3.2,12 H5.1 M18.9,12 H20.8 M5.8,5.8 L7.1,7.1 M16.9,16.9 L18.2,18.2 M18.2,5.8 L16.9,7.1 M7.1,16.9 L5.8,18.2"
+        android:strokeColor="@color/screen_ink"
+        android:strokeLineCap="round"
+        android:strokeWidth="1.6" />
+</vector>

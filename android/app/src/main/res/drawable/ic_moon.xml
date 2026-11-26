@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The dark half of the appearance choice: a crescent, the one shape everybody
+     already reads as night. Filled rather than drawn as a hairline, because the
+     outline of a crescent at 20dp is a sliver nobody can name; the tint is set at
+     runtime so the mark still answers the theme it is turning on. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="20dp"
+    android:height="20dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+
+    <path
+        android:fillColor="@color/screen_ink"
+        android:pathData="M20.4,14.4 A8.6,8.6 0 1,1 9.6,3.6 A6.9,6.9 0 0,0 20.4,14.4 Z" />
+</vector>

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="notif_channel">Phiên dùng thấu kính</string>
+    <string name="notif_title">Thấu kính đang bật</string>
+    <string name="notif_text">Chạm thấu kính vào bất kỳ văn bản nào để dịch.</string>
+    <string name="notif_stop">Tắt</string>
+    <string name="a11y_label">Quyền truy cập văn bản của Lucid</string>
+    <string name="a11y_summary">Cho phép thấu kính đọc văn bản bên dưới</string>
+    <string name="a11y_description">Lucid đọc văn bản nằm dưới thấu kính để dịch. Ứng dụng chỉ đọc văn bản đó, không lưu bản sao và không ghi lại gì. Với công cụ trực tuyến, những từ dưới thấu kính được gửi tới dịch vụ dịch trực tuyến cùng phần còn lại của màn hình làm ngữ cảnh; với công cụ trên thiết bị, không có gì rời khỏi điện thoại.</string>
+    <string name="lens_close">Thả thấu kính vào đây để tắt</string>
+    <string name="lens_delete">Xóa</string>
+    <string name="tile_label">Thấu kính Lucid</string>
+    <string name="tile_on">Thấu kính bật</string>
+    <string name="tile_off">Thấu kính tắt</string>
+    <string name="picker_search">Tìm trong %1$d ngôn ngữ</string>
+    <string name="picker_none">Không có ngôn ngữ nào phù hợp.</string>
+</resources>

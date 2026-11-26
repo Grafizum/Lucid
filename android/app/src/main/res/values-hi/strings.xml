@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="notif_channel">लेंस सत्र</string>
+    <string name="notif_title">लेंस चालू है</string>
+    <string name="notif_text">किसी भी टेक्स्ट पर लेंस रखकर उसे अनुवाद करें।</string>
+    <string name="notif_stop">बंद करें</string>
+    <string name="a11y_label">Lucid टेक्स्ट एक्सेस</string>
+    <string name="a11y_summary">लेंस को उसके नीचे का टेक्स्ट पढ़ने देता है</string>
+    <string name="a11y_description">Lucid अपने लेंस के नीचे का टेक्स्ट पढ़ता है ताकि उसका अनुवाद कर सके। वह केवल वही टेक्स्ट पढ़ता है, उसकी कोई प्रति नहीं रखता और कुछ रिकॉर्ड नहीं करता। ऑनलाइन इंजन के साथ, लेंस के नीचे के शब्द उस स्क्रीन के बाकी हिस्से के साथ संदर्भ के रूप में किसी ऑनलाइन अनुवाद सेवा को भेजे जाते हैं; डिवाइस पर इंजन के साथ कुछ भी फ़ोन से बाहर नहीं जाता।</string>
+    <string name="lens_close">लेंस को बंद करने के लिए उसे यहाँ छोड़ें</string>
+    <string name="lens_delete">हटाएँ</string>
+    <string name="tile_label">Lucid लेंस</string>
+    <string name="tile_on">लेंस चालू</string>
+    <string name="tile_off">लेंस बंद</string>
+    <string name="picker_search">%1$d भाषाओं में खोजें</string>
+    <string name="picker_none">कोई भाषा मेल नहीं खाती।</string>
+</resources>

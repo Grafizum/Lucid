@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Lucid — welcome mark variants</title>
+<style>
+  :root{
+    --page:#F8F2E7;
+    --card:#FFFBF3;
+    --edge:#E8DECB;
+    --ink:#2A2621;
+    --muted:#8A7F6E;
+    --faint:#B4A893;
+    --ring:#B9825F;
+    --cream:#F2ECE0;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;padding:40px 36px 56px;
+    background:var(--page);color:var(--ink);
+    font:14px/1.5 -apple-system,"Segoe UI",Inter,Roboto,sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1{font-size:22px;font-weight:600;letter-spacing:-.02em;margin:0 0 4px}
+  p.lead{margin:0 0 30px;color:var(--muted);max-width:62ch;font-size:13px}
+  .grid{display:flex;flex-wrap:wrap;gap:26px}
+  .card{
+    width:300px;background:var(--card);border:1px solid var(--edge);
+    border-radius:22px;padding:14px 14px 16px;
+    box-shadow:0 1px 0 #fff inset,0 10px 24px -18px #4a3a22;
+  }
+  .stage{width:272px;height:272px;margin:0 auto}
+  .stage svg,.mini svg{display:block;width:100%;height:100%;overflow:visible}
+  .breath{
+    fill:none;stroke:var(--ring);stroke-width:1.3;
+    animation:breathe 3.6s linear infinite;
+  }
+  @keyframes breathe{
+    0%,100%{stroke-opacity:.18;transform:scale(1)}
+    50%{stroke-opacity:.50;transform:scale(1.028)}
+  }
+  .breath{transform-origin:150px 150px}
+  .meta{display:flex;align-items:baseline;gap:8px;margin-top:12px}
+  .tag{
+    display:inline-flex;align-items:center;justify-content:center;
+    width:22px;height:22px;border-radius:8px;background:#F1E7D4;
+    font-size:11px;font-weight:600;color:#7A6749;flex:0 0 auto;
+  }
+  .name{font-size:13px;font-weight:600;letter-spacing:-.01em}
+  .pct{margin-left:auto;font-size:11px;color:var(--faint)}
+  .note{margin:6px 0 0;font-size:11.5px;color:var(--muted);line-height:1.45}
+  h2.section{font-size:13px;font-weight:600;letter-spacing:.02em;text-transform:uppercase;color:var(--faint);margin:44px 0 14px}
+  .real{display:flex;gap:34px;align-items:flex-end;flex-wrap:wrap}
+  .real figure{margin:0;text-align:center}
+  .mini{width:101px;height:101px}
+  .real figcaption{margin-top:8px;font-size:11px;color:var(--faint)}
+  .hint{margin-top:34px;font-size:12px;color:var(--muted)}
+  .hint code{background:#F1E7D4;border-radius:5px;padding:1px 5px;font-size:11px}
+</style>
+</head>
+<body>
+
+<h1>The lens inside the circle</h1>
+<p class="lead">The mark is the launcher icon's own drawing — thick cream frame, near-black glass, cream A, tan 文 and the long handle — with no plate behind it, held inside the breathing ring. Five takes: three sizes, two other styles. A, B and C are one shared drawing, scaled; the ring is the welcome's 40%-of-252&nbsp;dp circle.</p>
+
+<!-- ── the drawings, once ─────────────────────────────────────────── -->
+<svg width="0" height="0" aria-hidden="true" style="position:absolute">
+  <defs>
+    <linearGradient id="frameGrad" x1="0.1" y1="0.02" x2="0.86" y2="0.98">
+      <stop offset="0" stop-color="#FDF8EC"/>
+      <stop offset="0.42" stop-color="#F2E6CE"/>
+      <stop offset="1" stop-color="#DBC9A8"/>
+    </linearGradient>
+    <linearGradient id="handleGrad" gradientUnits="userSpaceOnUse"
+                    x1="651" y1="648" x2="857" y2="854">
+      <stop offset="0" stop-color="#F7EEDB"/>
+      <stop offset="1" stop-color="#DFCFB1"/>
+    </linearGradient>
+    <radialGradient id="glassGrad" cx="0.36" cy="0.3" r="0.88">
+      <stop offset="0" stop-color="#332E26"/>
+      <stop offset="0.66" stop-color="#282420"/>
+      <stop offset="1" stop-color="#211E19"/>
+    </radialGradient>
+    <filter id="lift" x="-40%" y="-40%" width="180%" height="180%">
+      <feDropShadow dx="0" dy="16" stdDeviation="22" flood-color="#4A3A22" flood-opacity="0.22"/>
+    </filter>
+  </defs>
+
+  <!-- the launcher's mark, as lens-mark.svg draws it (handle, frame, glass, A, 文) -->
+  <g id="solid" filter="url(#lift)">
+    <line x1="651.39" y1="648.39" x2="856.76" y2="853.76"
+          stroke="url(#handleGrad)" stroke-width="111.3" stroke-linecap="round"/>
+    <circle cx="473" cy="470" r="222.6" fill="none" stroke="url(#frameGrad)" stroke-width="75.49"/>
+    <circle cx="473" cy="470" r="184.86" fill="url(#glassGrad)"/>
+    <path d="M298.004,451.607 A175.960,175.960 0 0,1 466.859,294.147" stroke="#191712" stroke-opacity="0.55" stroke-width="13.14" fill="none" stroke-linecap="round"/>
+    <path d="M644.285,506.408 A175.112,175.112 0 0,1 509.408,641.285" stroke="#FFF8E9" stroke-opacity="0.22" stroke-width="8.48" fill="none" stroke-linecap="round"/>
+    <path d="M334.423,414.011 A149.460,149.460 0 0,1 402.833,338.035" stroke="#FBF4E4" stroke-opacity="0.11" stroke-width="11.66" fill="none" stroke-linecap="round"/>
+    <path d="M325.328,397.976 A164.300,164.300 0 0,1 376.427,337.079" stroke="#FBF4E4" stroke-opacity="0.28" stroke-width="6.78" fill="none" stroke-linecap="round"/>
+    <path d="M397.528,389.440 L348.556,518.760 M397.528,389.440 L451.164,518.760 M363.820,474.240 L433.780,474.240"
+          stroke="#F6EFE3" stroke-width="25.86" stroke-linecap="round" fill="none"/>
+    <path d="M537.660,400.464 L537.660,431.416 M566.280,456.220 L481.480,552.680 M509.040,456.220 L592.780,551.620 M473.000,445.196 L602.320,445.196"
+          stroke="#D2B88E" stroke-width="25.86" stroke-linecap="round" fill="none"/>
+  </g>
+
+  <!-- the same, as linework: ink on the page's own paper -->
+  <g id="outline">
+    <line x1="651.39" y1="648.39" x2="856.76" y2="853.76"
+          stroke="#2A2621" stroke-width="22" stroke-linecap="round"/>
+    <circle cx="473" cy="470" r="222.6" fill="#F8F2E7" stroke="#2A2621" stroke-width="22"/>
+    <path d="M397.528,389.440 L348.556,518.760 M397.528,389.440 L451.164,518.760 M363.820,474.240 L433.780,474.240"
+          stroke="#2A2621" stroke-width="25.86" stroke-linecap="round" fill="none"/>
+    <path d="M537.660,400.464 L537.660,431.416 M566.280,456.220 L481.480,552.680 M509.040,456.220 L592.780,551.620 M473.000,445.196 L602.320,445.196"
+          stroke="#B9825F" stroke-width="25.86" stroke-linecap="round" fill="none"/>
+  </g>
+
+  <!-- no handle: just the disc, its ring, and the two letters -->
+  <g id="disc" filter="url(#lift)">
+    <circle cx="473" cy="470" r="222.6" fill="none" stroke="url(#frameGrad)" stroke-width="75.49"/>
+    <circle cx="473" cy="470" r="184.86" fill="url(#glassGrad)"/>
+    <path d="M298.004,451.607 A175.960,175.960 0 0,1 466.859,294.147" stroke="#191712" stroke-opacity="0.55" stroke-width="13.14" fill="none" stroke-linecap="round"/>
+    <path d="M644.285,506.408 A175.112,175.112 0 0,1 509.408,641.285" stroke="#FFF8E9" stroke-opacity="0.22" stroke-width="8.48" fill="none" stroke-linecap="round"/>
+    <path d="M397.528,389.440 L348.556,518.760 M397.528,389.440 L451.164,518.760 M363.820,474.240 L433.780,474.240"
+          stroke="#F6EFE3" stroke-width="25.86" stroke-linecap="round" fill="none"/>
+    <path d="M537.660,400.464 L537.660,431.416 M566.280,456.220 L481.480,552.680 M509.040,456.220 L592.780,551.620 M473.000,445.196 L602.320,445.196"
+          stroke="#D2B88E" stroke-width="25.86" stroke-linecap="round" fill="none"/>
+  </g>
+</svg>
+
+<div class="grid">
+
+  <!-- A -->
+  <div class="card">
+    <div class="stage">
+      <svg viewBox="0 0 300 300">
+        <circle class="breath" cx="150" cy="150" r="104"/>
+        <use href="#solid" transform="translate(150 150) scale(0.10431) translate(-473 -470)"/>
+      </svg>
+    </div>
+    <div class="meta"><span class="tag">A</span><span class="name">Small</span><span class="pct">58% of the circle</span></div>
+    <p class="note">The whole magnifier, handle and all, well inside the ring. The most air; the mark reads as a small object held in the circle.</p>
+  </div>
+
+  <!-- B -->
+  <div class="card">
+    <div class="stage">
+      <svg viewBox="0 0 300 300">
+        <circle class="breath" cx="150" cy="150" r="104"/>
+        <use href="#solid" transform="translate(150 150) scale(0.12518) translate(-473 -470)"/>
+      </svg>
+    </div>
+    <div class="meta"><span class="tag">B</span><span class="name">Medium</span><span class="pct">72% of the circle</span></div>
+    <p class="note">Balanced: clear margin all round, and the frame still large enough to carry the A and 文 at a glance.</p>
+  </div>
+
+  <!-- C -->
+  <div class="card">
+    <div class="stage">
+      <svg viewBox="0 0 300 300">
+        <circle class="breath" cx="150" cy="150" r="104"/>
+        <use href="#solid" transform="translate(150 150) scale(0.14951) translate(-473 -470)"/>
+      </svg>
+    </div>
+    <div class="meta"><span class="tag">C</span><span class="name">Large</span><span class="pct">86% of the circle</span></div>
+    <p class="note">As big as it can sit without touching the ring: bold on the page, the handle almost reaching the edge.</p>
+  </div>
+
+  <!-- D -->
+  <div class="card">
+    <div class="stage">
+      <svg viewBox="0 0 300 300">
+        <circle class="breath" cx="150" cy="150" r="104"/>
+        <use href="#outline" transform="translate(150 150) scale(0.12518) translate(-473 -470)"/>
+      </svg>
+    </div>
+    <div class="meta"><span class="tag">D</span><span class="name">Linework</span><span class="pct">72% · style</span></div>
+    <p class="note">Same drawing, no glass: ink strokes on the page, the 文 kept in clay. Lighter on the cream page, more like a stamp.</p>
+  </div>
+
+  <!-- E -->
+  <div class="card">
+    <div class="stage">
+      <svg viewBox="0 0 300 300">
+        <circle class="breath" cx="150" cy="150" r="104"/>
+        <use href="#disc" transform="translate(150 150) scale(0.16) translate(-473 -470)"/>
+      </svg>
+    </div>
+    <div class="meta"><span class="tag">E</span><span class="name">Disc only</span><span class="pct">style</span></div>
+    <p class="note">The handle left off: a dark disc with its cream ring and the two letters, sitting in the middle of the circle like a coin.</p>
+  </div>
+
+</div>
+
+<h2 class="section">At the size the phone draws them</h2>
+<div class="real">
+  <figure><div class="mini"><svg viewBox="0 0 101 101"><circle class="breath" cx="50.5" cy="50.5" r="50.5" style="transform-origin:50.5px 50.5px"/><use href="#solid" transform="translate(50.5 50.5) scale(0.05063) translate(-473 -470)"/></svg></div><figcaption>A</figcaption></figure>
+  <figure><div class="mini"><svg viewBox="0 0 101 101"><circle class="breath" cx="50.5" cy="50.5" r="50.5" style="transform-origin:50.5px 50.5px"/><use href="#solid" transform="translate(50.5 50.5) scale(0.06078) translate(-473 -470)"/></svg></div><figcaption>B</figcaption></figure>
+  <figure><div class="mini"><svg viewBox="0 0 101 101"><circle class="breath" cx="50.5" cy="50.5" r="50.5" style="transform-origin:50.5px 50.5px"/><use href="#solid" transform="translate(50.5 50.5) scale(0.07260) translate(-473 -470)"/></svg></div><figcaption>C</figcaption></figure>
+  <figure><div class="mini"><svg viewBox="0 0 101 101"><circle class="breath" cx="50.5" cy="50.5" r="50.5" style="transform-origin:50.5px 50.5px"/><use href="#outline" transform="translate(50.5 50.5) scale(0.06078) translate(-473 -470)"/></svg></div><figcaption>D</figcaption></figure>
+  <figure><div class="mini"><svg viewBox="0 0 101 101"><circle class="breath" cx="50.5" cy="50.5" r="50.5" style="transform-origin:50.5px 50.5px"/><use href="#disc" transform="translate(50.5 50.5) scale(0.07769) translate(-473 -470)"/></svg></div><figcaption>E</figcaption></figure>
+</div>
+
+<p class="hint">The circle is the welcome screen's breathing ring at its real 101&nbsp;dp, and the mark is drawn to <code>lens-mark.svg</code>'s own proportions (frame 260, glass 185, handle to 543 from the centre of a 1024 box), so what is picked here is what the phone draws.</p>
+
+</body>
+</html>

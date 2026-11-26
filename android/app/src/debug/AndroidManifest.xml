@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Debug builds only: lets one frame be asked for from adb, so the
+         screenshot path can be tested without driving the lens by hand.
+         Nothing here exists in a release build. -->
+    <application>
+        <receiver
+            android:name=".DebugShotReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="com.grafizum.lucid.DEBUG_SHOT" />
+            </intent-filter>
+        </receiver>
+    </application>
+
+</manifest>

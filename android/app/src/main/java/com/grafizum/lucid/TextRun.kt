@@ -145,6 +145,142 @@ object TextRun {
         return Focus(trimmed, from, from + trimmed.length, narrowed)
     }
 
+    /** The marks that finish a sentence, Latin and CJK alike. */
+    private const val ENDERS = ".!?。！？…"
+
+    /** Quotes and brackets that close a sentence after its full stop. */
+    private const val CLOSERS = "”’\"')」』）]"
+
+    /**
+     * The whole sentence the run at [start, end) sits in.
+     *
+     * The lens is one gesture whichever path answers it, so the tree path must
+     * not read less than the pixel path does: an OCR line under the lens comes
+     * back as a sentence, and a node read by the accessibility tree has to be
+     * cut the same way. Putting the lens on one word therefore reads the
+     * sentence around it — the unit a person means by "put it on the text".
+     *
+     * A full stop between digits ("3.5", "v1.0.0") is not the end of anything,
+     * and a newline always is: two lines of a card are two things to read, not
+     * one run-on sentence across the gap between them.
+     */
+    fun sentence(text: String, start: Int, end: Int): Focus {
+        val clean = text.replace('\u00A0', ' ')
+        if (clean.isBlank()) return Focus(clean, 0, clean.length, narrowed = false)
+
+        val from0 = start.coerceIn(0, clean.length)
+        val to0 = end.coerceIn(from0, clean.length)
+
+        var from = from0
+        while (from > 0 && !endsAt(clean, from - 1) && clean[from - 1] != '\n') from--
+
+        var to = to0
+        while (to < clean.length && !endsAt(clean, to) && clean[to] != '\n') to++
+
+        // The stop that ended the search belongs to the sentence, and so do the
+        // quotes or brackets that follow it.
+        if (to < clean.length && clean[to] != '\n') {
+            to++
+            while (to < clean.length && clean[to] in CLOSERS) to++
+        }
+
+        while (from < to && clean[from].isWhitespace()) from++
+        while (to > from && clean[to - 1].isWhitespace()) to--
+        if (to <= from) return Focus(clean, 0, clean.length, narrowed = false)
+
+        val cut = clean.substring(from, to)
+        val narrowed = !(from == 0 && to == clean.length)
+        return Focus(cut, from, to, narrowed)
+    }
+
+    /**
+     * The whole block the lens is on — every line of the node, not the one
+     * sentence around the glyph.
+     *
+     * One gesture means "read this", and this is that: a paragraph comes whole,
+     * a line that is one bullet of a list comes with the lines beside it, and
+     * the card can then say what kind of thing was read instead of handing back
+     * a single clause with its neighbours missing. [max] keeps a whole article
+     * — one node with a page of text in it — from being read as one gesture: past
+     * that length the sentence around the lens is the honest unit again. The
+     * budget is a couple of screens, so a paragraph read whole is still a
+     * paragraph, and the end of it does not quietly go untranslated.
+     */
+    fun block(text: String, start: Int, end: Int, max: Int = MAX_BLOCK_CHARS): Focus {
+        val clean = text.replace('\u00A0', ' ')
+        if (clean.isBlank()) return Focus(clean, 0, clean.length, narrowed = false)
+
+        val trimmed = clean.trim()
+        if (trimmed.length > max) return sentence(clean, start, end)
+
+        val from = clean.indexOf(trimmed).coerceAtLeast(0)
+        return Focus(trimmed, from, from + trimmed.length, narrowed = false)
+    }
+
+    /**
+     * True when a block is written as a list: two or more of its lines start
+     * with a bullet, a dash or a star. It is what the card reads to know the
+     * answer should be given back as bullets rather than as one paragraph.
+     */
+    fun looksLikeList(text: String): Boolean {
+        var bullets = 0
+        for (line in text.lineSequence()) {
+            if (startsWithBullet(line) && ++bullets >= 2) return true
+        }
+        return false
+    }
+
+    /**
+     * True when a line opens with a bullet or a number: the marks a list uses.
+     *
+     * A list of settings rows, a chat and a feed are stack of rows too, and
+     * reading eight of them because the lens touched one would hand back a
+     * screenful. These marks are what tells a list that was written as a list
+     * from a screen that merely happens to be a column.
+     */
+    fun startsWithBullet(line: String): Boolean {
+        val t = line.trimStart()
+        if (t.length < 2) return false
+        when (t[0]) {
+            '\u2022', '\u00B7', '\u25E6', '\u2023', '\u25AA', '\u25CF' -> return true
+            '-', '*', '\u2013', '\u2014' -> return t.length > 1 && t[1] == ' '
+        }
+        // "1. something" or "2) something": a numbered list.
+        var digits = 0
+        while (digits < t.length && t[digits].isDigit()) digits++
+        return digits in 1..2 && digits < t.length - 1 &&
+            (t[digits] == '.' || t[digits] == ')') && t[digits + 1] == ' '
+    }
+
+    /**
+     * The answer given back as a list: one bullet per row read, with the marks
+     * the engine kept stripped first so none of them are doubled.
+     */
+    fun asBullets(text: String): String {
+        val lines = text.split('\n')
+            .map { line -> line.trim().trimStart('\u2022', '\u00B7', '-', '*', '\u2013').trim() }
+            .filter { it.isNotEmpty() }
+        if (lines.isEmpty()) return text
+        return lines.joinToString("\n") { "\u2022  $it" }
+    }
+
+    /**
+     * How much text one gesture takes in. A screen of text is 600–900
+     * characters and a paragraph in a document can run to two screens; past
+     * that the node holds an article, and the sentence under the lens is the
+     * honest unit again.
+     */
+    const val MAX_BLOCK_CHARS = 2000
+
+    /** True when the character at [i] finishes a sentence. */
+    private fun endsAt(clean: String, i: Int): Boolean {
+        val ch = clean[i]
+        if (ch !in ENDERS) return false
+        // "3.5" and "v1.0.0" are numbers, not two sentences and a stray one.
+        return !(ch == '.' && i > 0 && i + 1 < clean.length &&
+            clean[i - 1].isDigit() && clean[i + 1].isDigit())
+    }
+
     /** Character offset of the glyph under [x] on [line]. */
     private fun indexAt(clean: String, line: TextLines.Line, x: Int): Int {
         val target = (x - line.left).toFloat()

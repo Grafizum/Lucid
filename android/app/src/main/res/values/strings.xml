@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="shortcut_start_lens" translatable="false">Start the lens</string>
     <string name="app_name">Lucid</string>
     <string name="notif_channel">Lens session</string>
     <string name="notif_title">Lens is on</string>
@@ -7,10 +8,27 @@
     <string name="notif_stop">Turn off</string>
     <string name="a11y_label">Lucid text access</string>
     <string name="a11y_summary">Lets the lens read the text under it</string>
-    <string name="a11y_description">Lucid reads the text that sits under its floating lens so it can translate it. It reads only that text, keeps no copy, and records nothing. With the online engine, the words under the lens are sent to Google Translate, together with the rest of that screen as context, to be translated; with the on-device engine nothing leaves the phone.</string>
+    <string name="a11y_description">Lucid reads the text that sits under its floating lens so it can translate it. It reads only that text, keeps no copy, and records nothing. With the online engine, the words under the lens are sent to an online translation service, together with the rest of that screen as context, to be translated; with the on-device engine nothing leaves the phone.</string>
+    <!-- The card Lucid floats over Android's list of accessibility services:
+         the page with Lucid's own switch cannot be opened by an app, and the
+         section holding that switch is named differently on different phones.
+         %1$s is that section's name on this one. -->
+    <string name="nudge_title">Find Lucid text access</string>
+    <string name="nudge_body">Under %1$s — scroll down if it isn\'t there.</string>
     <string name="lens_close">Drop the lens here to turn it off</string>
     <string name="lens_delete">Delete</string>
     <string name="tile_label">Lucid lens</string>
     <string name="tile_on">Lens on</string>
     <string name="tile_off">Lens off</string>
+    <string name="picker_search">Search %1$d languages</string>
+    <string name="picker_none">No language matches that.</string>
+    <string name="picker_jump">Jump to a letter</string>
+    <string name="models_note">A pack is fetched once by the on-device translator and kept on this phone. Lucid never sees what you read.</string>
+    <string name="models_unavailable">The on-device translator is not answering just now. The packs cannot be read or added until it does.</string>
+    <string name="models_on_phone">ON THIS PHONE  ·  %1$d</string>
+
+    <!-- What the questions marks on the settings page are called. The long
+         explanations themselves are the app's own words: they live in
+         UiText.lines with every other line, so the pack carries them too. -->
+    <string name="info_mark">What this means</string>
 </resources>

@@ -1,8 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- One state, on purpose: a press is answered by motion (Press.kt), so the
-     chip keeps its own shape, fill and hairline while it sinks. -->
+     chip keeps its own shape, fill and hairline while it sinks.
+
+     Its fill and rim are button roles rather than the page's shared beige, so
+     the night page can give this one a step of its own: on charcoal the beige
+     chip sat within a hair of the card behind it and the button read as loose
+     words. -->
 <shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
-    <solid android:color="@color/cream_200" />
+    <solid android:color="@color/btn_ghost_fill" />
     <corners android:radius="999dp" />
-    <stroke android:width="1dp" android:color="@color/hairline_light" />
+    <stroke android:width="1dp" android:color="@color/btn_ghost_edge" />
 </shape>

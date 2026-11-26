@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Parchment & Charcoal. See design/palette.md for the roles and the measured
+<!-- Parchment & Charcoal, rosy taupe middle. See design/palette.md for the roles and the measured
      contrast of every pair used here. -->
 <resources>
 
@@ -10,10 +10,10 @@
     <color name="cream_300">#E7DCC7</color>
 
     <!-- beige — the raised warm middle -->
-    <color name="beige_200">#EBE1CE</color>
-    <color name="beige_300">#DFD2B8</color>
-    <color name="beige_400">#CDBB9B</color>
-    <color name="beige_500">#B39D7C</color>
+    <color name="beige_200">#E4D8CE</color>
+    <color name="beige_300">#D3C2B5</color>
+    <color name="beige_400">#C7B2A4</color>
+    <color name="beige_500">#AA8F7F</color>
 
     <!-- stone — muted text on cream -->
     <color name="stone_400">#A69C8C</color>
@@ -47,14 +47,200 @@
 
     <!-- hairlines and translucent fills -->
     <color name="hairline_light">#14191814</color>
+    <color name="divider_warm">#66C7B2A4</color>
     <color name="hairline_dark">#1AFCF8F1</color>
-    <color name="shell_light">#6BDFD2B8</color>
+    <color name="shell_light">#FFD3C2B5</color>
     <color name="shell_dark">#E62E2C27</color>
     <color name="wash">#8CB39D7C</color>
     <color name="scrim">#8C14120F</color>
 
+    <!-- The logo's own colours, sampled from the launcher icon itself, so the
+         mark drawn on the welcome page cannot drift from the one on the home
+         screen: cream frame and A, charcoal glass with a lighter crown, and the
+         warm tan of the 文. -->
+    <color name="logo_frame">#F2ECE0</color>
+    <color name="logo_glass">#2A2621</color>
+    <color name="logo_glass_high">#484239</color>
+    <color name="logo_tan">#CDB896</color>
+    <color name="logo_rim">#B4A893</color>
+    <!-- The launcher drawing's own stops, from design/icon/lens-mark.svg. -->
+    <color name="logo_cream_hi">#FDF8EC</color>
+    <color name="logo_cream_mid">#F2E6CE</color>
+    <color name="logo_cream_lo">#DBC9A8</color>
+    <color name="logo_handle_hi">#F7EEDB</color>
+    <color name="logo_handle_lo">#DFCFB1</color>
+    <color name="logo_glass_hi">#332E26</color>
+    <color name="logo_glass_mid">#282420</color>
+    <color name="logo_glass_lo">#211E19</color>
+    <color name="logo_glyph_a">#F6EFE3</color>
+    <color name="logo_glyph_b">#D2B88E</color>
+
+    <!-- The strip behind the navigation buttons. A light page wants the bar to
+         disappear into it, and that is only safe from Android 8.1 (API 27),
+         where the icons can be darkened — values-v27 makes it transparent. On
+         7.x the icons are always white, so the same attribute would leave three
+         invisible buttons on the page; there the bar stays charcoal. -->
+    <color name="nav_bar">#191814</color>
+
     <!-- the lens bubble -->
     <color name="bubble_core">#16150F</color>
     <color name="bubble_edge">#38FCF8F1</color>
+
+    <!-- The app screen's own roles. Everything the main screen draws reads one of
+         these instead of a palette step, so the whole screen can change its
+         clothes in values-night without touching a single palette entry — the
+         lens, its card and the sheets are dark whatever the theme is, and they
+         must not move when the page under them does. -->
+    <color name="screen_canvas">#F8F2E7</color>
+    <color name="screen_band">#E4D8CE</color>
+    <color name="screen_shell">#D3C2B5</color>
+    <color name="screen_card">#FCF8F1</color>
+    <color name="screen_knob_low">#F8F2E7</color>
+    <color name="screen_knob_high">#FCF8F1</color>
+    <color name="screen_chip">#E4D8CE</color>
+    <color name="screen_button">#F1E9DA</color>
+    <color name="screen_dot">#C7B2A4</color>
+    <color name="screen_ok">#55603F</color>
+    <!-- The word of a permission that is granted: olive on paper, a light olive
+         at night, where the deep olive would sink into the charcoal. -->
+    <color name="screen_ok_ink">#55603F</color>
+    <!-- The line above the slide, while the lens is still missing a switch: rose,
+         not grey, so it is seen before the slide is dragged — and the muted rose
+         of the palette rather than a signal red, which would make a first run
+         look like something has gone wrong. 6.8:1 on paper; the night file holds
+         the same role for charcoal. -->
+    <color name="screen_warn_ink">#8C3B2F</color>
+    <color name="screen_edge">#14191814</color>
+    <!-- A step stronger, for the one control that has to lift off a card rather
+         than sit inside it: the swap ring on the pair's seam. -->
+    <color name="screen_edge_strong">#24191814</color>
+    <color name="screen_divider">#66C7B2A4</color>
+    <color name="screen_ink">#191814</color>
+    <color name="screen_muted">#6A6254</color>
+    <color name="screen_faint">#857B6C</color>
+    <color name="screen_accent">#8A5A3C</color>
+    <!-- Accent text that sits on an accent fill, not on the page. The fill is clay
+         over cream, so the ground behind the words is darker than paper and the
+         usual accent only reaches 4.2:1 there — under the floor for 11sp. One
+         step down the clay stair buys 5.9:1 and keeps the hue. -->
+    <color name="screen_accent_ink">#6E4630</color>
+    <color name="screen_accent_soft">#B9825F</color>
+    <!-- A chip that says "on" has to look like a chip, not a wash: at 12% the
+         fill was so close to the card that the state read only from the words.
+         20% keeps the card's calm and makes the tint a surface of its own, and
+         the darker accent ink still clears 6:1 on it. -->
+    <color name="screen_accent_fill">#33A46E4B</color>
+    <color name="screen_accent_edge">#59A46E4B</color>
+    <!-- One button system, and only one. The heavier answer is not a colour of
+         its own: it is the accent tint, one step deeper than a state chip's, with
+         the same rim and the same accent ink — the family the engine switch, the
+         chosen theme and the language chip already belong to. So a primary
+         button and an on-chip are the same surface in the same colours, and
+         nothing on a sheet is a slab of some palette step no other control uses.
+         Quiet buttons and the "off" state are the page's beige chip. 30% clay by
+         day, which is the step the accent ink clears 6:1 on; at night the tint
+         runs deeper and the label turns cream, which the night file explains. -->
+    <color name="btn_primary_fill">#4DA46E4B</color>
+    <color name="btn_primary_ink">@color/screen_accent_ink</color>
+    <color name="btn_primary_edge">@color/screen_accent_edge</color>
+    <!-- The quiet answer, as its own surface: the page's beige chip with its
+         hairline. It has roles of its own so the dark page can lift it a step
+         without moving every card that shares the beige. -->
+    <color name="btn_ghost_fill">@color/screen_button</color>
+    <color name="btn_ghost_edge">@color/screen_edge</color>
+    <!-- The half of the pair card under a thumb. It was a translucent beige at
+         74 %, which over paper came out at 1.15:1 — a press you could not see,
+         so the eye caught the hairline ring drawn inside the card's own edge
+         instead: a second box on the first. This is a solid step of the same
+         beige at 1.30:1, the surface itself pushed in, and it needs no ring. -->
+    <color name="screen_half_press">#FFE7DAC6</color>
+    <color name="screen_shade">#191814</color>
+    <color name="screen_well">#F8F2E7</color>
+    <color name="screen_well_shade">#1A191814</color>
+    <color name="screen_well_rim">#8CB39D7C</color>
+
+    <!-- The lens's own chrome. On the day theme it is paper: a pale disc with an
+         ink hairline, ink glyphs and a paper pill under the word, so the lens
+         reads as part of the page instead of a hole cut out of the night. The
+         night theme re-points these to the charcoal dressing it always had. -->
+    <color name="lens_surface">#F2FCF8F1</color>
+    <color name="lens_surface_high">#F7F1E7</color>
+    <color name="lens_ring">#4D191814</color>
+    <color name="lens_glyph">#191814</color>
+    <color name="lens_glyph_soft">#A46E4B</color>
+    <color name="lens_label">#F2FCF8F1</color>
+    <color name="lens_label_edge">#26191814</color>
+
+    <!-- The lip is its own surface: a step of beige, not paper, so the handle on
+         the edge still reads on a white page instead of vanishing into it, and a
+         mid-tone hairline that shows over light and dark content alike. -->
+    <color name="lens_lip_surface">#FFE4D8CE</color>
+    <color name="lens_lip_ring">#8C6A6254</color>
+
+    <!-- The translation card travels with the same theme: on the day theme it is
+         paper with ink in it, at night it is the charcoal card it has always been. -->
+    <color name="card_surface">#FCF8F1</color>
+    <color name="card_edge">#14191814</color>
+    <!-- The band that heads the language sheet: one step of beige deeper than
+         the card, and the dots that make it paper rather than a strip of colour.
+         Both stay quieter than the words that sit on them. -->
+    <color name="card_band">#F5EEE2</color>
+    <color name="card_dot">#2A6A6254</color>
+    <color name="card_ink">#191814</color>
+    <color name="card_muted">#6A6254</color>
+    <color name="card_faint">#857B6C</color>
+    <color name="card_accent">#8A5A3C</color>
+    <!-- The same fix on the card: a chip's own tint is not paper, so its label
+         reads the darker clay instead of the accent used on the card itself. -->
+    <color name="card_accent_ink">#6E4630</color>
+    <color name="card_warn">#8A6A2B</color>
+    <color name="card_danger">#8C3B2F</color>
+    <color name="card_chip_fill">#10191814</color>
+    <color name="card_chip_edge">#1F191814</color>
+    <color name="card_chip_accent_fill">#1FA46E4B</color>
+    <color name="card_chip_accent_edge">#40A46E4B</color>
+
+    <!-- The picker sheet, as the deep-lift study drew it: the card's paper at
+         full strength at the top, thinning toward the bottom edge so the page
+         reads through it, with a hairline of its own. The depth is the sheet's
+         own elevation; these colours are only its body. -->
+    <color name="sheet_lift_top">#FFFCF8F1</color>
+    <color name="sheet_lift_mid">#FDFCF8F1</color>
+    <!-- The sheet is read, not looked through. Even a four-per-cent floor left
+         a second set of words ghosting under the last rows of the list, so the
+         body is paper all the way down: the shadow, the hairline and the margin
+         clear of the page are what say it floats, and the list stays clean. -->
+    <color name="sheet_lift_floor">#FFFCF8F1</color>
+    <color name="sheet_lift_edge">#1F191814</color>
+
+    <!-- The sheets that ask a question — one-time setup, the text-access
+         consent, the permission guide. They were drawn charcoal-only, which
+         made three popups dark over the day page. These roles are that same
+         charcoal voice at night and the page's own paper by day, so the sheet a
+         person answers is the surface they were already reading. -->
+    <color name="ask_surface">#FCF8F1</color>
+    <color name="ask_card_edge">#14191814</color>
+    <color name="ask_ink">#191814</color>
+    <color name="ask_body">#6A6254</color>
+    <color name="ask_faint">#857B6C</color>
+    <color name="ask_label">#8A5A3C</color>
+    <!-- The heavier answer: the page's own clay by day, paper at night. Ink on
+         paper was the loudest thing on the sheet — a black slab on cream — and
+         the accent already means "this is the one to press" everywhere else in
+         the app. -->
+    <color name="ask_primary_fill">@color/btn_primary_fill</color>
+    <color name="ask_primary_ink">@color/btn_primary_ink</color>
+    <color name="ask_secondary_fill">@color/screen_button</color>
+    <color name="ask_secondary_edge">@color/screen_edge</color>
+    <color name="ask_secondary_ink">@color/screen_ink</color>
+    <!-- The disclosure inset, and the drawing of Android's own screen inside
+         the permission guide: a step of cream under the paper by day, the
+         charcoal mock it has always been at night. -->
+    <color name="ask_inset">#0A191814</color>
+    <color name="ask_inset_edge">#1A191814</color>
+    <color name="ask_guide_screen">#F5EEE2</color>
+    <color name="ask_guide_screen_edge">#1F191814</color>
+    <color name="ask_guide_row">#24A46E4B</color>
+    <color name="ask_guide_ghost">#14191814</color>
 
 </resources>

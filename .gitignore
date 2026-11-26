@@ -1,3 +1,12 @@
+# Signing material never enters the repository: the keystore lives outside it
+# (~/.grafizum/keys/) and its passwords live in the environment or in .env.
+.env
+.env.*
+!.env.example
+*.jks
+*.keystore
+keystore.properties
+
 # Android
 android/.gradle/
 android/.kotlin/
@@ -41,3 +50,4 @@ store-listing/video/
 # OS
 .DS_Store
 Thumbs.db
+/freebuff-sites-build/

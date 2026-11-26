@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The language's own disc on the From end: the card's recess, one step of
+     beige under the paper, so the letters sit in a well instead of on a chip. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="oval">
+    <solid android:color="@color/screen_button" />
+    <stroke android:width="1dp" android:color="@color/screen_edge" />
+</shape>

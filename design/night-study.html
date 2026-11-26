@@ -1,0 +1,721 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lucid — Night, reconsidered</title>
+<style>
+  :root{
+    --paper:#F7F1E5;
+    --paper-hi:#FCF8F1;
+    --band:#E4D8CE;
+    --shell:#D3C2B5;
+    --ink:#191814;
+    --muted:#6A6254;
+    --faint:#857B6C;
+    --clay:#A46E4B;
+    --clay-soft:#B9825F;
+    --hair:rgba(25,24,20,.11);
+    --hair-soft:rgba(25,24,20,.07);
+    --ease:cubic-bezier(.38,0,.26,1);
+    --sans:'Plus Jakarta Sans','Segoe UI Variable','DejaVu Sans',system-ui,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:var(--sans);
+    -webkit-font-smoothing:antialiased;
+    padding:96px 32px 120px;
+    line-height:1.55;
+  }
+  .wrap{max-width:1180px;margin:0 auto}
+
+  .eyebrow{
+    margin:0 0 22px;
+    font-size:10px;letter-spacing:.24em;text-transform:uppercase;
+    color:var(--clay);font-weight:500;
+  }
+  h1{
+    margin:0;
+    font-size:clamp(38px,5vw,62px);
+    line-height:1.02;
+    letter-spacing:-.042em;
+    font-weight:500;
+  }
+  h1 em{font-style:normal;color:var(--clay)}
+  .lede{
+    margin:26px 0 0;max-width:56ch;
+    font-size:16px;line-height:1.65;color:var(--muted);
+  }
+  .lede b{color:var(--ink);font-weight:500}
+
+  section{margin-top:104px}
+  .sec-head{display:flex;align-items:baseline;gap:18px;margin-bottom:34px}
+  .sec-num{
+    font-size:10px;letter-spacing:.2em;color:var(--faint);
+    font-variant-numeric:tabular-nums;
+  }
+  h2{
+    margin:0;font-size:13px;letter-spacing:.2em;text-transform:uppercase;
+    font-weight:500;color:var(--ink);
+  }
+  .sec-rule{flex:1;height:1px;background:var(--hair);transform:translateY(-4px)}
+
+  /* ── the diagnosis ───────────────────────────────────────────── */
+  .diag{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+  .diag-card{
+    background:var(--paper-hi);
+    border:1px solid var(--hair);
+    border-radius:20px;
+    padding:22px 22px 24px;
+  }
+  .diag-card .n{
+    font-size:34px;letter-spacing:-.04em;font-weight:500;
+    color:var(--clay);line-height:1;margin-bottom:10px;
+    font-variant-numeric:tabular-nums;
+  }
+  .diag-card p{margin:0;font-size:12.5px;line-height:1.6;color:var(--muted)}
+  .diag-card p b{color:var(--ink);font-weight:500}
+
+  /* ── the phone ───────────────────────────────────────────────── */
+  .phone{
+    width:262px;
+    border-radius:26px;
+    overflow:hidden;
+    background:var(--p-canvas);
+    color:var(--p-ink);
+    padding:14px 15px 0;
+    position:relative;
+    font-size:9px;
+    box-shadow:0 1px 0 rgba(255,255,255,.06) inset, 0 0 0 1px rgba(25,24,20,.28);
+    transition:background .4s var(--ease);
+  }
+  .p-status{
+    display:flex;justify-content:space-between;align-items:center;
+    font-size:8.5px;color:var(--p-muted);letter-spacing:.01em;
+    padding:2px 4px 12px;
+  }
+  .p-status i{font-style:normal;letter-spacing:.14em}
+  .p-head{display:flex;align-items:center;gap:7px;padding:0 1px}
+  .p-head .word{
+    font-size:20px;letter-spacing:-.035em;font-weight:500;color:var(--p-ink);
+    margin-right:auto;
+  }
+  .p-ico{
+    width:17px;height:17px;border-radius:5px;display:grid;place-items:center;
+    flex:0 0 auto;
+  }
+  .p-ico .ring{
+    width:10px;height:10px;border-radius:50%;
+    display:grid;place-items:center;
+    font-size:4.4px;letter-spacing:-.02em;line-height:1;
+  }
+  .p-btn{
+    width:19px;height:19px;border-radius:50%;
+    display:grid;place-items:center;font-size:8px;
+    background:var(--p-chip);color:var(--p-muted);
+    border:1px solid var(--p-edge);
+  }
+  .p-lede{
+    margin:11px 1px 0;font-size:10px;line-height:1.5;color:var(--p-muted);
+    letter-spacing:-.005em;
+  }
+  .p-shell{
+    margin-top:11px;border-radius:15px;padding:2px;
+    background:var(--p-shell);
+    border:1px solid var(--p-edge);
+  }
+  .p-card{
+    background:var(--p-card);border-radius:13px;padding:0 11px;
+    border:1px solid var(--p-card-edge);
+  }
+  .p-row{
+    display:flex;align-items:center;gap:7px;
+    padding:8px 0;
+    border-bottom:1px solid var(--p-divider);
+  }
+  .p-row:last-child{border-bottom:0}
+  .p-row .dot{
+    width:4px;height:4px;border-radius:50%;background:var(--p-dot);flex:0 0 auto;
+  }
+  .p-row .txt{flex:1;min-width:0}
+  .p-row b{display:block;font-size:9px;font-weight:500;color:var(--p-ink);letter-spacing:-.01em}
+  .p-row i{display:block;font-style:normal;font-size:7.4px;color:var(--p-faint);margin-top:1px}
+  .p-chip{
+    flex:0 0 auto;border-radius:999px;padding:4px 9px;
+    font-size:7.6px;color:var(--p-muted);
+    background:var(--p-button);border:1px solid var(--p-edge);
+  }
+  .p-chip.on{color:var(--p-accent);background:var(--p-accent-fill);border-color:var(--p-accent-edge)}
+  .p-band{
+    display:flex;align-items:center;justify-content:space-between;
+    margin:16px 1px 9px;
+  }
+  .p-band span{font-size:7px;letter-spacing:.2em;color:var(--p-faint)}
+  .p-band b{font-size:16px;letter-spacing:-.03em;font-weight:500;color:var(--p-ink)}
+  .p-slide{
+    position:relative;margin:12px 0 0;height:33px;border-radius:999px;
+    background:var(--p-shell);border:1px solid var(--p-edge);
+    display:flex;align-items:center;justify-content:center;
+    color:var(--p-muted);font-size:10px;
+  }
+  .p-slide .knob{
+    position:absolute;left:3px;top:3px;bottom:3px;width:30px;border-radius:999px;
+    background:var(--p-card);border:1px solid var(--p-edge);
+    display:grid;place-items:center;color:var(--p-ink);font-size:10px;
+  }
+  .p-foot{
+    display:flex;justify-content:space-between;
+    padding:12px 2px 14px;font-size:7px;color:var(--p-faint);
+  }
+  .p-bar{height:3px;width:70px;border-radius:999px;background:var(--p-ink);opacity:.35;margin:0 auto 7px}
+
+  /* ── variants ────────────────────────────────────────────────── */
+  .variants{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:26px}
+  .v-card{
+    display:flex;gap:26px;
+    background:var(--paper-hi);
+    border:1px solid var(--hair);
+    border-radius:26px;
+    padding:26px;
+  }
+  .v-card.rec{border-color:rgba(164,110,75,.42)}
+  .v-info{flex:1;min-width:0;display:flex;flex-direction:column}
+  .v-name{display:flex;align-items:center;gap:9px;margin:0}
+  .v-name h3{margin:0;font-size:19px;letter-spacing:-.03em;font-weight:500}
+  .tag{
+    font-size:8.5px;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--clay);border:1px solid rgba(164,110,75,.3);
+    border-radius:999px;padding:2px 7px;white-space:nowrap;
+  }
+  .v-mood{margin:7px 0 0;font-size:12px;line-height:1.6;color:var(--muted)}
+  .v-swatches{display:flex;margin-top:16px;border-radius:9px;overflow:hidden;border:1px solid var(--hair);background:var(--hair)}
+  .v-swatches i{flex:1;height:28px;display:block}
+  .v-keys{margin-top:12px;display:grid;grid-template-columns:1fr 1fr;gap:3px 10px}
+  .v-keys code{
+    font-family:var(--sans);font-size:9.5px;color:var(--faint);
+    font-variant-numeric:tabular-nums;letter-spacing:.01em;
+  }
+  .v-keys code b{color:var(--muted);font-weight:500}
+  .v-metrics{
+    margin-top:20px;padding-top:14px;border-top:1px solid var(--hair);
+    display:flex;gap:18px;flex-wrap:wrap;
+  }
+  .v-metrics div{font-size:9.5px;color:var(--faint);line-height:1.4}
+  .v-metrics b{display:block;font-size:15px;color:var(--ink);letter-spacing:-.02em;font-weight:500;font-variant-numeric:tabular-nums}
+  .v-note{margin-top:12px;font-size:11px;line-height:1.6;color:var(--muted)}
+  .v-note b{color:var(--ink);font-weight:500}
+
+  /* ── icons ───────────────────────────────────────────────────── */
+  .icons{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px}
+  .i-card{
+    background:var(--paper-hi);border:1px solid var(--hair);border-radius:22px;
+    padding:22px;
+  }
+  .i-card.rec{border-color:rgba(164,110,75,.42)}
+  .i-head{display:flex;align-items:center;gap:9px}
+  .i-head h3{margin:0;font-size:15px;letter-spacing:-.02em;font-weight:500}
+  .i-body{margin-top:18px}
+  .i-zooms{display:flex;gap:12px;align-items:center;margin-top:12px}
+  .i-zooms .hint{font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--faint);margin-left:auto}
+  .i-strip{
+    flex:1;min-width:0;border-radius:14px;overflow:hidden;
+    border:1px solid var(--hair);
+  }
+  .i-strip .on{display:flex;align-items:center;gap:9px;padding:13px 14px}
+  .i-strip .on.light{background:#F8F2E7;color:#191814}
+  .i-strip .on.dark{background:var(--strip);color:#F7F1E5}
+  .i-ref{
+    display:flex;align-items:center;gap:20px;flex-wrap:wrap;
+    background:var(--paper-hi);border:1px solid var(--hair);border-radius:18px;
+    padding:16px 20px;margin-bottom:22px;
+  }
+  .i-ref .label{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--faint);white-space:nowrap}
+  .i-ref .pair{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+  .refchip{
+    display:flex;align-items:center;gap:9px;padding:9px 14px 9px 10px;border-radius:12px;
+    font-size:15px;letter-spacing:-.03em;font-weight:500;
+  }
+  .refchip.light{background:#F8F2E7;color:#191814;border:1px solid rgba(25,24,20,.10)}
+  .refchip.dark{background:#35302A;color:#F7F1E5;border:1px solid rgba(252,248,241,.14)}
+  .refchip .mark{width:22px;height:22px;border-radius:6px;background:#F2ECE0}
+  .refchip .mark .lens{width:15px;height:15px;font-size:6px;border:1.6px solid #F2ECE0;background:#2A2621;color:#F2ECE0}
+  .refchip .mark .lens span{color:#CDB896}
+  .i-strip .on .word{font-size:17px;letter-spacing:-.035em;font-weight:500}
+  .i-strip .on .zoom{margin-left:auto;font-size:7.5px;letter-spacing:.16em;text-transform:uppercase;opacity:.45}
+  .i-zoom .box{
+    width:56px;height:56px;border-radius:15px;display:grid;place-items:center;
+    border:1px solid var(--hair);
+  }
+  .i-zoom .box.light{background:#F8F2E7}
+  .i-zoom .box.dark{background:#35302A;border-color:rgba(252,248,241,.12)}
+  .i-note{margin:14px 0 0;font-size:11px;line-height:1.6;color:var(--muted)}
+  .i-note b{color:var(--ink);font-weight:500}
+
+  /* the mark, drawn small */
+  .mark{
+    display:grid;place-items:center;border-radius:5px;flex:0 0 auto;
+    width:17px;height:17px;
+  }
+  .mark .lens{
+    width:11px;height:11px;border-radius:50%;position:relative;
+    display:grid;place-items:center;
+    font-size:4.6px;line-height:1;letter-spacing:-.03em;font-weight:500;
+  }
+  .mark .lens::after{
+    content:"";position:absolute;right:-3px;bottom:-2px;
+    width:1.6px;height:4.5px;border-radius:2px;
+    transform:rotate(-45deg);
+    background:currentColor;opacity:.85;
+  }
+
+  /* ── motion ──────────────────────────────────────────────────── */
+  .motion{display:grid;grid-template-columns:340px 1fr;gap:46px;align-items:start}
+  .stage{
+    position:relative;width:320px;height:640px;border-radius:30px;overflow:hidden;
+    background:var(--paper);
+    box-shadow:0 0 0 1px var(--hair), 0 24px 50px -34px rgba(25,24,20,.55);
+  }
+  .stage .layer{position:absolute;inset:0;will-change:opacity}
+  .stage .layer svg{display:block;width:100%;height:100%}
+  .stage .behind{position:absolute;inset:0;background:var(--paper)}
+  .m-btns{display:flex;gap:10px;margin-top:20px;flex-wrap:wrap}
+  button{
+    font-family:var(--sans);font-size:11px;font-weight:500;
+    letter-spacing:.02em;border-radius:999px;padding:11px 18px;cursor:pointer;
+    border:1px solid var(--hair);background:var(--paper-hi);color:var(--ink);
+    transition:transform .18s var(--ease), background .25s var(--ease), border-color .25s var(--ease);
+  }
+  button:hover{border-color:rgba(25,24,20,.22)}
+  button:active{transform:scale(.975)}
+  button.primary{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+  .m-copy p{margin:0 0 16px;font-size:13.5px;line-height:1.7;color:var(--muted);max-width:52ch}
+  .m-copy p b{color:var(--ink);font-weight:500}
+  .m-copy h3{margin:0 0 14px;font-size:17px;letter-spacing:-.02em;font-weight:500}
+  .m-list{margin:0;padding:0;list-style:none;border-top:1px solid var(--hair)}
+  .m-list li{
+    display:flex;gap:14px;padding:13px 0;border-bottom:1px solid var(--hair);
+    font-size:12px;color:var(--muted);line-height:1.55;
+  }
+  .m-list li b{color:var(--ink);font-weight:500;min-width:96px}
+  .m-list li span{flex:1;min-width:0}
+  .m-list code{
+    font-family:var(--sans);font-size:11.5px;color:var(--clay);
+    font-variant-numeric:tabular-nums;white-space:nowrap;
+  }
+
+  footer{
+    margin-top:110px;padding-top:34px;border-top:1px solid var(--hair);
+    display:flex;justify-content:space-between;gap:30px;flex-wrap:wrap;
+    font-size:11px;color:var(--faint);
+  }
+  footer b{color:var(--ink);font-weight:500}
+
+  @media (max-width:900px){
+    body{padding:64px 20px 90px}
+    .diag,.variants,.icons{grid-template-columns:1fr}
+    .motion{grid-template-columns:1fr}
+    .v-card{flex-direction:column}
+    .phone{width:100%;max-width:286px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <p class="eyebrow">Lucid · night study · 23 Nov 2026</p>
+  <h1>Night, <em>reconsidered</em>.</h1>
+  <p class="lede">
+    The dark page is not too dark because it is dark — it is too dark because the
+    <b>stair never rises</b>: canvas sits at L* 5.5, the card above it at 15.8, and the
+    three steps in between are 3&nbsp;L* apart. Every surface is charcoal, the cream ink is
+    16.6:1 above it, and the whole page reads as one black field with white text laid on.
+    Four ways to lift it without leaving the palette, four ways to settle the corner mark,
+    and the transition rebuilt.
+  </p>
+
+  <section>
+    <div class="sec-head"><span class="sec-num">01</span><h2>What is actually wrong</h2><span class="sec-rule"></span></div>
+    <div class="diag">
+      <div class="diag-card">
+        <div class="n">3.4</div>
+        <p><b>L* between canvas and band.</b> The page has five surfaces — canvas, band, shell, card, chip — and they are 3.4, 2.9 and 4.0 apart. At that spacing a card edge is a suggestion; on the light page the same relationship is carried by a 12&nbsp;L* paper-to-taupe step.</p>
+      </div>
+      <div class="diag-card">
+        <div class="n">16.6:1</div>
+        <p><b>Cream ink on charcoal.</b> Higher contrast than the light theme's 15.9:1, on a surface that is darker than the ink is bright. Cream belongs on paper; on a near-black page it stops reading as ink and starts reading as light.</p>
+      </div>
+      <div class="diag-card">
+        <div class="n">L* 5.5</div>
+        <p><b>The canvas itself.</b> Below L* 8 an OLED page stops being a page and becomes an absence — fine for a media player, wrong for a utility you look at while another app is behind it.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="sec-num">02</span><h2>Four nights</h2><span class="sec-rule"></span></div>
+    <p class="lede" style="margin:-12px 0 34px;font-size:13.5px">
+      Same roles, same cream, same clay — only the values move. Each card is the home
+      page rendered in that palette; the measurements underneath are the ones the theme
+      would be shipped on.
+    </p>
+    <div class="variants" id="variants"></div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="sec-num">03</span><h2>The corner mark</h2><span class="sec-rule"></span></div>
+    <p class="lede" style="margin:-12px 0 26px;font-size:13.5px">
+      The launcher icon is a cream tile with the lens burned into it. On paper it is the
+      brand; on charcoal it is a lamp. Four ways to keep the mark and lose the glare —
+      shown on the lifted night canvas from 02.
+    </p>
+    <div class="i-ref">
+      <span class="label">What ships now</span>
+      <div class="pair">
+        <span class="refchip light"><span class="mark"><span class="lens">A<span>文</span></span></span>Lucid</span>
+        <span class="refchip dark"><span class="mark"><span class="lens">A<span>文</span></span></span>Lucid</span>
+      </div>
+      <span class="label" style="margin-left:auto">at 22 px · 60×60 at night</span>
+    </div>
+    <div class="icons" id="icons"></div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="sec-num">04</span><h2>The switch</h2><span class="sec-rule"></span></div>
+    <div class="motion">
+      <div>
+        <div class="stage" id="stage">
+          <div class="behind"></div>
+        </div>
+        <div class="m-btns">
+          <button class="primary" id="playNew">Replay · new</button>
+          <button id="playOld">Replay · old</button>
+        </div>
+      </div>
+      <div class="m-copy">
+        <h3>Two layers, or one</h3>
+        <p>
+          The old switch faded the old page out <i>and</i> the new page in at the same
+          time, over 190&nbsp;ms. Both layers half-transparent means the window
+          background shows through them: at the midpoint the whole screen is a blend of
+          paper, charcoal and nothing. That dip is the blink.
+        </p>
+        <p>
+          The new switch fades <b>one</b> layer. The rebuilt page is complete from its
+          first frame; the captured old page dissolves over it for <b>420&nbsp;ms</b> on
+          an ease-in-out, so every frame is an honest blend of the two pages.
+        </p>
+        <ul class="m-list">
+          <li><b>Duration</b><span>190 ms → <code>420 ms</code>, measured as a 345–420 ms ramp on the emulator.</span></li>
+          <li><b>Layers</b><span>two fading against each other → <code>one</code> fading over a finished page.</span></li>
+          <li><b>Curve</b><span>default decelerate → <code>cubic-bezier(.38,0,.26,1)</code>.</span></li>
+          <li><b>Interference</b><span>the setup sheet fired 350 ms into the rebuild → <code>only on a real open</code>.</span></li>
+          <li><b>Guard</b><span>the held frame could be recycled at 450 ms → <code>1 200 ms</code>.</span></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <span><b>Recommendation</b> — Umber, with the quiet tile and the one-layer dissolve.</span>
+    <span>Contrast measured with the WCAG 2.1 formula; L* from relative luminance.</span>
+  </footer>
+
+</div>
+
+<script>
+/* ── palettes ─────────────────────────────────────────────────── */
+const P = {
+  current: {label:'Current night', canvas:'#131210', band:'#1B1916', shell:'#211F1A', card:'#2A2722', chip:'#302D27',
+            ink:'#F7F1E5', muted:'#D8CEBA', faint:'#C2B8A4', accent:'#E9BC96',
+            edge:'rgba(252,248,241,.20)', divider:'rgba(252,248,241,.12)', cardEdge:'rgba(252,248,241,.03)',
+            dot:'#7A7160', button:'#2E2B26', accentFill:'rgba(233,188,150,.24)', accentEdge:'rgba(233,188,150,.45)'},
+  umber:   {label:'Umber', canvas:'#1B1915', band:'#242019', shell:'#2C2821', card:'#35302A', chip:'#3E3830',
+            ink:'#F7F1E5', muted:'#DCCFBA', faint:'#BDB19C', accent:'#E9BC96',
+            edge:'rgba(252,248,241,.14)', divider:'rgba(252,248,241,.14)', cardEdge:'rgba(252,248,241,.07)',
+            dot:'#8A8070', button:'#3B352D', accentFill:'rgba(233,188,150,.20)', accentEdge:'rgba(233,188,150,.42)'},
+  cinder:  {label:'Cinder', canvas:'#211E19', band:'#2A2620', shell:'#332E26', card:'#3C362D', chip:'#463F35',
+            ink:'#F5EFE3', muted:'#D6CBB8', faint:'#B7AC9A', accent:'#E6B993',
+            edge:'rgba(250,245,235,.13)', divider:'rgba(250,245,235,.13)', cardEdge:'rgba(250,245,235,.07)',
+            dot:'#94897A', button:'#443D33', accentFill:'rgba(230,185,147,.20)', accentEdge:'rgba(230,185,147,.40)'},
+  dusk:    {label:'Dusk', canvas:'#221C15', band:'#2C251A', shell:'#352D20', card:'#3F3527', chip:'#4A3E2E',
+            ink:'#FBF2E2', muted:'#DECDB2', faint:'#C2B095', accent:'#F0C79F',
+            edge:'rgba(251,242,226,.14)', divider:'rgba(251,242,226,.14)', cardEdge:'rgba(251,242,226,.08)',
+            dot:'#9A8B73', button:'#483C2C', accentFill:'rgba(240,199,159,.22)', accentEdge:'rgba(240,199,159,.44)'},
+  graphite:{label:'Graphite', canvas:'#1D1D1C', band:'#262625', shell:'#2F2E2C', card:'#383733', chip:'#42403B',
+            ink:'#F2EFE7', muted:'#D5D0C6', faint:'#B7B1A6', accent:'#E2B591',
+            edge:'rgba(242,239,231,.13)', divider:'rgba(242,239,231,.13)', cardEdge:'rgba(242,239,231,.07)',
+            dot:'#8F8B84', button:'#403E39', accentFill:'rgba(226,181,145,.20)', accentEdge:'rgba(226,181,145,.40)'}
+};
+const LIFTED = '#35302A';
+
+/* the recommended corner mark, sized for the mock */
+function markQuiet(){
+  return `<span class="mark" style="background:rgba(252,248,241,.09);border:1px solid rgba(252,248,241,.16)">
+    <span class="lens" style="border:1.4px solid rgba(247,241,229,.85);color:#F7F1E5">A<span style="color:#E9BC96">文</span></span>
+  </span>`;
+}
+
+/* ── the home page mock ───────────────────────────────────────── */
+const ROWS_A = [
+  ['Float over other apps','Off by default — lets the lens sit on top','Allow'],
+  ['Text access','Off by default — lets the lens read text','Allow'],
+  ['Quick button','Adds Lucid to the shade’s quick buttons','Add']
+];
+const ROWS_B = [
+  ['Auto-translate','Reads the moment the lens stops moving','On',true],
+  ['Engine','Best quality — sent online to translate','Online',true],
+  ['Offline only','No read ever leaves the phone','Off'],
+  ['Offline models','1 pack downloaded','Manage'],
+  ['What was sent','Nothing has left the phone yet','View']
+];
+const row = (r) => `<div class="p-row"><span class="dot"></span><span class="txt"><b>${r[0]}</b><i>${r[1]}</i></span><span class="p-chip${r[3]?' on':''}">${r[2]}</span></div>`;
+
+function phone(p){
+  const v = Object.entries(p).filter(([k])=>!['label'].includes(k))
+    .map(([k,val])=>`--p-${k.replace(/[A-Z]/g,m=>'-'+m.toLowerCase())}:${val}`).join(';');
+  return `<div class="phone" style="${v}">
+    <div class="p-status"><span>11:10</span><i>◐ ◔ ▮</i></div>
+    <div class="p-head">
+      ${markQuiet()}
+      <span class="word">Lucid</span>
+      <span class="p-btn">⚙</span>
+      <span class="p-btn">☾</span>
+    </div>
+    <p class="p-lede">Reads whatever the lens sits over — WhatsApp, a browser, any app — and translates it in place.</p>
+    <div class="p-shell"><div class="p-card">${ROWS_A.map(row).join('')}</div></div>
+    <div class="p-band"><span>TRANSLATE INTO</span><b>Spanish</b></div>
+    <div class="p-shell"><div class="p-card">${ROWS_B.map(row).join('')}</div></div>
+    <div class="p-slide"><span class="knob">→</span>Start the lens</div>
+    <div class="p-foot"><span>v1.0.2</span><span>Shipped with Grafizum.com</span></div>
+    <div class="p-bar"></div>
+  </div>`;
+}
+
+/* ── variant cards ────────────────────────────────────────────── */
+const VARIANTS = [
+  { key:'umber', name:'Umber', rec:true,
+    mood:'Charcoal lifted into warm paper territory. Nothing changes hue — the canvas comes up 3.3 L* and the stair opens to ~3.9 a step, so a card edge is drawn rather than implied.',
+    note:'This is the one to take: the page stops being an absence, the cream stops being a lamp, and every measured pair still clears its floor.',
+    metrics:[['L* canvas','8.8'],['Card − canvas','11.4'],['Ink','15.6:1'],['Muted on card','8.5:1']] },
+  { key:'cinder', name:'Cinder',
+    mood:'A further step up, for the reading-in-bedlight case. Cards sit at L* 23 — near a mid-charcoal — and the surface stair is almost perfectly even at 4 a step.',
+    note:'Reads more like a “dark slate” app and less like Lucid’s paper; the clay has slightly less to push against, and the faint labels drop to 5.3:1.',
+    metrics:[['L* canvas','11.4'],['Card − canvas','11.5'],['Ink','14.5:1'],['Muted on card','7.4:1']] },
+  { key:'dusk', name:'Dusk',
+    mood:'The warmest of the four: night keeps a little of the afternoon in it. Canvas carries a brown cast; clay reads almost bronze and the cards feel like dark card stock.',
+    note:'Beautiful under warm light, but a brown-black page can look dirty beside a neutral system UI. The accent is the star here, so it wants to stay an accent.',
+    metrics:[['L* canvas','10.7'],['Card − canvas','12.1'],['Ink','15.2:1'],['Muted on card','7.7:1']] },
+  { key:'graphite', name:'Graphite',
+    mood:'The professional argument: keep the values of Umber but take the warmth out of the neutrals, so the cream ink and the clay are the only warm things on the page.',
+    note:'The most “software” of the four and the least Lucid-like — the paper personality only survives in the ink. Good if the app has to sit beside Slack or Linear.',
+    metrics:[['L* canvas','10.7'],['Card − canvas','12.3'],['Ink','14.7:1'],['Muted on card','7.8:1']] }
+];
+
+document.getElementById('variants').innerHTML = VARIANTS.map(v=>{
+  const p = P[v.key];
+  const keys = ['canvas','band','shell','card','chip'].map(k=>`<code><b>${k}</b> ${p[k]}</code>`).join('');
+  const sw = ['canvas','band','shell','card','chip'].map(k=>`<i style="background:${p[k]}"></i>`).join('');
+  return `<article class="v-card${v.rec?' rec':''}">
+    ${phone(p)}
+    <div class="v-info">
+      <div class="v-name"><h3>${v.name}</h3>${v.rec?'<span class="tag">Recommended</span>':''}</div>
+      <p class="v-mood">${v.mood}</p>
+      <div class="v-swatches">${sw}</div>
+      <div class="v-keys">${keys}</div>
+      <div class="v-metrics">${v.metrics.map(m=>`<div><b>${m[1]}</b>${m[0]}</div>`).join('')}</div>
+      <p class="v-note">${v.note}</p>
+    </div>
+  </article>`;
+}).join('');
+
+/* ── icon options, shown on the lifted night canvas ───────────── */
+const ICONS = [
+  { name:'Quiet tile', rec:true,
+    css:'background:rgba(252,248,241,.12);border:1px solid rgba(252,248,241,.20)',
+    lens:'border:1.4px solid rgba(247,241,229,.85);color:#F7F1E5',
+    glyph:'A<span style="color:#E9BC96">文</span>',
+    dayCss:'background:rgba(25,24,20,.06);border:1px solid rgba(25,24,20,.10)',
+    dayLens:'border:1.4px solid rgba(25,24,20,.72);color:#191814',
+    note:'The same tile, turned down: a 12% cream wash with a hairline where the solid tile was. It reads as a soft stamp beside the wordmark instead of a lit square, and it keeps the launcher identity exactly as it is.' },
+  { name:'Recessed tile',
+    css:'background:#35302A;border:1px solid rgba(233,188,150,.34)',
+    lens:'border:1.4px solid #F7F1E5;background:#1B1915',
+    dayCss:'background:#FCF8F1;border:1px solid rgba(25,24,20,.14)',
+    dayLens:'border:1.4px solid #191814;background:#F8F2E7',
+    glyph:'A<span style="color:#E9BC96">文</span>',
+    note:'The tile becomes part of the stair: a card-coloured chip with a clay rim. The glass goes back to the canvas colour, so the mark reads as machined into the header rather than pasted onto it.' },
+  { name:'Bare mark',
+    css:'background:transparent;border:0',
+    lens:'border:1.4px solid #E9BC96;color:#F7F1E5',
+    dayCss:'background:transparent;border:0',
+    dayLens:'border:1.4px solid #A46E4B;color:#191814',
+    glyph:'A<span style="color:#E9BC96">文</span>',
+    note:'No container at all — a clay ring with the two glyphs, sized to the cap height of “Lucid”. The most typographic and the most expensive-looking; it needs a vector mark rather than the launcher raster, and it loses the home-screen tie.' },
+  { name:'Outline tile',
+    css:'background:transparent;border:1px solid rgba(247,241,229,.22)',
+    lens:'border:1.4px solid #F7F1E5;color:#F7F1E5',
+    dayCss:'background:transparent;border:1px solid rgba(25,24,20,.18)',
+    dayLens:'border:1.4px solid #191814;color:#191814',
+    glyph:'A<span style="color:#E9BC96">文</span>',
+    note:'Keeps the square silhouette the launcher has, drawn as a single hairline with everything inside it cream. Quiet at rest, and it still holds the corner when the page behind it is busy.' }
+];
+
+document.getElementById('icons').innerHTML = ICONS.map(o=>`
+  <article class="i-card${o.rec?' rec':''}">
+    <div class="i-head"><h3>${o.name}</h3>${o.rec?'<span class="tag">Recommended</span>':''}</div>
+    <div class="i-body">
+      <div class="i-strip" style="--strip:${LIFTED}">
+        <div class="on light">
+          <span class="mark" style="background:rgba(25,24,20,.06);border:1px solid rgba(25,24,20,.10)">
+            <span class="lens" style="border:1.4px solid rgba(25,24,20,.7);color:#191814">A<span style="color:#A46E4B">文</span></span>
+          </span>
+          <span class="word">Lucid</span><span class="zoom">day</span>
+        </div>
+        <div class="on dark">
+          <span class="mark" style="${o.css}">
+            <span class="lens" style="${o.lens}">${o.glyph}</span>
+          </span>
+          <span class="word">Lucid</span><span class="zoom">night</span>
+        </div>
+      </div>
+      <div class="i-zooms">
+        <div class="i-zoom"><div class="box light"><span class="mark" style="width:34px;height:34px;border-radius:9px;${o.dayCss||o.css}">
+          <span class="lens" style="width:22px;height:22px;font-size:9px;${o.dayLens||o.lens}">${o.glyph}</span></span></div></div>
+        <div class="i-zoom"><div class="box dark"><span class="mark" style="width:34px;height:34px;border-radius:9px;${o.css}">
+          <span class="lens" style="width:22px;height:22px;font-size:9px;${o.lens}">${o.glyph}</span></span></div></div>
+        <span class="hint">3× · day / night</span>
+      </div>
+    </div>
+    <p class="i-note">${o.note}</p>
+  </article>
+`).join('');
+
+/* ── the motion stage ─────────────────────────────────────────── */
+function screenSVG(dark){
+  const c = dark ? P.umber : {canvas:'#F8F2E7',band:'#E4D8CE',shell:'#D3C2B5',card:'#FCF8F1',ink:'#191814',
+                              muted:'#6A6254',faint:'#857B6C',accent:'#8A5A3C'};
+  const edge = dark ? 'rgba(252,248,241,.14)' : 'rgba(25,24,20,.10)';
+  const div  = dark ? 'rgba(252,248,241,.14)' : 'rgba(211,194,181,.55)';
+  const btn  = dark ? '#3B352D' : '#E4D8CE';
+  const F = 'Plus Jakarta Sans,system-ui';
+  const rowsA = [['Float over other apps','Off by default — lets the lens sit on top','Allow'],
+                 ['Text access','Off by default — lets the lens read text','Allow'],
+                 ['Quick button','Adds Lucid to the shade’s quick buttons','Add']];
+  const rowsB = [['Auto-translate','Reads the moment the lens stops moving','On'],
+                 ['Engine','Best quality — sent online to translate','Online'],
+                 ['Offline only','No read ever leaves the phone','Off'],
+                 ['Offline models','1 pack downloaded','Manage'],
+                 ['What was sent','Nothing has left the phone yet','View']];
+
+  /* one row of a card: title, sub, chip, hairline */
+  const rowSvg = (rows, top, x, w, h) => rows.map((r,i)=>{
+    const y = top + i*h;
+    return `<text x="${x+16}" y="${y+20}" font-family="${F}" font-size="11.5" font-weight="500" letter-spacing="-.1" fill="${c.ink}">${r[0]}</text>
+      <text x="${x+16}" y="${y+34}" font-family="${F}" font-size="9" fill="${c.faint}">${r[1]}</text>
+      <rect x="${x+w-68}" y="${y+10}" width="54" height="22" rx="11" fill="${btn}" stroke="${edge}"/>
+      <text x="${x+w-41}" y="${y+25}" text-anchor="middle" font-family="${F}" font-size="8.5" fill="${c.muted}">${r[2]||'Allow'}</text>
+      ${i<rows.length-1?`<line x1="${x+12}" y1="${y+h-1}" x2="${x+w-12}" y2="${y+h-1}" stroke="${div}"/>`:''}`;
+  }).join('');
+
+  return `<svg viewBox="0 0 320 640" xmlns="http://www.w3.org/2000/svg">
+    <rect width="320" height="640" fill="${c.canvas}"/>
+    <text x="24" y="30" font-family="${F}" font-size="9.5" fill="${c.muted}">11:10</text>
+    <text x="296" y="30" text-anchor="end" font-family="${F}" font-size="8.5" letter-spacing="1" fill="${c.muted}">◐ ◔ ▮</text>
+
+    <rect x="24" y="42" width="28" height="28" rx="8.5" fill="${dark?'rgba(252,248,241,.09)':'rgba(25,24,20,.05)'}" stroke="${dark?'rgba(252,248,241,.16)':'rgba(25,24,20,.10)'}"/>
+    <circle cx="38" cy="56" r="7.4" fill="none" stroke="${dark?'#F7F1E5':'#191814'}" stroke-opacity=".82" stroke-width="1.8"/>
+    <text x="34.6" y="58.6" font-family="${F}" font-size="6.8" font-weight="500" fill="${dark?'#F7F1E5':'#191814'}">A</text>
+    <text x="39.8" y="58.6" font-family="${F}" font-size="6.8" font-weight="500" fill="${dark?'#E9BC96':'#A46E4B'}">文</text>
+    <text x="61" y="64" font-family="${F}" font-size="24" font-weight="500" letter-spacing="-.9" fill="${c.ink}">Lucid</text>
+    <circle cx="256" cy="56" r="14" fill="${btn}" stroke="${edge}"/>
+    <circle cx="292" cy="56" r="14" fill="${btn}" stroke="${edge}"/>
+    <text x="251" y="61" font-family="${F}" font-size="10.5" fill="${c.muted}">⚙</text>
+    <text x="287" y="61" font-family="${F}" font-size="10.5" fill="${c.muted}">☾</text>
+
+    <text x="24" y="102" font-family="${F}" font-size="11.5" fill="${c.muted}">Reads whatever the lens sits over — WhatsApp, a</text>
+    <text x="24" y="118" font-family="${F}" font-size="11.5" fill="${c.muted}">browser, any app — and translates it in place.</text>
+
+    <rect x="24" y="136" width="272" height="158" rx="18" fill="${c.shell}" stroke="${edge}"/>
+    <rect x="27" y="139" width="266" height="152" rx="16" fill="${c.card}" stroke="${edge}"/>
+    ${rowSvg(rowsA, 140, 27, 266, 50)}
+
+    <text x="25" y="322" font-family="${F}" font-size="8" letter-spacing="2.2" fill="${c.faint}">TRANSLATE INTO</text>
+    <text x="296" y="326" text-anchor="end" font-family="${F}" font-size="19" font-weight="500" letter-spacing="-.6" fill="${c.ink}">Spanish</text>
+
+    <rect x="24" y="338" width="272" height="246" rx="18" fill="${c.shell}" stroke="${edge}"/>
+    <rect x="27" y="341" width="266" height="240" rx="16" fill="${c.card}" stroke="${edge}"/>
+    ${rowSvg(rowsB, 342, 27, 266, 47)}
+
+    <rect x="24" y="592" width="272" height="32" rx="16" fill="${c.shell}" stroke="${edge}"/>
+    <rect x="27" y="595" width="26" height="26" rx="13" fill="${c.card}" stroke="${edge}"/>
+    <text x="36" y="612" font-family="${F}" font-size="10" fill="${c.ink}">→</text>
+    <text x="184" y="612" text-anchor="middle" font-family="${F}" font-size="10" fill="${c.muted}">Start the lens</text>
+
+    <text x="24" y="636" font-family="${F}" font-size="7.5" fill="${c.faint}">v1.0.2</text>
+    <text x="296" y="636" text-anchor="end" font-family="${F}" font-size="7.5" fill="${c.faint}">Shipped with Grafizum.com</text>
+  </svg>`;
+}
+
+/* the stage is a viewport onto a 320×566 screen; the slide sits below the fold */
+const stage = document.getElementById('stage');
+const lightLayer = document.createElement('div');
+const darkLayer  = document.createElement('div');
+lightLayer.className = 'layer';
+darkLayer.className  = 'layer';
+lightLayer.innerHTML = screenSVG(false);
+darkLayer.innerHTML  = screenSVG(true);
+darkLayer.style.opacity = '0';
+stage.append(lightLayer, darkLayer);
+
+let dark = false;
+let running = false;
+
+/* OLD: both layers cross-fade against the window behind them */
+function playOld(){
+  if(running) return; running = true;
+  darkLayer.style.transition = 'none';
+  lightLayer.style.transition = 'none';
+  darkLayer.style.opacity  = dark ? '1' : '0';
+  lightLayer.style.opacity = dark ? '0' : '1';
+  void darkLayer.offsetWidth;
+  dark = !dark;
+  const t = 'opacity 190ms ease-in-out';
+  darkLayer.style.transition = t;
+  lightLayer.style.transition = t;
+  darkLayer.style.opacity  = dark ? '1' : '0';
+  lightLayer.style.opacity = dark ? '0' : '1';
+  setTimeout(()=>{ running = false; normalise(); }, 260);
+}
+
+/* NEW: the destination is already there; only the page leaving dissolves */
+function playNew(){
+  if(running) return; running = true;
+  normalise();
+  void darkLayer.offsetWidth;
+  dark = !dark;
+  const leaving  = dark ? lightLayer : darkLayer;
+  const arriving = dark ? darkLayer  : lightLayer;
+  arriving.style.transition = 'none';
+  arriving.style.opacity = '1';
+  leaving.style.transition = 'opacity 420ms cubic-bezier(.38,0,.26,1)';
+  leaving.style.opacity = '0';
+  setTimeout(()=>{ running = false; normalise(); }, 440);
+}
+
+/* settle into the resting state: exactly one opaque page */
+function normalise(){
+  darkLayer.style.transition = 'none';
+  lightLayer.style.transition = 'none';
+  darkLayer.style.opacity  = dark ? '1' : '0';
+  lightLayer.style.opacity = dark ? '0' : '1';
+}
+normalise();
+
+document.getElementById('playNew').addEventListener('click', playNew);
+document.getElementById('playOld').addEventListener('click', ()=>playOld());
+</script>
+</body>
+</html>
