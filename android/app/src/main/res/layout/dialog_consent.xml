@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The consent, asked from settings rather than from the setup sheet: the same
+     words on the same surface, whichever page the question is asked from. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/ask_card_bg"
+    android:orientation="vertical"
+    android:paddingStart="20dp"
+    android:paddingTop="20dp"
+    android:paddingEnd="20dp"
+    android:paddingBottom="14dp">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/lucid_sans"
+        android:letterSpacing="0.2"
+        android:text="Text access"
+        android:textAllCaps="true"
+        android:textColor="@color/ask_label"
+        android:textSize="9sp" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:fontFamily="@font/lucid_sans"
+        android:letterSpacing="-0.02"
+        android:text="Before the switch, what it does"
+        android:textColor="@color/ask_ink"
+        android:textFontWeight="500"
+        android:textSize="17sp" />
+
+    <include
+        layout="@layout/consent_block"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp" />
+</LinearLayout>

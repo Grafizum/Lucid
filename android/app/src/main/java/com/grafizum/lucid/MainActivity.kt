@@ -4,9 +4,9 @@ import android.Manifest
 import android.animation.ValueAnimator
 import android.app.ActivityManager
 import android.app.Dialog
-import android.app.StatusBarManager
-import android.content.ComponentName
 import android.content.Intent
+import android.content.res.ColorStateList
+import android.content.res.Configuration
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Icon
@@ -22,35 +22,34 @@ import android.view.HapticFeedbackConstants
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
+import androidx.core.widget.NestedScrollView
+import androidx.core.view.ViewCompat
 import android.view.animation.AccelerateInterpolator
-import android.view.animation.DecelerateInterpolator
 import android.view.animation.Interpolator
+import android.view.animation.PathInterpolator
 import android.widget.FrameLayout
+import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import kotlin.math.cos
 import kotlin.math.exp
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
+import com.google.android.play.core.review.ReviewManagerFactory
+import com.google.mlkit.common.model.RemoteModelManager
+import com.google.mlkit.nl.translate.TranslateRemoteModel
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var dot1: View
-    private lateinit var dot2: View
-    private lateinit var btn1: TextView
-    private lateinit var btn2: TextView
-    private lateinit var btn3: TextView
-    private lateinit var sub1: TextView
-    private lateinit var sub2: TextView
-    private lateinit var sub3: TextView
-    private lateinit var targetName: TextView
-    private lateinit var dot4: View
-    private lateinit var btn4: TextView
-    private lateinit var sub4: TextView
+    companion object {
+        /** The launcher shortcut: put the lens on screen without opening the page. */
+        const val ACTION_START_LENS = "com.grafizum.lucid.action.START_LENS"
+    }
+
     private lateinit var autoBtn: TextView
     private lateinit var autoHint: TextView
     private lateinit var engBtn: TextView
@@ -58,9 +57,16 @@ class MainActivity : AppCompatActivity() {
     private lateinit var startBtn: SwipeToStart
     private lateinit var stopX: FrameLayout
     private lateinit var stopXBtn: FrameLayout
-    private lateinit var lensState: TextView
-    private lateinit var versionName: TextView
+    private lateinit var modelsHint: TextView
+    private lateinit var historyHint: TextView
+    private lateinit var lensHint: TextView
 
+
+    /**
+     * Whether the setup sheet has been offered on this screen yet. Held here so
+     * the question is asked once — after the onboarding, not over it.
+     */
+    private var setupAsked = false
 
     /** Whether the cross is currently sitting beside the slide. */
     private var stopXShown = false
@@ -121,10 +127,10 @@ class MainActivity : AppCompatActivity() {
         val data = result.data
         if (result.resultCode == RESULT_OK && data != null) {
             // The choice is written down; the grant itself cannot be, so this is
-            // what tells an updated app that the user had Look mode on.
+            // what tells an updated app that the user allowed screen capture.
             Prefs.setLookMode(this, true)
             LensService.startWithCapture(this, result.resultCode, data)
-            say("Look mode is on — the whole screen, every app.")
+            say("Screen capture is on — the whole screen, every app.")
             startBtn.postDelayed({ refresh() }, 900)
         } else {
             say("Screen access declined. Text access alone still works everywhere it can read.")
@@ -132,54 +138,43 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        // The theme is put on before anything is inflated, so a dark choice is
+        // already true on the first frame of the next launch — not a light page
+        // that flips over after it has been drawn.
+        AppCompatDelegate.setDefaultNightMode(ThemeChoice.nightMode(this))
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        // A theme chosen from the corner rebuilds this page; the picture kept
+        // before the rebuild dissolves the old page over the new one.
+        ThemeFade.reveal(this)
 
-        dot1 = findViewById(R.id.dot1)
-        dot2 = findViewById(R.id.dot2)
-        btn1 = findViewById(R.id.btn1)
-        btn2 = findViewById(R.id.btn2)
-        btn3 = findViewById(R.id.btn3)
-        sub1 = findViewById(R.id.sub1)
-        sub2 = findViewById(R.id.sub2)
-        sub3 = findViewById(R.id.sub3)
-        dot4 = findViewById(R.id.dot4)
-        btn4 = findViewById(R.id.btn4)
-        sub4 = findViewById(R.id.sub4)
-        targetName = findViewById(R.id.targetName)
         autoBtn = findViewById(R.id.autoBtn)
         autoHint = findViewById(R.id.autoHint)
         engBtn = findViewById(R.id.engBtn)
         engHint = findViewById(R.id.engHint)
+        modelsHint = findViewById(R.id.modelsHint)
+        historyHint = findViewById(R.id.historyHint)
+        lensHint = findViewById(R.id.lensHint)
         startBtn = findViewById(R.id.startBtn)
         stopX = findViewById(R.id.stopX)
         stopXBtn = findViewById(R.id.stopXBtn)
-        lensState = findViewById(R.id.lensState)
-        versionName = findViewById(R.id.versionName)
-        versionName.text = "v${BuildConfig.VERSION_NAME}"
+        startBtn.startLabel = UiText.t(this, "tour.start")
+        startBtn.stopLabel = UiText.line(this, "Stop the lens")
 
-        startBtn.startLabel = "Start the lens"
-        startBtn.stopLabel = "Stop the lens"
+        // Settings, in the corner: the page where everything the app can be
+        // told lives — the switches Android asks for, the language every read is
+        // answered in, the apps that open the lens by themselves, and what has
+        // been read.
+        val settingsBtn = findViewById<View>(R.id.settingsBtn)
+        Press.attach(settingsBtn)
+        settingsBtn.setOnClickListener {
+            startActivity(Intent(this, SettingsActivity::class.java))
+        }
 
         // Every control answers a press the same way: it gives under the finger
         // and springs back. No ripples, no grey boxes — see Press.kt.
-        Press.attachAll(btn1, btn2, btn3, btn4, autoBtn, engBtn, stopXBtn)
-        Press.attach(findViewById(R.id.changeTarget))
+        Press.attachAll(autoBtn, engBtn, stopXBtn)
 
-        // An "Allow" that is already on is not a question any more: it goes
-        // straight to the switch. A switch still off gets the drawn screen first.
-        btn1.setOnClickListener {
-            if (Settings.canDrawOverlays(this)) openOverlaySettings() else askPermission(Ask.OVERLAY)
-        }
-        btn2.setOnClickListener {
-            if (LensAccessibilityService.isEnabled(this)) {
-                openAccessibilitySettings()
-            } else {
-                askPermission(Ask.TEXT)
-            }
-        }
-        btn3.setOnClickListener { enableLookMode() }
-        btn4.setOnClickListener { addQuickButton() }
         // The slide reads the way it is facing at the moment it lands, so one
         // control starts the lens and, from its other seat, switches it off.
         // It reports that seat itself: the control has already handed over by
@@ -187,19 +182,40 @@ class MainActivity : AppCompatActivity() {
         startBtn.onComplete = { done ->
             if (done == SwipeToStart.Mode.START) startLens() else stopLens()
         }
+        // The line is text, not a button: it keeps its look and only gains the
+        // tap. No ripple, no underline, no press — the page stays the page.
+        lensHint.setOnClickListener { askForMissingSwitch() }
         stopXBtn.setOnClickListener {
             stopXBtn.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
             stopLens()
         }
-        findViewById<View>(R.id.changeTarget).setOnClickListener { showLanguageDialog() }
         autoBtn.setOnClickListener { toggleAuto() }
         engBtn.setOnClickListener { toggleEngine() }
+        findViewById<View>(R.id.modelsRow).setOnClickListener { showModels() }
+        findViewById<View>(R.id.historyRow).setOnClickListener {
+            startActivity(Intent(this, HistoryActivity::class.java))
+        }
 
         // Edge to edge, with the bars paid for in padding instead of left to
         // fitsSystemWindows: the bottom line — version and grafizum.com — has to
         // clear the gesture bar on every device, not just most of them.
         WindowCompat.setDecorFitsSystemWindows(window, false)
         val root = findViewById<ViewGroup>(R.id.root)
+        @Suppress("DEPRECATION")
+        val sheet = findViewById<NestedScrollView>(R.id.sheetScroll)
+        sheet.addOnAttachStateChangeListener(object : View.OnAttachStateChangeListener {
+            override fun onViewAttachedToWindow(v: View) {
+                v.removeOnAttachStateChangeListener(this)
+                // ViewCompat, not View#getRootWindowInsets: that call only
+                // exists from Android 11, and this runs on every launch, so on
+                // Android 7 to 10 it was a crash, not a missing inset.
+                val sheetBars = ViewCompat.getRootWindowInsets(v)?.getInsets(
+                    WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout(),
+                ) ?: return
+                v.setPaddingRelative(0, sheetBars.top, 0, sheetBars.bottom)
+            }
+            override fun onViewDetachedFromWindow(v: View) {}
+        })
         ViewCompat.setOnApplyWindowInsetsListener(root) { view, insets ->
             val bars = insets.getInsets(
                 WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout(),
@@ -208,7 +224,7 @@ class MainActivity : AppCompatActivity() {
                 dp(32) + bars.left,
                 dp(30) + bars.top,
                 dp(32) + bars.right,
-                dp(24) + bars.bottom,
+                dp(18) + bars.bottom,
             )
             insets
         }
@@ -217,8 +233,54 @@ class MainActivity : AppCompatActivity() {
         window.statusBarColor = Color.TRANSPARENT
 
         refresh()
-        // Asked as the app opens: the switches are off until they are allowed.
-        startBtn.postDelayed({ askForSetup() }, 350)
+        // A first launch meets the welcome and then the six loops, and the
+        // setup question waits until those are done: a permission sheet on top
+        // of an animation is a sheet nobody reads.
+        val firstRun = !Prefs.onboardingSeen(this)
+        setupAsked = !firstRun
+        if (firstRun && savedInstanceState == null) {
+            // A real first launch, not a page just rebuilt: a theme change
+            // rebuilds this screen, and that is not the app being opened for
+            // the first time — the welcome would flash up over the tour, or
+            // over the page the choice was made on.
+            startActivity(Intent(this, WelcomeActivity::class.java))
+        } else if (savedInstanceState == null) {
+            // Asked as the app opens: the switches are off until they are allowed.
+            // Only a real open, though — a screen rebuilt under the person is not
+            // an open, and a sheet arriving on a rebuilt page is a flicker.
+            startBtn.postDelayed({ askForSetup() }, 350)
+        }
+
+        // Age assurance, once the first frame is up rather than before it: Play
+        // is asked whether this install may share its age range and the answer
+        // is only logged. The call is never awaited and changes nothing on
+        // screen — Lucid has no age gate to apply it to.
+        window.decorView.post { AgeSignalsHelper.requestAgeSignals(this) }
+
+        // The launcher shortcut asks for the lens itself, not for this page.
+        handleShortcut(intent)
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        handleShortcut(intent)
+    }
+
+    /**
+     * Comes from the home-screen shortcut. With both switches on the lens goes up
+     * and the page steps out of the way; with one off, the page stays, because
+     * that is the only place the switches can be found.
+     */
+    private fun handleShortcut(intent: Intent?) {
+        if (intent?.action != ACTION_START_LENS) return
+        intent.action = null
+        if (!Settings.canDrawOverlays(this) || !LensAccessibilityService.isEnabled(this)) {
+            startBtn.postDelayed({ askForSetup() }, 300)
+            return
+        }
+        startLens()
+        moveTaskToBack(true)
     }
 
     override fun onResume() {
@@ -230,9 +292,24 @@ class MainActivity : AppCompatActivity() {
         if (finished != null && granted(finished)) {
             startBtn.postDelayed({ nextStep(finished) }, 450)
         }
+        // The shade keeps the last picture it was handed, and a stopped
+        // process cannot repaint it — after an update, a force-stop or the
+        // system ending the session, the button can be left reading "on" over
+        // an empty screen. Opening Lucid settles it back to the truth.
+        LensTileService.refresh(this)
+        // And a button put in by hand is only ever discovered by the shade
+        // binding it, so ask for that bind now rather than after the person has
+        // opened the shade — the row says "Added" as they land back here.
+        LensTileService.ask(this)
         // Coming back from a system screen means its switch may have changed.
         refresh()
         bindSetupDialog()
+        // Asked from the page the person is already on, never over another app.
+        maybeAskForReview()
+        // The tour asks for the switch itself, on its last loop, and Skip walks
+        // out of it without one. So leaving the tour no longer opens the sheet:
+        // the rows on this page carry the same two buttons from here on.
+        if (!setupAsked && Prefs.onboardingSeen(this)) setupAsked = true
         LensState.observe { runOnUiThread { refresh() } }
     }
 
@@ -276,7 +353,11 @@ class MainActivity : AppCompatActivity() {
 
         // Android's own accessibility screen. There is no per-service page an app
         // is allowed to open — that one is guarded by a system permission — so
-        // the guide has already shown where Lucid sits in this list.
+        // the section Lucid's row sits in is written on the guide card just
+        // before it opens, in this phone's own words. The page is also written
+        // down as the way back: the granted service returns here on its own,
+        // with the switch on.
+        AccessReturn.arm(this, javaClass)
         val opened = runCatching {
             accessibilityLauncher.launch(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
         }
@@ -287,26 +368,11 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    /**
-     * Optional fallback for apps that hide their text. Requests the whole
-     * display explicitly, so Android never offers the single-app option.
-     */
-    private fun enableLookMode() {
-        if (!Settings.canDrawOverlays(this)) {
-            askPermission(Ask.OVERLAY)
-            return
-        }
-
-        // The capture dialog is one more place to know what to tap, so it gets
-        // the same drawn-screen treatment as a switch in Settings.
-        askPermission(Ask.CAPTURE)
-    }
-
     /** Android's own capture dialog, once the sheet has said what to pick. */
     private fun startCapture() {
         val manager = getSystemService(MediaProjectionManager::class.java)
-        val intent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-            manager.createScreenCaptureIntent(MediaProjectionConfig.createConfigForDefaultDisplay())
+        val intent = if (Capabilities.framesLeaveOverlaysOut) {
+            wholeDisplay(manager)
         } else {
             manager.createScreenCaptureIntent()
         }
@@ -314,64 +380,49 @@ class MainActivity : AppCompatActivity() {
     }
 
     /**
-     * The one switch Android lets an app offer itself. From 13 the system puts
-     * up its own "add Lucid?" sheet, so the user answers in their own words;
-     * before that a tile can only be dragged in from the panel's edit screen,
-     * so say that instead of asking for something the platform won't do.
+     * Android 14 can be asked for the whole display by name, so its dialog never
+     * offers the single-app option. Kept in its own method so an older phone
+     * never has to resolve [MediaProjectionConfig], which it does not have.
      */
-    private fun addQuickButton() {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
-            say("Open the shade, tap the pencil, and drag Lucid into your quick buttons.")
-            return
-        }
-        val manager = getSystemService(StatusBarManager::class.java)
-        if (manager == null) {
-            say("This phone has no quick buttons to add to.")
-            return
-        }
-        manager.requestAddTileService(
-            ComponentName(this, LensTileService::class.java),
-            getString(R.string.tile_label),
-            Icon.createWithResource(this, R.drawable.ic_tile_mark),
-            mainExecutor,
-        ) { result ->
-            runOnUiThread {
-                when (result) {
-                    StatusBarManager.TILE_ADD_REQUEST_RESULT_TILE_ADDED -> {
-                        Prefs.setTileAdded(this, true)
-                        say("Lucid is in your quick buttons — tap it from the shade.")
-                    }
-                    StatusBarManager.TILE_ADD_REQUEST_RESULT_TILE_ALREADY_ADDED -> {
-                        Prefs.setTileAdded(this, true)
-                        say("Lucid is already in your quick buttons.")
-                    }
-                    else -> say("Not added — the shade's pencil can still drag it in.")
-                }
-                refresh()
-            }
-        }
-    }
+    @androidx.annotation.RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
+    private fun wholeDisplay(manager: MediaProjectionManager) =
+        manager.createScreenCaptureIntent(MediaProjectionConfig.createConfigForDefaultDisplay())
+
 
     private fun startLens() {
         // Neither switch can be worked around: without one the lens has nowhere
         // to sit, without the other it reads nothing. So this is a decision, said
         // once in a sheet, not a line that waits under the slide.
-        // The slide has already turned itself round for a lens that will not
-        // start, so it is told the truth again a beat later: nothing to stop.
+        if (askForMissingSwitch()) return
+
+        LensService.start(this)
+        startBtn.postDelayed({ refresh() }, 500)
+    }
+
+    /**
+     * The ask half of starting the lens, on its own: whichever switch is still
+     * off gets its sheet, and this answers whether it had to. The slide calls it,
+     * and so does the one line above the bar — that line is only ever on screen
+     * while a switch is missing, so a tap on it asks the same question the drag
+     * would, and never starts a lens that could not work.
+     *
+     * The slide has already turned itself round for a lens that will not start, so
+     * it is told the truth again a beat later: nothing to stop.
+     */
+    private fun askForMissingSwitch(): Boolean {
         if (!Settings.canDrawOverlays(this)) {
             askPermission(Ask.OVERLAY)
             startBtn.postDelayed({ refresh() }, 420)
-            return
+            return true
         }
 
         if (!LensAccessibilityService.isEnabled(this)) {
             askPermission(Ask.TEXT)
             startBtn.postDelayed({ refresh() }, 420)
-            return
+            return true
         }
 
-        LensService.start(this)
-        startBtn.postDelayed({ refresh() }, 500)
+        return false
     }
 
     /**
@@ -419,7 +470,9 @@ class MainActivity : AppCompatActivity() {
         }
         dialog.findViewById<TextView>(R.id.guideRowSub).text = when (ask) {
             Ask.OVERLAY -> "Tap this to reach its switch"
-            Ask.TEXT -> "Downloaded apps \u00B7 Off"
+            // Named the way this phone's own list names it: the drawn row is
+            // meant to be recognised in Settings, not merely looked at.
+            Ask.TEXT -> UiText.line(this, "%s · Off", SetupNudge.sectionName(this))
             Ask.CAPTURE -> "So the lens sees every app, not one"
         }
         dialog.findViewById<TextView>(R.id.guideCaption).text = when (ask) {
@@ -429,13 +482,32 @@ class MainActivity : AppCompatActivity() {
         }
         dialog.findViewById<TextView>(R.id.guidePath).text = when (ask) {
             Ask.OVERLAY -> "Settings \u203A Apps \u203A Special access \u203A Display over other apps"
-            Ask.TEXT -> "Settings \u203A Accessibility \u203A Downloaded apps \u203A ${getString(R.string.a11y_label)}"
+            Ask.TEXT -> UiText.line(
+                this,
+                "Settings › Accessibility › %s › %s",
+                SetupNudge.sectionName(this),
+                getString(R.string.a11y_label),
+            )
             Ask.CAPTURE -> "Pick Entire screen, then Start now \u2014 a single app will not do."
         }
         val note = dialog.findViewById<TextView>(R.id.guideNote)
-        // Sideloaded builds are greyed out until Android's own restriction is
-        // lifted, which is the one trap this screen has.
+        // Two things are worth knowing before the list opens: the section the
+        // row is under — so a long list is scrolled rather than searched — and
+        // that a sideloaded build is greyed out until Android's own restriction
+        // is lifted. Both are on this card because nothing of ours may stand
+        // over Settings itself: an app overlay is composited at reduced alpha
+        // there, so its words would read through the list behind them.
         note.visibility = if (ask == Ask.TEXT) View.VISIBLE else View.GONE
+        if (ask == Ask.TEXT) {
+            note.text = UiText.line(
+                this,
+                "Under %s — scroll down if it isn't there.",
+                SetupNudge.sectionPhrase(this),
+            ) + "\n" + UiText.line(
+                this,
+                "Greyed out? Open App info › ⋮ › Allow restricted settings first.",
+            )
+        }
 
         // Both Settings screens are lists, so the ringed row is the target; only
         // Android's own dialog has a button instead.
@@ -448,9 +520,9 @@ class MainActivity : AppCompatActivity() {
         // not agreed yet is sent to the disclosure rather than promised a screen
         // they cannot reach in one tap.
         open.text = when {
-            ask == Ask.CAPTURE -> "Continue"
-            ask == Ask.TEXT && !Prefs.textConsent(this) -> "Read and agree"
-            else -> "Open settings"
+            ask == Ask.CAPTURE -> UiText.line(this, "Continue")
+            ask == Ask.TEXT && !Prefs.textConsent(this) -> UiText.line(this, "Read and agree")
+            else -> UiText.line(this, "Open settings")
         }
         Press.attachAll(open, later)
         open.setOnClickListener {
@@ -464,6 +536,7 @@ class MainActivity : AppCompatActivity() {
         later.setOnClickListener { dialog.dismiss() }
 
         dialog.setOnDismissListener { guidePulse?.cancel() }
+        dialog.window?.decorView?.let { UiText.apply(this, it) }
         dialog.show()
         pulse(dialog.findViewById(R.id.guideRing), dialog.findViewById(R.id.guidePillRing))
     }
@@ -494,14 +567,63 @@ class MainActivity : AppCompatActivity() {
         applyEngine(next)
     }
 
+    /**
+     * The one switch that decides where a read happens.
+     *
+     * There used to be a second one — Offline only — that turned this off and
+     * greyed it out, so two controls said the same thing and one of them hid
+     * the other. On-device IS that promise now: with it on nothing leaves the
+     * phone, not the read and not the word list under it.
+     */
     private fun applyEngine(online: Boolean) {
         engBtn.text = if (online) "Online" else "On-device"
         engBtn.setBackgroundResource(if (online) R.drawable.chip_accent_bg else R.drawable.btn_ghost)
-        engBtn.setTextColor(getColor(if (online) R.color.clay_600 else R.color.stone_600))
+        // A state label is read at 11sp, so it is never the muted grey: the fill
+        // and the hairline already say which state the chip is in.
+        engBtn.setTextColor(getColor(if (online) R.color.screen_accent_ink else R.color.screen_ink))
         engHint.text = if (online) {
-            "Best quality \u2014 sent to Google Translate"
+            "Best quality \u2014 sent online to translate"
         } else {
-            "Offline models \u2014 nothing leaves the phone"
+            "Nothing leaves the phone"
+        }
+    }
+    /** The row that says what is installed on the phone right now. */
+    private fun refreshSidePanels() {
+        RemoteModelManager.getInstance()
+            .getDownloadedModels(TranslateRemoteModel::class.java)
+            .addOnSuccessListener { models ->
+                val count = models.map { it.language }.distinct().size
+                modelsHint.text = when (count) {
+                    0 -> UiText.line(this, "No packs downloaded yet")
+                    1 -> UiText.line(this, "1 pack downloaded")
+                    else -> UiText.line(this, "%d packs downloaded", count)
+                }
+            }
+            .addOnFailureListener { modelsHint.text = UiText.line(this, "Downloaded language packs") }
+    }
+
+    /**
+     * The offline languages, on their own page: search a language, add its pack,
+     * or take one back. The page reads its truth from ML Kit itself, so nothing
+     * about the packs is duplicated here.
+     */
+    private fun showModels() {
+        startActivity(Intent(this, ModelsActivity::class.java))
+    }
+
+    /**
+     * The rating sheet, asked once and only after the lens has actually answered
+     * several reads: a prompt on a first launch is a prompt nobody means.
+     */
+    private fun maybeAskForReview() {
+        if (Prefs.reviewAsked(this) || Prefs.goodReads(this) < 8) return
+        // Recorded before the ask: whether the sheet is shown or not, it is asked
+        // once, and a dismissal is an answer.
+        Prefs.setReviewAsked(this, true)
+
+        val manager = ReviewManagerFactory.create(this)
+        manager.requestReviewFlow().addOnCompleteListener { task ->
+            if (task.isSuccessful) manager.launchReviewFlow(this, task.result)
         }
     }
 
@@ -515,38 +637,20 @@ class MainActivity : AppCompatActivity() {
         autoBtn.text = if (enabled) "On" else "Off"
         autoBtn.setBackgroundResource(if (enabled) R.drawable.chip_accent_bg else R.drawable.btn_ghost)
         autoBtn.setTextColor(
-            getColor(if (enabled) R.color.clay_600 else R.color.stone_600),
+            getColor(if (enabled) R.color.screen_accent_ink else R.color.screen_ink),
         )
         autoHint.text =
             if (enabled) "Reads the moment the lens stops moving" else "Only reads when you let go of the lens"
     }
 
     private fun askNotificationPermission() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        if (Capabilities.asksForNotifications) {
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) !=
                 android.content.pm.PackageManager.PERMISSION_GRANTED
             ) {
                 notificationLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
             }
         }
-    }
-
-    private fun showLanguageDialog() {
-        val dialog = Dialog(this)
-        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-        dialog.setContentView(
-            LanguagePicker.build(this, Prefs.targetLanguage(this)) { lang ->
-                Prefs.setTargetLanguage(this, lang.code)
-                refresh()
-                Toast.makeText(this, "Translating into ${lang.label}", Toast.LENGTH_SHORT).show()
-                dialog.dismiss()
-            },
-        )
-        dialog.window?.setLayout(
-            (resources.displayMetrics.widthPixels * 0.86f).toInt(),
-            WindowManager.LayoutParams.WRAP_CONTENT,
-        )
-        dialog.show()
     }
 
     /**
@@ -601,6 +705,11 @@ class MainActivity : AppCompatActivity() {
                 if (from != Ask.OVERLAY) askPermission(Ask.OVERLAY)
             !LensAccessibilityService.isEnabled(this) ->
                 if (from != Ask.TEXT) askPermission(Ask.TEXT)
+            // Where the phone has no screenshot API of its own, pixels only come
+            // through a screen share, so it is asked as the last step of the same
+            // setup instead of being left as a row to be found later.
+            Capabilities.needsScreenShare && !LensService.hasCapture && from != Ask.CAPTURE ->
+                askPermission(Ask.CAPTURE)
             else -> askNotificationPermission()
         }
     }
@@ -615,71 +724,32 @@ class MainActivity : AppCompatActivity() {
         val running = LensService.isLensVisible
         val lookMode = LensService.hasCapture
 
-        // Both permission rows read the same way: the button is the ask while
-        // the switch is off, and the answer once it is on.
-        dot1.background = ContextCompat.getDrawable(this, if (canOverlay) R.drawable.dot_ok else R.drawable.dot_step)
-        btn1.text = if (canOverlay) "Allowed" else "Allow"
-        btn1.setTextColor(getColor(if (canOverlay) R.color.olive_600 else R.color.ink_900))
-        sub1.text = if (canOverlay) {
-            "On — the lens can sit over any app"
-        } else {
-            "Off by default — lets the lens sit on top"
+        // One switch off is enough to stop the slide from starting the lens, so
+        // the line above the bar says so before the sheet behind the slide has
+        // to. Both on, it goes and the bar sits where it always did.
+        lensHint.visibility = if (canOverlay && textAccess) View.GONE else View.VISIBLE
+
+        // The count is the whole row's promise: it says whether opening it is
+        // worth the tap.
+        val reads = Prefs.history(this).size
+        historyHint.text = when (reads) {
+            0 -> UiText.line(this, "What the lens has read, kept on this phone")
+            1 -> UiText.line(this, "1 read kept on this phone")
+            else -> UiText.line(this, "%d reads kept on this phone", reads)
         }
 
-        // The shade's button is the fourth switch, and the only one Android
-        // lets the app add itself: the rest are the user's alone to allow.
-        val quickButton = Prefs.tileAdded(this)
-        dot4.background = ContextCompat.getDrawable(this, if (quickButton) R.drawable.dot_ok else R.drawable.dot_step)
-        btn4.text = if (quickButton) "Added" else "Add"
-        btn4.setTextColor(getColor(if (quickButton) R.color.olive_600 else R.color.ink_900))
-        btn4.isEnabled = !quickButton
-        sub4.text = if (quickButton) {
-            "In the shade — one tap turns the lens on"
-        } else {
-            "Adds Lucid to the shade's quick buttons"
-        }
-
-        dot2.background = ContextCompat.getDrawable(this, if (textAccess) R.drawable.dot_ok else R.drawable.dot_step)
-        btn2.text = if (textAccess) "Allowed" else "Allow"
-        btn2.setTextColor(getColor(if (textAccess) R.color.olive_600 else R.color.ink_900))
-        sub2.text = if (textAccess) {
-            "On — the lens can read the text under it"
-        } else {
-            "Off by default — lets the lens read text"
-        }
-
-        // Look mode's consent lasts one session, so the live grant and the
-        // user's choice are two different things: after an update the grant is
-        // gone but the choice is not, and the row says so rather than quietly
-        // reading "Turn on" as if it had never been asked for.
-        val lookWanted = Prefs.lookMode(this)
-        btn3.text = when {
-            lookMode -> "On"
-            lookWanted -> "Allow"
-            else -> "Turn on"
-        }
-        btn3.setTextColor(getColor(if (lookMode) R.color.clay_600 else R.color.ink_900))
-        btn3.setBackgroundResource(if (lookMode) R.drawable.chip_accent_bg else R.drawable.btn_ghost)
-        btn3.isEnabled = !lookMode
-        sub3.text = when {
-            lookMode -> "On — images, video and hidden text, every app"
-            lookWanted -> "Kept on — Android asks to share the screen each session"
-            else -> "Optional — reads images, video and hidden text"
-        }
-
-        targetName.text = Languages.label(Prefs.targetLanguage(this))
         applyAuto(Prefs.autoTranslate(this))
         applyEngine(Prefs.onlineEngine(this))
-
-        lensState.visibility = View.VISIBLE
-        lensState.text = if (running) "Lens on" else "Lens off"
-        lensState.setTextColor(getColor(if (running) R.color.clay_600 else R.color.stone_600))
+        refreshSidePanels()
 
         // Off: the well sits left and drags right. On: it sits right, drags
         // left, and the cross appears beside it as the other way to stop.
         startBtn.mode = if (running) SwipeToStart.Mode.STOP else SwipeToStart.Mode.START
         applyStopX(running)
 
+        // Everything above was written in English; this gives the page the
+        // language the person fetched, if there is one.
+        UiText.apply(this, findViewById(R.id.root))
     }
 
     /* ── the one-time setup ask ──────────────────────────────────────── */
@@ -691,7 +761,14 @@ class MainActivity : AppCompatActivity() {
      */
     private fun askForSetup(resumeTo: Ask? = null) {
         if (Settings.canDrawOverlays(this) && LensAccessibilityService.isEnabled(this)) {
-            askNotificationPermission()
+            // Older phones need the screen share before a photo can be read at
+            // all, so it is asked here once; after that the row on the page owns
+            // it and the app never brings it up again by itself.
+            if (Capabilities.needsScreenShare && !Prefs.lookMode(this)) {
+                askPermission(Ask.CAPTURE)
+            } else {
+                askNotificationPermission()
+            }
             return
         }
         if (setupDialog?.isShowing == true) return
@@ -735,6 +812,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         setupDialog = dialog
+        dialog.window?.decorView?.let { UiText.apply(this, it) }
         dialog.show()
         bindSetupDialog(dialog)
     }
@@ -772,14 +850,26 @@ class MainActivity : AppCompatActivity() {
 
         dialog.findViewById<TextView>(R.id.setupTitle).text = when {
             !consented -> "Text access, explained"
-            both -> "Two switches, off by default"
+            both -> "Allow, swipe, read"
             else -> "One switch left"
         }
         dialog.findViewById<TextView>(R.id.setupBody).text = when {
             !consented ->
-                "Android keeps it off until you allow it. What the lens reads, and where that text goes, is below — agree first, then flip Android's switch."
-            both -> "Android keeps both off until you allow them — nothing is recorded, no frame is saved."
-            else -> "Android keeps this off until you allow it — nothing is recorded, no frame is saved."
+                "Agree to what the lens reads, then allow Android's switch. Nothing is recorded and no frame is saved."
+            both -> "Two permissions, one swipe, and the lens is on. Nothing is recorded and no frame is saved."
+            else -> "Android keeps it off until you allow it — nothing is recorded, no frame is saved."
+        }
+
+        // The whole of onboarding, one line per step, in the order they happen:
+        // let it read, swipe to start, put the lens on text. Nothing to learn
+        // beyond that.
+        dialog.findViewById<TextView>(R.id.setupSteps).text = when {
+            !consented ->
+                "1  Read and agree to what Text access does\n2  Allow the switches\n3  Swipe \u201CStart the lens\u201D to the right"
+            both ->
+                "1  Allow both switches\n2  Swipe \u201CStart the lens\u201D to the right\n3  Drag the lens onto any text \u2014 that\u2019s it"
+            else ->
+                "1  Allow the switch\n2  Swipe \u201CStart the lens\u201D to the right\n3  Drag the lens onto any text \u2014 that\u2019s it"
         }
 
         dialog.findViewById<View>(R.id.setupConsent).visibility =

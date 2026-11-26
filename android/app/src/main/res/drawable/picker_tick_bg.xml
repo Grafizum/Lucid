@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The clay medallion at the end of the chosen row. Its mark is cream by day
+     and charcoal at night: @color/card_surface is the sheet's own paper in
+     whichever theme is in force. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="oval">
+    <solid android:color="@color/card_accent" />
+</shape>

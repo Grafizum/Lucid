@@ -1,0 +1,148 @@
+package com.grafizum.lucid
+
+import android.app.Dialog
+import android.content.Intent
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
+import android.os.Bundle
+import android.view.View
+import android.view.ViewGroup
+import android.view.WindowManager
+import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
+
+/**
+ * The first thing a new install sees, on its own screen rather than as a page
+ * of the tour: the app's mark, the welcome, and the way in. The mark is the
+ * button — the hint under it says so — and tapping it opens the six loops.
+ *
+ * The language chip is here because this is the screen someone meets first, and
+ * which language the lens reads into is the one choice worth making before it
+ * starts.
+ */
+class WelcomeActivity : AppCompatActivity() {
+
+    private lateinit var language: TextView
+    private lateinit var langState: TextView
+
+    /**
+     * The chip's own story, and the reason this page has one: picking a language
+     * fetches its words, and the page is written in them once they land. Without
+     * this the chip said 日本語 over an English welcome.
+     */
+    private val packWatcher = object : AppLanguage.Watcher {
+        override fun onPackChanged(code: String, pack: AppLanguage.Pack, done: Int, total: Int) {
+            if (code != Prefs.uiLanguage(this@WelcomeActivity)) return
+            paintLanguage()
+            if (pack == AppLanguage.Pack.READY) {
+                UiText.apply(this@WelcomeActivity, findViewById(R.id.welcomeRoot))
+            }
+        }
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        // The theme goes on before anything is drawn, so the page never flashes
+        // light on its way into a dark choice.
+        AppCompatDelegate.setDefaultNightMode(ThemeChoice.nightMode(this))
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_welcome)
+        // If this page was rebuilt because the theme was just chosen, the page
+        // as it stood is still held: dissolve it away over this one.
+        ThemeFade.reveal(this)
+
+        language = findViewById(R.id.welcomeLang)
+        langState = findViewById(R.id.welcomeLangState)
+        bindLanguage()
+        paintLanguage()
+        AppLanguage.watch(packWatcher)
+        Press.attach(language)
+        language.setOnClickListener { pickLanguage() }
+
+        // The mark plays its own launch first — the ring opens, the mark blooms
+        // and fades — and only then asks for the tour.
+        findViewById<WelcomeMark>(R.id.welcomeMark).onLaunch = {
+            startActivity(Intent(this, OnboardingActivity::class.java))
+            // The welcome is not a place to come back to: the tour is next, and
+            // the screen behind both of them is the app itself.
+            finish()
+        }
+
+        // Edge to edge, with the bars paid for in padding: the label at the foot
+        // has to clear the gesture bar on short phones too.
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+        val root = findViewById<ViewGroup>(R.id.welcomeRoot)
+        ViewCompat.setOnApplyWindowInsetsListener(root) { view, insets ->
+            val bars = insets.getInsets(
+                WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout(),
+            )
+            view.setPaddingRelative(
+                dp(26f).toInt() + bars.left,
+                dp(18f).toInt() + bars.top,
+                dp(26f).toInt() + bars.right,
+                dp(16f).toInt() + bars.bottom,
+            )
+            insets
+        }
+
+        UiText.apply(this, root)
+    }
+
+    override fun onDestroy() {
+        AppLanguage.unwatch(packWatcher)
+        super.onDestroy()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // Back on this page with a connection: the language the corner said
+        // could not be fetched is fetched now, without asking again.
+        paintLanguage()
+        AppLanguage.retryIfOnline(this, Prefs.uiLanguage(this))
+    }
+
+    /** The chip's word: the app's language, short enough for a chip. */
+    private fun bindLanguage() {
+        // The label alone: the chip is a button, and an arrow beside a name at
+        // this size only ever read as noise.
+        language.text = Languages.nativeShort(Prefs.uiLanguage(this))
+    }
+
+    /** The line under the chip, or nothing while the words are already here. */
+    private fun paintLanguage() {
+        val notice = AppLanguage.notice(this, Prefs.uiLanguage(this))
+        langState.visibility = if (notice == null) View.GONE else View.VISIBLE
+        langState.text = notice ?: ""
+    }
+
+    /**
+     * The app's language switch — the same one Settings and the tour open, so the
+     * first page of the app and the last one cannot disagree about it.
+     */
+    private fun pickLanguage() {
+        val dialog = Dialog(this)
+        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        dialog.setContentView(
+            LanguagePicker.build(this, Prefs.uiLanguage(this), title = "APP LANGUAGE") { lang ->
+                Prefs.setTargetLanguage(this, lang.code)
+                // Fetched with the pick, so the welcome is written in the
+                // language the chip names instead of English under a new name.
+                AppLanguage.ensure(this, lang.code)
+                AppLanguage.choose(this, lang.code)
+                bindLanguage()
+                paintLanguage()
+                dialog.dismiss()
+            },
+        )
+        dialog.window?.setLayout(
+            (resources.displayMetrics.widthPixels * 0.86f).toInt(),
+            WindowManager.LayoutParams.WRAP_CONTENT,
+        )
+        dialog.show()
+    }
+
+    private fun dp(value: Float): Float = value * resources.displayMetrics.density
+}

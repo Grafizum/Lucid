@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="notif_channel">Linsession</string>
+    <string name="notif_title">Linsen är på</string>
+    <string name="notif_text">Tryck med linsen på valfri text för att översätta den.</string>
+    <string name="notif_stop">Stäng av</string>
+    <string name="a11y_label">Lucid textåtkomst</string>
+    <string name="a11y_summary">Låter linsen läsa texten under sig</string>
+    <string name="a11y_description">Lucid läser texten under sin lins för att kunna översätta den. Den läser bara den texten, behåller ingen kopia och registrerar ingenting. Med onlinemotorn skickas orden under linsen, tillsammans med resten av skärmen som sammanhang, till en onlinetjänst för översättning; med motorn på enheten lämnar ingenting telefonen.</string>
+    <string name="lens_close">Släpp linsen här för att stänga av den</string>
+    <string name="lens_delete">Ta bort</string>
+    <string name="tile_label">Lucid-lins</string>
+    <string name="tile_on">Lins på</string>
+    <string name="tile_off">Lins av</string>
+    <string name="picker_search">Sök bland %1$d språk</string>
+    <string name="picker_none">Inget språk matchar.</string>
+</resources>

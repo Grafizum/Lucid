@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The word in an appearance option. Chosen sits on the accent fill, so it reads
+     the darker accent ink that chips on a fill already use; the rest are plain
+     page ink. -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_selected="true" android:color="@color/screen_accent_ink" />
+    <item android:color="@color/screen_ink" />
+</selector>

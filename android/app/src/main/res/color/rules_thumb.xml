@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The rules page's switch: a handle and a track, not a handle against the
+     card. Off used to take the card's own paper, which at night made the thumb
+     the same charcoal as the row and the switch all but vanished; faint is a
+     mid tone that reads as a handle on the beige track by day and on the
+     charcoal one at night. -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:color="@color/screen_knob_high" android:state_checked="true" />
+    <item android:color="@color/screen_faint" />
+</selector>

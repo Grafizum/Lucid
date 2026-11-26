@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The chosen surface inside the appearance card. The tint and its hairline are
+     the same accent a chip uses, so "this one" reads the way every other on-state
+     in the app reads; an option that is not chosen has no fill at all. -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_selected="true">
+        <shape android:shape="rectangle">
+            <solid android:color="@color/screen_accent_fill" />
+            <corners android:radius="12dp" />
+            <stroke android:width="1dp" android:color="@color/screen_accent_edge" />
+        </shape>
+    </item>
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="@android:color/transparent" />
+            <corners android:radius="12dp" />
+        </shape>
+    </item>
+</selector>

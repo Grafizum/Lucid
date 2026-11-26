@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Appearance: the sun-and-moon mark, traced from the supplied artwork.
+
+     One filled disc, its moon taken out of it by a second circle laid over the
+     first and a third laid inside that, three craters punched through the
+     crescent, and six round-capped rays standing off the rim — two vertical, four
+     at the diagonals. Every number here is the drawing's own, measured off the
+     512 px source and mapped into this 24-unit box at 24/432; the shape is the
+     shape, not an impression of it.
+
+     It is one colour so the row can tint it like every other mark in the page,
+     and the holes are holes rather than paper-coloured discs, so it reads on
+     cream by day and on charcoal at night without a second file. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+
+    <path
+        android:fillColor="@color/screen_muted"
+        android:fillType="evenOdd"
+        android:pathData="M12,11.97 m-6.99,0 a6.99,6.99 0 1,0 13.98,0 a6.99,6.99 0 1,0 -13.98,0
+            M10.34,6.16 A5.85,5.85 0 0 0 8.85,16.88 A5.49,5.49 0 0 0 10.34,6.16 Z
+            M16.53,12.31 m-0.89,0 a0.89,0.89 0 1,0 1.78,0 a0.89,0.89 0 1,0 -1.78,0
+            M15.17,15.28 m-0.53,0 a0.53,0.53 0 1,0 1.06,0 a0.53,0.53 0 1,0 -1.06,0
+            M15.72,8.94 m-0.42,0 a0.42,0.42 0 1,0 0.84,0 a0.42,0.42 0 1,0 -0.84,0" />
+
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M11.97,0.44 L11.97,3.11 M11.97,20.89 L11.97,23.56 M4.22,7.5 L2,6.22 M19.72,7.5 L21.94,6.22 M4.22,16.44 L2,17.72 M19.72,16.44 L21.94,17.72"
+        android:strokeColor="@color/screen_muted"
+        android:strokeLineCap="round"
+        android:strokeWidth="0.89" />
+</vector>

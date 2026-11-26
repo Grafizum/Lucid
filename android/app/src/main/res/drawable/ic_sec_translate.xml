@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Translation: the two pages of the supplied mark — one carrying the 文, one
+     carrying the A — and the pair of arrows that carry the reading across. It is
+     the drawing every phone already knows, so the row needs no explaining.
+
+     Each page is drawn as one open run rather than a closed square: the corner
+     that faces the other page is left off, so the two openings make a diagonal
+     channel for the arrows instead of four lines crossing in the middle. The
+     openings are not the same size — the far page's top edge starts well right of
+     its corner, which is what keeps the upper arrow's stem clear of it.
+
+     Weights are the reference's proportions, pulled down to what this row can
+     hold: 1.55 for the pages, 1.2 for 文, A and the arrows. At 1.7 — the weight the
+     globe and the sun-and-moon are drawn at — this denser drawing crowded itself
+     into a blot, and at 1.25 the glyphs closed up on each other; 1.2 with the pages
+     a step lighter keeps the reference's own relationship, the glyphs standing out
+     of the paper rather than sunk into it. The row gives the mark 17 dp rather than
+     the 15 dp of its neighbours: two glyphs, two pages and two arrows need the extra
+     pixel of stroke more than the single-shape marks do.
+
+     文 is placed where the reference puts it, not where a tidy box would: the mark
+     sits a whisker above the roof rather than centred in the page, the roof rides
+     high, and the two lower strokes start from different heights — the long one out
+     of the roof itself at the right, the short one detached and lower at the left —
+     so they cross below the middle and sweep out to a wide, low base. Both are
+     curved, the falling one bowing out as it goes and the rising one flattening into
+     its foot; drawn as straight lines they read as an X, which is the one thing 文
+     is not. Together they are what makes the character legible at this size: bar,
+     dot, a crossing low on the left and two feet wide apart.
+     One colour, tinted by the row, so the night page needs no second file. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+
+    <!-- the page that is read from: closed at the top and left, open toward
+         the other page at the bottom right -->
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M12.8,9.5 V2.75 A1.75,1.75 0 0 0 11.05,1 H2.75 A1.75,1.75 0 0 0 1,2.75 V11.05 A1.75,1.75 0 0 0 2.75,12.8 H10.2"
+        android:strokeColor="@color/screen_muted"
+        android:strokeLineCap="round"
+        android:strokeWidth="1.55" />
+
+    <!-- the page it is read into: closed at the bottom and right, open at the
+         top left -->
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M16,11.2 H21.25 A1.75,1.75 0 0 1 23,12.95 V21.25 A1.75,1.75 0 0 1 21.25,23 H12.95 A1.75,1.75 0 0 1 11.2,21.25 V14"
+        android:strokeColor="@color/screen_muted"
+        android:strokeLineCap="round"
+        android:strokeWidth="1.55" />
+
+    <!-- 文: the mark, the roof, and the two curved strokes under it -->
+    <path
+        android:fillColor="@color/screen_muted"
+        android:pathData="M6.86,3.4 m-0.36,0 a0.36,0.36 0 1,0 0.72,0 a0.36,0.36 0 1,0 -0.72,0" />
+
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M3.3,4.58 H10.5"
+        android:strokeColor="@color/screen_muted"
+        android:strokeLineCap="round"
+        android:strokeWidth="1.2" />
+
+    <!-- the falling stroke: out of the roof at the right, down and away to the left -->
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M8.62,4.86 C8.9,6.8 7.6,8.9 4.45,10.55"
+        android:strokeColor="@color/screen_muted"
+        android:strokeLineCap="round"
+        android:strokeWidth="1.2" />
+
+    <!-- the rising stroke: detached below the roof at the left, down and across to
+         the right, crossing the other below the middle -->
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M4.8,5.95 C5.3,7.6 6.5,9.3 8.9,10.55"
+        android:strokeColor="@color/screen_muted"
+        android:strokeLineCap="round"
+        android:strokeWidth="1.2" />
+
+    <!-- A, as the strokes of a capital, crossbar low the way the reference draws it -->
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M17.05,13.6 L14.25,21.15 M17.05,13.6 L19.85,21.15 M14.75,19.95 H19.35"
+        android:strokeColor="@color/screen_muted"
+        android:strokeLineCap="round"
+        android:strokeWidth="1.2" />
+
+    <!-- out of the near page, up and across to the far one -->
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M20.5,9.9 C20.5,6.5 17.9,3.5 14.6,3.5 M16.9,1.3 L14.6,3.5 L16.9,5.7"
+        android:strokeColor="@color/screen_muted"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:strokeWidth="1.2" />
+
+    <!-- and back down the other side -->
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M3.5,14.1 C3.5,17.5 6.1,20.5 9.4,20.5 M7.1,18.3 L9.4,20.5 L7.1,22.7"
+        android:strokeColor="@color/screen_muted"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:strokeWidth="1.2" />
+</vector>

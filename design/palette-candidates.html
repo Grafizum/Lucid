@@ -1,0 +1,169 @@
+<!doctype html><html><head><meta charset="utf-8"><style>
+*{box-sizing:border-box}
+body{margin:0;padding:34px 38px 40px;background:#141310;color:#EDE6D8;
+     font-family:'Inter','DejaVu Sans',system-ui,sans-serif}
+h1{font-size:19px;letter-spacing:-.01em;margin:0 0 4px;font-weight:650}
+.sub{color:#9A917F;font-size:12.5px;margin:0 0 26px}
+.row{display:grid;grid-template-columns:250px 1fr;gap:26px;padding:20px 0;
+      border-top:1px solid #2A2823}
+h2{font-size:14.5px;margin:0 0 6px;font-weight:650;color:#F3ECDE}
+.meta p{font-size:11.5px;line-height:1.5;color:#9A917F;margin:0 0 10px}
+.rule{font-size:10.5px;color:#7E7666;line-height:1.7}
+.stage{display:flex;flex-direction:column;gap:12px}
+.canvas{background:#F8F2E7;border-radius:18px;padding:16px;display:flex;gap:14px;align-items:flex-start}
+.card{background:#F1E9DA;border-radius:16px;padding:5px}
+.inner{background:#FCF8F1;border-radius:12px;padding:14px 16px;width:270px}
+.eyebrow{display:inline-block;font-size:8.5px;letter-spacing:.14em;color:#191814;
+          padding:3px 7px;border-radius:5px;font-weight:600}
+.line{color:#191814;font-size:15px;margin:10px 0 4px;font-weight:500}
+.tr{color:#857B6C;font-size:12.5px}
+.divider{height:1px;margin:11px 0}
+.mini{display:flex;align-items:center;justify-content:space-between}
+.pill{font-size:8.5px;letter-spacing:.1em;border:1px solid;border-radius:5px;padding:2px 6px}
+.accent{font-size:11px;font-weight:600}
+.darkcard{background:#23221E;border-radius:16px;padding:14px 16px;width:270px;position:relative;overflow:hidden}
+.dline{color:#F3ECDE;font-size:14px;font-weight:500}
+.dsub{color:#C2B9A6;font-size:11px;margin-top:5px}
+.dhl{position:absolute;left:16px;bottom:12px;height:3px;width:120px;border-radius:2px;opacity:.55}
+.swrow{display:flex;gap:10px}
+.sw{text-align:center}
+.chip{width:56px;height:34px;border-radius:8px;border:1px solid #2A2823}
+.tok{font-size:8.5px;color:#7E7666;margin-top:5px}
+.hex{font-size:9.5px;color:#B7AE9C;font-variant-numeric:tabular-nums}
+.old{display:flex;gap:8px;align-items:center;font-size:11px;color:#9A917F;margin-top:2px}
+.old span{width:26px;height:16px;border-radius:4px;display:inline-block}
+</style></head><body>
+<h1>Lucid — replacing the gold beige</h1>
+<p class="sub">Same layout, four new middle families. Cream, charcoal and the clay accent are untouched, so only the yellow is on trial.</p>
+<div class="old" style="margin-bottom:8px">Today:
+  <span style="background:#DFD2B8"></span>#DFD2B8
+  <span style="background:#CDBB9B"></span>#CDBB9B
+  <span style="background:#B39D7C"></span>#B39D7C
+  <em style="font-style:normal;color:#7E7666">— the yellow one</em>
+</div>
+
+  <section class="row">
+    <div class="meta">
+      <h2>A — Greige</h2>
+      <p>Pulls all the yellow out: a warm grey with 6 units of chroma instead of the current 24.</p>
+      <div class="rule">hairline #C4BCAE on cream — 1.7:1</div>
+      <div class="rule">beige_500 on cream — 2.4:1</div>
+      <div class="rule">sand_400 on ink_800 — 8.2:1</div>
+    </div>
+    <div class="stage">
+      <div class="canvas">
+        <div class="card">
+          <div class="inner">
+            <div class="eyebrow" style="background:#DFD9CF">TRANSLATION</div>
+            <div class="line">¿Dónde está la estación?</div>
+            <div class="tr">Where is the station?</div>
+            <div class="divider" style="background:#C4BCAE"></div>
+            <div class="mini">
+              <span class="pill" style="border-color:#CFC8BC;color:#A79D8E">EN · EDIT</span>
+              <span class="accent" style="color:#B9825F">Copy</span>
+            </div>
+          </div>
+        </div>
+        <div class="darkcard">
+          <div class="dline">Where is the station?</div>
+          <div class="dsub">card on charcoal · ink_800</div>
+          <div class="dhl" style="background:#A79D8E"></div>
+        </div>
+      </div>
+      <div class="swrow"><div class="sw"><div class="chip" style="background:#DFD9CF"></div><div class="tok">beige_200</div><div class="hex">#DFD9CF</div></div><div class="sw"><div class="chip" style="background:#CFC8BC"></div><div class="tok">beige_300</div><div class="hex">#CFC8BC</div></div><div class="sw"><div class="chip" style="background:#C4BCAE"></div><div class="tok">beige_400</div><div class="hex">#C4BCAE</div></div><div class="sw"><div class="chip" style="background:#A79D8E"></div><div class="tok">beige_500</div><div class="hex">#A79D8E</div></div></div>
+    </div>
+  </section>
+  <section class="row">
+    <div class="meta">
+      <h2>B — Rosy taupe</h2>
+      <p>Moves the hue red-ward, so the warmth reads as skin/clay rather than gold.</p>
+      <div class="rule">hairline #C6B3A6 on cream — 1.8:1</div>
+      <div class="rule">beige_500 on cream — 2.7:1</div>
+      <div class="rule">sand_400 on ink_800 — 8.2:1</div>
+    </div>
+    <div class="stage">
+      <div class="canvas">
+        <div class="card">
+          <div class="inner">
+            <div class="eyebrow" style="background:#E2D6CC">TRANSLATION</div>
+            <div class="line">¿Dónde está la estación?</div>
+            <div class="tr">Where is the station?</div>
+            <div class="divider" style="background:#C6B3A6"></div>
+            <div class="mini">
+              <span class="pill" style="border-color:#D2C2B6;color:#A98F80">EN · EDIT</span>
+              <span class="accent" style="color:#B9825F">Copy</span>
+            </div>
+          </div>
+        </div>
+        <div class="darkcard">
+          <div class="dline">Where is the station?</div>
+          <div class="dsub">card on charcoal · ink_800</div>
+          <div class="dhl" style="background:#A98F80"></div>
+        </div>
+      </div>
+      <div class="swrow"><div class="sw"><div class="chip" style="background:#E2D6CC"></div><div class="tok">beige_200</div><div class="hex">#E2D6CC</div></div><div class="sw"><div class="chip" style="background:#D2C2B6"></div><div class="tok">beige_300</div><div class="hex">#D2C2B6</div></div><div class="sw"><div class="chip" style="background:#C6B3A6"></div><div class="tok">beige_400</div><div class="hex">#C6B3A6</div></div><div class="sw"><div class="chip" style="background:#A98F80"></div><div class="tok">beige_500</div><div class="hex">#A98F80</div></div></div>
+    </div>
+  </section>
+  <section class="row">
+    <div class="meta">
+      <h2>C — Oat</h2>
+      <p>Keeps a little gold but halves it and lightens, so it reads oat, not mustard.</p>
+      <div class="rule">hairline #C0B7A6 on cream — 1.8:1</div>
+      <div class="rule">beige_500 on cream — 2.6:1</div>
+      <div class="rule">sand_400 on ink_800 — 8.2:1</div>
+    </div>
+    <div class="stage">
+      <div class="canvas">
+        <div class="card">
+          <div class="inner">
+            <div class="eyebrow" style="background:#DDD6C9">TRANSLATION</div>
+            <div class="line">¿Dónde está la estación?</div>
+            <div class="tr">Where is the station?</div>
+            <div class="divider" style="background:#C0B7A6"></div>
+            <div class="mini">
+              <span class="pill" style="border-color:#CCC4B4;color:#A19684">EN · EDIT</span>
+              <span class="accent" style="color:#B9825F">Copy</span>
+            </div>
+          </div>
+        </div>
+        <div class="darkcard">
+          <div class="dline">Where is the station?</div>
+          <div class="dsub">card on charcoal · ink_800</div>
+          <div class="dhl" style="background:#A19684"></div>
+        </div>
+      </div>
+      <div class="swrow"><div class="sw"><div class="chip" style="background:#DDD6C9"></div><div class="tok">beige_200</div><div class="hex">#DDD6C9</div></div><div class="sw"><div class="chip" style="background:#CCC4B4"></div><div class="tok">beige_300</div><div class="hex">#CCC4B4</div></div><div class="sw"><div class="chip" style="background:#C0B7A6"></div><div class="tok">beige_400</div><div class="hex">#C0B7A6</div></div><div class="sw"><div class="chip" style="background:#A19684"></div><div class="tok">beige_500</div><div class="hex">#A19684</div></div></div>
+    </div>
+  </section>
+  <section class="row">
+    <div class="meta">
+      <h2>D — Bone</h2>
+      <p>The lightest and quietest: barely a colour at all, paper next to charcoal.</p>
+      <div class="rule">hairline #CCC3B3 on cream — 1.6:1</div>
+      <div class="rule">beige_500 on cream — 2.2:1</div>
+      <div class="rule">sand_400 on ink_800 — 8.2:1</div>
+    </div>
+    <div class="stage">
+      <div class="canvas">
+        <div class="card">
+          <div class="inner">
+            <div class="eyebrow" style="background:#E6DFD2">TRANSLATION</div>
+            <div class="line">¿Dónde está la estación?</div>
+            <div class="tr">Where is the station?</div>
+            <div class="divider" style="background:#CCC3B3"></div>
+            <div class="mini">
+              <span class="pill" style="border-color:#D8D0C1;color:#ADA392">EN · EDIT</span>
+              <span class="accent" style="color:#B9825F">Copy</span>
+            </div>
+          </div>
+        </div>
+        <div class="darkcard">
+          <div class="dline">Where is the station?</div>
+          <div class="dsub">card on charcoal · ink_800</div>
+          <div class="dhl" style="background:#ADA392"></div>
+        </div>
+      </div>
+      <div class="swrow"><div class="sw"><div class="chip" style="background:#E6DFD2"></div><div class="tok">beige_200</div><div class="hex">#E6DFD2</div></div><div class="sw"><div class="chip" style="background:#D8D0C1"></div><div class="tok">beige_300</div><div class="hex">#D8D0C1</div></div><div class="sw"><div class="chip" style="background:#CCC3B3"></div><div class="tok">beige_400</div><div class="hex">#CCC3B3</div></div><div class="sw"><div class="chip" style="background:#ADA392"></div><div class="tok">beige_500</div><div class="hex">#ADA392</div></div></div>
+    </div>
+  </section>
+</body></html>

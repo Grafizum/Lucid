@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Lucid — open decisions</title>
+<style>
+  :root{
+    --cream-50:#FCF8F1;
+    --cream-100:#F8F2E7;
+    --cream-200:#F1E9DA;
+    --cream-300:#E7DCC7;
+    --beige-200:#E4D8CE;
+    --beige-300:#D3C2B5;
+    --beige-400:#C7B2A4;
+    --stone-500:#857B6C;
+    --stone-600:#6A6254;
+    --ink-900:#191814;
+    --ink-800:#23221E;
+    --clay-500:#A46E4B;
+    --clay-600:#8A5A3C;
+    --olive-600:#55603F;
+    --shell:rgba(205,187,155,0.45);
+    --hairline:rgba(25,24,20,0.08);
+    --ease:cubic-bezier(0.32,0.72,0,1);
+    --serif:"Iowan Old Style","Palatino Linotype",Palatino,"Book Antiqua",Georgia,serif;
+    --sans:"Söhne","Segoe UI","SF Pro Text",system-ui,sans-serif;
+  }
+
+  *{box-sizing:border-box;margin:0;padding:0}
+
+  html{scroll-behavior:smooth}
+
+  body{
+    background:var(--cream-100);
+    color:var(--ink-900);
+    font-family:var(--sans);
+    font-size:16px;
+    line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+    padding-bottom:140px;
+  }
+
+  /* film grain, fixed so it never repaints with scroll */
+  body::after{
+    content:"";
+    position:fixed;
+    inset:0;
+    z-index:60;
+    pointer-events:none;
+    opacity:.05;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/></filter><rect width='160' height='160' filter='url(%23n)' opacity='0.6'/></svg>");
+  }
+
+  .wrap{
+    width:min(1120px, calc(100% - 48px));
+    margin:0 auto;
+  }
+
+  /* ── masthead ─────────────────────────────────────────── */
+
+  header.mast{
+    padding:clamp(72px,12vw,160px) 0 clamp(48px,7vw,88px);
+  }
+
+  .eyebrow{
+    display:inline-flex;
+    align-items:center;
+    gap:10px;
+    padding:7px 14px;
+    border-radius:999px;
+    background:var(--beige-200);
+    color:var(--clay-600);
+    font-size:10px;
+    letter-spacing:.22em;
+    text-transform:uppercase;
+    font-weight:600;
+  }
+
+  .eyebrow .dot{
+    width:5px;height:5px;border-radius:50%;
+    background:var(--clay-500);
+  }
+
+  h1{
+    font-family:var(--serif);
+    font-weight:400;
+    font-size:clamp(46px,7.4vw,92px);
+    line-height:.98;
+    letter-spacing:-0.028em;
+    margin-top:34px;
+    max-width:15ch;
+  }
+
+  h1 em{font-style:italic;color:var(--clay-600)}
+
+  .lede{
+    margin-top:30px;
+    max-width:56ch;
+    color:var(--stone-600);
+    font-size:clamp(15px,1.4vw,17.5px);
+    line-height:1.65;
+  }
+
+  .meta{
+    display:flex;flex-wrap:wrap;gap:8px;
+    margin-top:38px;
+  }
+
+  .meta span{
+    font-size:11px;
+    letter-spacing:.06em;
+    color:var(--stone-600);
+    padding:7px 13px;
+    border-radius:999px;
+    border:1px solid var(--hairline);
+    background:var(--cream-50);
+  }
+
+  /* ── the decision list ───────────────────────────────── */
+
+  .decisions{margin-top:clamp(24px,4vw,56px)}
+
+  .decision{
+    display:grid;
+    grid-template-columns:minmax(0,190px) minmax(0,1fr);
+    gap:clamp(24px,5vw,72px);
+    padding:clamp(44px,6vw,84px) 0;
+    border-top:1px solid var(--hairline);
+    opacity:0;
+    transform:translateY(28px);
+    filter:blur(6px);
+    transition:opacity .9s var(--ease), transform .9s var(--ease), filter .9s var(--ease);
+  }
+
+  .decision.in{
+    opacity:1;transform:none;filter:blur(0);
+  }
+
+  .rail{
+    position:sticky;
+    top:44px;
+    align-self:start;
+  }
+
+  .rail .num{
+    font-family:var(--serif);
+    font-style:italic;
+    font-size:clamp(38px,4.6vw,54px);
+    line-height:1;
+    color:var(--clay-500);
+    letter-spacing:-0.02em;
+  }
+
+  .rail .tag{
+    margin-top:14px;
+    font-size:9.5px;
+    letter-spacing:.24em;
+    text-transform:uppercase;
+    color:var(--stone-500);
+  }
+
+  .rail .state{
+    margin-top:22px;
+    display:inline-block;
+    font-size:11px;
+    color:var(--stone-500);
+    letter-spacing:.02em;
+  }
+
+  .rail .state b{
+    color:var(--olive-600);
+    font-weight:600;
+  }
+
+  h2{
+    font-family:var(--serif);
+    font-weight:400;
+    font-size:clamp(25px,2.9vw,36px);
+    line-height:1.12;
+    letter-spacing:-0.018em;
+  }
+
+  .now{
+    margin-top:18px;
+    display:flex;
+    gap:12px;
+    align-items:flex-start;
+    padding:14px 18px;
+    border-radius:16px;
+    background:var(--cream-200);
+    color:var(--stone-600);
+    font-size:13.5px;
+    line-height:1.5;
+  }
+
+  .now b{
+    flex:none;
+    font-size:9.5px;
+    letter-spacing:.2em;
+    text-transform:uppercase;
+    color:var(--stone-500);
+    padding-top:4px;
+  }
+
+  /* ── options: double-bezel cards ─────────────────────── */
+
+  .options{
+    display:grid;
+    gap:12px;
+    margin-top:24px;
+  }
+
+  .opt{
+    position:relative;
+    display:block;
+    width:100%;
+    text-align:left;
+    font:inherit;
+    color:inherit;
+    background:var(--shell);
+    border:none;
+    border-radius:26px;
+    padding:6px;
+    cursor:pointer;
+    transition:transform .6s var(--ease), background .6s var(--ease);
+    -webkit-tap-highlight-color:transparent;
+  }
+
+  .opt:hover{background:rgba(205,187,155,.72)}
+  .opt:active{transform:scale(.994)}
+
+  .opt:focus-visible{outline:2px solid var(--clay-500);outline-offset:3px}
+
+  .core{
+    display:grid;
+    grid-template-columns:auto minmax(0,1fr);
+    gap:16px;
+    padding:18px 20px;
+    border-radius:20px;
+    background:var(--cream-50);
+    box-shadow:inset 0 1px 1px rgba(255,255,255,.7);
+    transition:background .6s var(--ease), box-shadow .6s var(--ease);
+  }
+
+  .key{
+    flex:none;
+    width:30px;height:30px;
+    display:grid;place-items:center;
+    border-radius:50%;
+    background:var(--cream-200);
+    color:var(--stone-600);
+    font-size:12px;
+    font-weight:600;
+    letter-spacing:.04em;
+    transition:background .6s var(--ease), color .6s var(--ease), transform .6s var(--ease);
+  }
+
+  .opt-title{
+    font-size:14.5px;
+    font-weight:600;
+    letter-spacing:-0.005em;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    flex-wrap:wrap;
+  }
+
+  .badge{
+    font-size:9px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--olive-600);
+    background:rgba(85,96,63,.1);
+    border-radius:999px;
+    padding:3px 8px;
+    font-weight:600;
+  }
+
+  .opt-note{
+    margin-top:6px;
+    font-size:13px;
+    line-height:1.55;
+    color:var(--stone-600);
+  }
+
+  .opt[aria-pressed="true"]{background:var(--ink-900)}
+  .opt[aria-pressed="true"] .core{background:var(--ink-800);box-shadow:inset 0 1px 0 rgba(252,248,241,.07)}
+  .opt[aria-pressed="true"] .opt-title{color:var(--cream-50)}
+  .opt[aria-pressed="true"] .opt-note{color:#C2B9A6}
+  .opt[aria-pressed="true"] .key{background:var(--clay-500);color:var(--cream-50);transform:scale(1.04)}
+  .opt[aria-pressed="true"] .badge{color:#B9C79A;background:rgba(185,199,154,.14)}
+
+  /* ── footer + summary ────────────────────────────────── */
+
+  footer{
+    border-top:1px solid var(--hairline);
+    padding:clamp(48px,7vw,96px) 0 40px;
+    color:var(--stone-600);
+    font-size:13.5px;
+  }
+
+  footer .sign{
+    font-family:var(--serif);
+    font-size:clamp(22px,3vw,30px);
+    color:var(--ink-900);
+    letter-spacing:-0.01em;
+    max-width:26ch;
+    line-height:1.25;
+  }
+
+  footer p{margin-top:16px;max-width:56ch}
+
+  .dock{
+    position:fixed;
+    left:0;right:0;bottom:0;
+    z-index:40;
+    display:flex;
+    justify-content:center;
+    padding:16px 16px calc(16px + env(safe-area-inset-bottom));
+    pointer-events:none;
+    background:linear-gradient(to top, rgba(248,242,231,.96) 40%, rgba(248,242,231,0));
+  }
+
+  .dock-inner{
+    width:min(760px,100%);
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding:8px 8px 8px 20px;
+    border-radius:999px;
+    background:rgba(25,24,20,.93);
+    box-shadow:0 18px 40px -20px rgba(25,24,20,.55);
+    pointer-events:auto;
+    transform:translateY(140%);
+    opacity:0;
+    transition:transform .8s var(--ease), opacity .8s var(--ease);
+  }
+
+  .dock.show .dock-inner{transform:none;opacity:1}
+
+  .dock-text{
+    flex:1;
+    min-width:0;
+    color:#D8CFBC;
+    font-size:12.5px;
+    line-height:1.35;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+  }
+
+  .dock-text b{color:var(--cream-50);font-weight:600}
+
+  .copy{
+    flex:none;
+    display:inline-flex;
+    align-items:center;
+    gap:10px;
+    border:none;
+    cursor:pointer;
+    background:var(--cream-50);
+    color:var(--ink-900);
+    font:inherit;
+    font-size:12.5px;
+    font-weight:600;
+    padding:11px 16px 11px 18px;
+    border-radius:999px;
+    transition:transform .5s var(--ease), background .5s var(--ease);
+  }
+
+  .copy:hover{background:#fff}
+  .copy:active{transform:scale(.98)}
+
+  .copy .orb{
+    width:22px;height:22px;
+    display:grid;place-items:center;
+    border-radius:50%;
+    background:var(--clay-500);
+    color:var(--cream-50);
+    font-size:11px;
+    transition:transform .5s var(--ease);
+  }
+
+  .copy:hover .orb{transform:translate(1px,-1px) scale(1.06)}
+
+  @media (max-width:820px){
+    .decision{grid-template-columns:1fr;gap:20px}
+    .rail{position:static;display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
+    .rail .num{font-size:34px}
+    .rail .tag{margin-top:0}
+    .rail .state{margin-top:0;margin-left:auto;font-size:10.5px}
+    .dock-inner{padding:8px 8px 8px 16px}
+    .dock-text{font-size:11.5px}
+    .copy span.label{display:none}
+    .copy{padding:11px 13px}
+  }
+
+  @media (prefers-reduced-motion:reduce){
+    *{transition-duration:.01ms !important;animation-duration:.01ms !important}
+    .decision{opacity:1;transform:none;filter:none}
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <header class="mast">
+    <div class="eyebrow"><span class="dot"></span>Lucid · open decisions</div>
+    <h1>Seven choices before the <em>next build.</em></h1>
+    <p class="lede">
+      Everything the settings page asked for is built and on the phone. What is left is not more
+      work — it is your call on seven forks, each with the current behaviour written down beside it.
+      Pick one per card; the bar at the foot collects your answers as a line you can send back.
+    </p>
+    <div class="meta">
+      <span>build 1.0.2 · v5 debug</span>
+      <span>Galaxy S22+ · installed 14:01</span>
+      <span>5 of 7 decided by you</span>
+    </div>
+  </header>
+
+  <main class="decisions" id="decisions">
+
+    <!-- 01 -->
+    <article class="decision" data-key="theme">
+      <div class="rail">
+        <div class="num">01</div>
+        <div class="tag">Theme</div>
+        <div class="state" data-rail>undecided</div>
+      </div>
+      <div>
+        <h2>Where the light and dark switch lives.</h2>
+        <div class="now"><b>Now</b><span>A two-state moon/sun button in the home header, saved per phone, deliberately not “follow the system”.</span></div>
+        <div class="options">
+          <button class="opt" aria-pressed="false" data-pick="1" data-label="Keep the header toggle as it is">
+            <span class="core">
+              <span class="key">A</span>
+              <span>
+                <span class="opt-title">Keep the header toggle as it is <span class="badge">now</span></span>
+                <span class="opt-note">One tap on the home page, no new rows, and the app never changes colour under you at sunset.</span>
+              </span>
+            </span>
+          </button>
+          <button class="opt" aria-pressed="false" data-pick="2" data-label="Three-way System / Light / Dark row in Settings, header toggle removed">
+            <span class="core">
+              <span class="key">B</span>
+              <span>
+                <span class="opt-title">System / Light / Dark row, header toggle removed</span>
+                <span class="opt-note">Settings owns the theme like it owns the language. Home goes quiet — only the gear. Choosing System means Android decides, including at sunset.</span>
+              </span>
+            </span>
+          </button>
+          <button class="opt" aria-pressed="false" data-pick="3" data-label="Keep the header toggle and add a System third state">
+            <span class="core">
+              <span class="key">C</span>
+              <span>
+                <span class="opt-title">Keep the toggle, add System as a third state</span>
+                <span class="opt-note">The header cycle becomes Light → Dark → System, with the glyph changing to match. Fast, but a third state in a two-state button is easy to land on by accident.</span>
+              </span>
+            </span>
+          </button>
+        </div>
+      </div>
+    </article>
+
+    <!-- 02 -->
+    <article class="decision" data-key="depth">
+      <div class="rail">
+        <div class="num">02</div>
+        <div class="tag">Settings depth</div>
+        <div class="state" data-rail>undecided</div>
+      </div>
+      <div>
+        <h2>How much of the home tray moves in.</h2>
+        <div class="now"><b>Now</b><span>Engine, Offline only, Offline models and Auto-translate are still rows on the home page. Settings holds language, permissions, app switches and reads.</span></div>
+        <div class="options">
+          <button class="opt" aria-pressed="false" data-pick="1" data-label="Leave the tray on home">
+            <span class="core">
+              <span class="key">A</span>
+              <span>
+                <span class="opt-title">Leave the tray on home <span class="badge">now</span></span>
+                <span class="opt-note">Daily switches stay one tap from the slide; Settings stays about setup. The home page carries more weight than a lens page ideally should.</span>
+              </span>
+            </span>
+          </button>
+          <button class="opt" aria-pressed="false" data-pick="2" data-label="Move everything into Settings">
+            <span class="core">
+              <span class="key">B</span>
+              <span>
+                <span class="opt-title">Move all of it into Settings</span>
+                <span class="opt-note">Home becomes the intro, the slide and the gear — nothing else. Every switch in one place, with longer sentences to explain each.</span>
+              </span>
+            </span>
+          </button>
+          <button class="opt" aria-pressed="false" data-pick="3" data-label="Move only the quality rows">
+            <span class="core">
+              <span class="key">C</span>
+              <span>
+                <span class="opt-title">Move only Engine and Offline models</span>
+                <span class="opt-note">Set-once choices go to Settings; Auto-translate, Offline only and Recent reads stay on home because people flip them while reading.</span>
+              </span>
+            </span>
+          </button>
+        </div>
+      </div>
+    </article>
+
+    <!-- 03 -->
+    <article class="decision" data-key="recent">
+      <div class="rail">
+        <div class="num">03</div>
+        <div class="tag">Recent apps</div>
+        <div class="state" data-rail>undecided</div>
+      </div>
+      <div>
+        <h2>What “recently used” is allowed to mean.</h2>
+        <div class="now"><b>Now</b><span>No extra permission. The list orders by apps you switched on, then apps in your read history, then A–Z.</span></div>
+        <div class="options">
+          <button class="opt" aria-pressed="false" data-pick="1" data-label="Keep the permission-free order">
+            <span class="core">
+              <span class="key">A</span>
+              <span>
+                <span class="opt-title">Keep the permission-free order <span class="badge">now</span></span>
+                <span class="opt-note">Honest about what it knows, asks for nothing, and still puts the apps you actually read near the top. An app you opened but never read stays in the alphabet.</span>
+              </span>
+            </span>
+          </button>
+          <button class="opt" aria-pressed="false" data-pick="2" data-label="Ask for Usage Access for true recency">
+            <span class="core">
+              <span class="key">B</span>
+              <span>
+                <span class="opt-title">Ask for Usage Access</span>
+                <span class="opt-note">The list becomes genuinely recent. Costs a second special permission screen, a privacy line in the store listing, and one more thing that can be left off.</span>
+              </span>
+            </span>
+          </button>
+        </div>
+      </div>
+    </article>
+
+    <!-- 04 -->
+    <article class="decision" data-key="language">
+      <div class="rail">
+        <div class="num">04</div>
+        <div class="tag">Language</div>
+        <div class="state" data-rail>undecided</div>
+      </div>
+      <div>
+        <h2>One answer, or one per app.</h2>
+        <div class="now"><b>Now</b><span>Picking a language on the lens over an app already saves it for that app only, while the top row edits the global default — and nothing shows which apps differ.</span></div>
+        <div class="options">
+          <button class="opt" aria-pressed="false" data-pick="1" data-label="Show the per-app override on each row">
+            <span class="core">
+              <span class="key">A</span>
+              <span>
+                <span class="opt-title">Show the override on each row</span>
+                <span class="opt-note">The top row stays the default; a switched app carries a small chip with its own language and a way to clear it. The page finally tells the truth.</span>
+              </span>
+            </span>
+          </button>
+          <button class="opt" aria-pressed="false" data-pick="2" data-label="Flatten to one language everywhere">
+            <span class="core">
+              <span class="key">B</span>
+              <span>
+                <span class="opt-title">Flatten to one language everywhere</span>
+                <span class="opt-note">Simplest to explain: what the top row says is what every app gets. Loses the chat-into-German, browser-into-English trick.</span>
+              </span>
+            </span>
+          </button>
+          <button class="opt" aria-pressed="false" data-pick="3" data-label="Keep it silent, per app">
+            <span class="core">
+              <span class="key">C</span>
+              <span>
+                <span class="opt-title">Keep it silent, per app <span class="badge">now</span></span>
+                <span class="opt-note">Nothing new to build or explain. The top row can still look like it governs everything when it does not.</span>
+              </span>
+            </span>
+          </button>
+        </div>
+      </div>
+    </article>
+
+    <!-- 05 -->
+    <article class="decision" data-key="history">
+      <div class="rail">
+        <div class="num">05</div>
+        <div class="tag">History</div>
+        <div class="state" data-rail>undecided</div>
+      </div>
+      <div>
+        <h2>Whether reads can be wiped.</h2>
+        <div class="now"><b>Now</b><span>Fifty reads are kept on the phone and the oldest falls off. A <code>clearHistory</code> function exists but nothing on screen calls it.</span></div>
+        <div class="options">
+          <button class="opt" aria-pressed="false" data-pick="1" data-label="Add Clear all inside the dropdown">
+            <span class="core">
+              <span class="key">A</span>
+              <span>
+                <span class="opt-title">Add “Clear all” in the dropdown</span>
+                <span class="opt-note">One quiet text button at the foot of the open list, with a confirm. The 50-read cap stays as the automatic housekeeping.</span>
+              </span>
+            </span>
+          </button>
+          <button class="opt" aria-pressed="false" data-pick="2" data-label="Clear all plus a shorter retention">
+            <span class="core">
+              <span class="key">B</span>
+              <span>
+                <span class="opt-title">Clear all, plus a shorter retention</span>
+                <span class="opt-note">Same button, but keep twenty reads instead of fifty — a settings page log, not an archive.</span>
+              </span>
+            </span>
+          </button>
+          <button class="opt" aria-pressed="false" data-pick="3" data-label="Leave it as it is">
+            <span class="core">
+              <span class="key">C</span>
+              <span>
+                <span class="opt-title">Leave it as it is <span class="badge">now</span></span>
+                <span class="opt-note">Nothing to build. Old reads age out on their own, but there is no way to remove them on purpose.</span>
+              </span>
+            </span>
+          </button>
+        </div>
+      </div>
+    </article>
+
+    <!-- 06 -->
+    <article class="decision" data-key="autoopen">
+      <div class="rail">
+        <div class="num">06</div>
+        <div class="tag">Auto-open</div>
+        <div class="state" data-rail>undecided</div>
+      </div>
+      <div>
+        <h2>How eager the per-app switch is.</h2>
+        <div class="now"><b>Now</b><span>The switch brings up the floating lens when the app reaches the front. It reads nothing until you drag it, and it needs Float plus Text access.</span></div>
+        <div class="options">
+          <button class="opt" aria-pressed="false" data-pick="1" data-label="Lens appears only">
+            <span class="core">
+              <span class="key">A</span>
+              <span>
+                <span class="opt-title">Lens appears only <span class="badge">now</span></span>
+                <span class="opt-note">“Nothing is read until you drag the lens” stays true, which is the promise the app makes about privacy.</span>
+              </span>
+            </span>
+          </button>
+          <button class="opt" aria-pressed="false" data-pick="2" data-label="Lens appears and reads the top line">
+            <span class="core">
+              <span class="key">B</span>
+              <span>
+                <span class="opt-title">Lens appears and reads the top line</span>
+                <span class="opt-note">Faster for a chat you open fifty times a day. It also means text is read without being asked for, and the explanation above has to be rewritten.</span>
+              </span>
+            </span>
+          </button>
+        </div>
+      </div>
+    </article>
+
+    <!-- 07 -->
+    <article class="decision" data-key="capture">
+      <div class="rail">
+        <div class="num">07</div>
+        <div class="tag">Screen capture</div>
+        <div class="state" data-rail>undecided</div>
+      </div>
+      <div>
+        <h2>Whether the odd permission out is always visible.</h2>
+        <div class="now"><b>Now</b><span>The Screen capture row hides itself unless the phone refuses accessibility screenshots or a fallback was flagged — so on the S22 you may never see it.</span></div>
+        <div class="options">
+          <button class="opt" aria-pressed="false" data-pick="1" data-label="Keep it hidden unless needed">
+            <span class="core">
+              <span class="key">A</span>
+              <span>
+                <span class="opt-title">Keep it hidden unless needed <span class="badge">now</span></span>
+                <span class="opt-note">A short settings page, no scary permission offered to someone who will never need it.</span>
+              </span>
+            </span>
+          </button>
+          <button class="opt" aria-pressed="false" data-pick="2" data-label="Always show it as an optional row">
+            <span class="core">
+              <span class="key">B</span>
+              <span>
+                <span class="opt-title">Always show it as optional</span>
+                <span class="opt-note">Photos and video are readable on every phone from day one, at the cost of a third permission row that many people will skip.</span>
+              </span>
+            </span>
+          </button>
+        </div>
+      </div>
+    </article>
+
+  </main>
+
+  <footer>
+    <div class="sign">Pick the ones that are obvious; leave the rest for later.</div>
+    <p>
+      Nothing here is undone work — the settings page, the app switches, the folded history and the
+      automatic return from Android's accessibility screen are all built, tested and on the phone.
+      These seven are the places where two reasonable answers exist and only you can say which one
+      Lucid should ship with.
+    </p>
+  </footer>
+
+</div>
+
+<div class="dock" id="dock">
+  <div class="dock-inner">
+    <div class="dock-text" id="dockText"><b>0 of 7 chosen</b> · pick one per card</div>
+    <button class="copy" id="copyBtn" aria-label="Copy my answers">
+      <span class="label">Copy answers</span>
+      <span class="orb" aria-hidden="true">↗</span>
+    </button>
+  </div>
+</div>
+
+<script>
+(function () {
+  var picks = new Map();
+  var total = document.querySelectorAll('.decision').length;
+  var dock = document.getElementById('dock');
+  var dockText = document.getElementById('dockText');
+  var copyBtn = document.getElementById('copyBtn');
+  var sections = Array.prototype.slice.call(document.querySelectorAll('.decision'));
+
+  // scroll reveal
+  if ('IntersectionObserver' in window) {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+      });
+    }, { rootMargin: '0px 0px -12% 0px', threshold: 0.06 });
+    sections.forEach(function (s) { io.observe(s); });
+  } else {
+    sections.forEach(function (s) { s.classList.add('in'); });
+  }
+
+  function titleOf(section) {
+    return section.querySelector('h2').textContent.trim();
+  }
+
+  function refresh() {
+    var chosen = picks.size;
+    sections.forEach(function (s) {
+      var rail = s.querySelector('[data-rail]');
+      var pick = picks.get(s.dataset.key);
+      rail.innerHTML = pick ? '<b>' + pick.key + '</b> · chosen' : 'undecided';
+    });
+
+    dock.classList.toggle('show', chosen > 0);
+
+    if (chosen === 0) {
+      dockText.innerHTML = '<b>0 of ' + total + ' chosen</b> · pick one per card';
+      return;
+    }
+    var last = Array.from(picks.values()).pop();
+    dockText.innerHTML = '<b>' + chosen + ' of ' + total + ' chosen</b> · ' + last.key + ' — ' + last.label;
+  }
+
+  sections.forEach(function (section) {
+    var buttons = section.querySelectorAll('.opt');
+    Array.prototype.forEach.call(buttons, function (btn) {
+      btn.addEventListener('click', function () {
+        var already = btn.getAttribute('aria-pressed') === 'true';
+        Array.prototype.forEach.call(buttons, function (b) { b.setAttribute('aria-pressed', 'false'); });
+        if (already) {
+          picks.delete(section.dataset.key);
+        } else {
+          btn.setAttribute('aria-pressed', 'true');
+          picks.set(section.dataset.key, { key: btn.dataset.pick, label: btn.dataset.label });
+        }
+        refresh();
+      });
+    });
+  });
+
+  copyBtn.addEventListener('click', function () {
+    var lines = ['Lucid — my decisions:'];
+    sections.forEach(function (s) {
+      var pick = picks.get(s.dataset.key);
+      lines.push('· ' + titleOf(s) + ' → ' + (pick ? pick.key + ' (' + pick.label + ')' : 'later'));
+    });
+    var text = lines.join('\n');
+    var done = function () {
+      var orb = copyBtn.querySelector('.orb');
+      var old = orb.textContent;
+      orb.textContent = '✓';
+      setTimeout(function () { orb.textContent = old; }, 1600);
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(done, function () { fallback(text, done); });
+    } else {
+      fallback(text, done);
+    }
+  });
+
+  function fallback(text, done) {
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy'); done(); } catch (e) {}
+    document.body.removeChild(ta);
+  }
+
+  refresh();
+})();
+</script>
+</body>
+</html>

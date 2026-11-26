@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="notif_channel">Sesi lensa</string>
+    <string name="notif_title">Lensa aktif</string>
+    <string name="notif_text">Ketuk lensa pada teks apa pun untuk menerjemahkannya.</string>
+    <string name="notif_stop">Matikan</string>
+    <string name="a11y_label">Akses teks Lucid</string>
+    <string name="a11y_summary">Memungkinkan lensa membaca teks di bawahnya</string>
+    <string name="a11y_description">Lucid membaca teks yang berada di bawah lensanya agar bisa diterjemahkan. Lucid hanya membaca teks itu, tidak menyimpan salinan, dan tidak merekam apa pun. Dengan mesin online, kata-kata di bawah lensa dikirim ke layanan terjemahan online beserta sisa layar itu sebagai konteks; dengan mesin di perangkat, tidak ada yang keluar dari ponsel.</string>
+    <string name="lens_close">Lepaskan lensa di sini untuk mematikannya</string>
+    <string name="lens_delete">Hapus</string>
+    <string name="tile_label">Lensa Lucid</string>
+    <string name="tile_on">Lensa aktif</string>
+    <string name="tile_off">Lensa nonaktif</string>
+    <string name="picker_search">Cari di antara %1$d bahasa</string>
+    <string name="picker_none">Tidak ada bahasa yang cocok.</string>
+</resources>
