@@ -112,6 +112,14 @@ class LensService : Service() {
         private const val SCREENSHOT_TIMEOUT_MS = 2_000L
 
         /**
+         * How long a read may hold the lens before it is treated as wedged.
+         * Longer than the slowest honest read — a throttled online attempt, then
+         * an offline model still downloading — and short enough that the lens
+         * is never simply dead for the rest of the session.
+         */
+        private const val STUCK_READ_MS = 60_000L
+
+        /**
          * How many extra frames a moving picture gets after one that read as
          * empty, and how far apart they are taken. A caption is on screen for
          * two to four seconds, so a fifth of a second is long enough for the
@@ -509,6 +517,9 @@ class LensService : Service() {
 
     /** The source language the user picked for this card, when not left on auto. */
     private var cardSourcePin: String? = null
+
+    /** This card asked for detection itself, over a source pinned in Settings. */
+    private var cardSourceAuto = false
     private var cardTarget: String = ""
 
     /**
@@ -540,7 +551,26 @@ class LensService : Service() {
     private var bubbleSize = 0
     private var screenW = 0
     private var screenH = 0
+    /** A read is in flight: the next look must not start on top of it. */
     private var busy = false
+
+    /** When the read in flight started, so a wedged one can be let go of. */
+    private var busySince = 0L
+
+    /**
+     * Busy, and when it began.
+     *
+     * A read that never comes back used to be the end of the lens on that
+     * phone: every look after it was skipped as "a read is already running",
+     * silently, until the service was restarted. Only a hung platform call can
+     * do that now — the network and the on-device models are all bounded — and
+     * the clock here is what turns even that into one bad read instead of a
+     * dead lens.
+     */
+    private fun setBusy(on: Boolean) {
+        busy = on
+        busySince = if (on) SystemClock.uptimeMillis() else 0L
+    }
 
     /** Reads in a row where the phone refused its own screenshot API. */
     private var a11yRefusals = 0
@@ -1993,6 +2023,16 @@ class LensService : Service() {
      * sheet drawn over the page.
      */
     private fun readNow(auto: Boolean = false, retry: Int = 2) {
+        // A read still in flight after far longer than any read can take is not
+        // a read any more — a platform call it was waiting on never answered.
+        // The lens takes itself back rather than stay dead for the rest of the
+        // session, which is what a phone with a broken recogniser or a stalled
+        // model download would otherwise look like: an app that stopped working.
+        if (busy && SystemClock.uptimeMillis() - busySince > STUCK_READ_MS) {
+            Log.w(TAG, "read stuck for ${SystemClock.uptimeMillis() - busySince}ms; letting the lens go")
+            setBusy(false)
+            setScanning(false)
+        }
         if (busy || dormant) {
             Log.i(TAG, "read skipped (busy=$busy dormant=$dormant)")
             return
@@ -2144,7 +2184,7 @@ class LensService : Service() {
         if (key == lastKey && card != null) return true
         lastKey = key
 
-        busy = true
+        setBusy(true)
         setScanning(true)
         renderScanning()
 
@@ -2159,6 +2199,7 @@ class LensService : Service() {
                     onStatus = { phase ->
                         handler.post { if (gen == readGen) updateScanningPhase(phase) }
                     },
+                    sourceHint = sourcePin(),
                     screenContext = hit.context,
                 ) ?: Outcome(error = "Translator unavailable.")
             } catch (err: Exception) {
@@ -2168,7 +2209,7 @@ class LensService : Service() {
             // Cancelled or superseded: this answer is stale, and it must not
             // touch the state of the read that replaced it.
             if (gen != readGen) return@launch
-            busy = false
+            setBusy(false)
             setScanning(false)
             renderOutcome(outcome, target, auto)
         }
@@ -2212,7 +2253,7 @@ class LensService : Service() {
             return
         }
 
-        busy = true
+        setBusy(true)
         setScanning(true)
 
         val gen = ++readGen
@@ -2324,7 +2365,7 @@ class LensService : Service() {
 
             if (bitmap == null) {
                 if (gen == readGen) {
-                    busy = false
+                    setBusy(false)
                     setScanning(false)
                     if (!auto) renderError("Couldn't grab a frame. Try again.")
                 }
@@ -2397,7 +2438,7 @@ class LensService : Service() {
 
             // Cancelled or superseded: leave the current read's state alone.
             if (gen != readGen) return@launch
-            busy = false
+            setBusy(false)
             setScanning(false)
 
             // Nothing under the lens: drop the old answer rather than leave it
@@ -2643,7 +2684,7 @@ class LensService : Service() {
         readGen++
         lookupGen++
         wordsGen++
-        busy = false
+        setBusy(false)
         setScanning(false)
         hideCard()
         hideSight()
@@ -2651,6 +2692,15 @@ class LensService : Service() {
     }
 
     /* ── live language change ────────────────────────────────────────── */
+
+    /**
+     * The language every read starts from: the card's own answer when it was
+     * given one, otherwise the one SETTINGS › Translation › Translate from
+     * holds. Null is the default — nothing is pinned, and each read works the
+     * language out itself.
+     */
+    private fun sourcePin(): String? =
+        if (cardSourceAuto) null else cardSourcePin ?: Prefs.sourceLanguage(this)
 
     /**
      * A dimmed sheet over the card, so either language of the current
@@ -2673,8 +2723,8 @@ class LensService : Service() {
             save -> Prefs.targetFor(this, readPackage)
             pickTarget -> cardTarget.ifBlank { Prefs.targetFor(this, readPackage) }
             // The sheet marks the choice, not the detection: a card left on
-            // auto shows Auto detect ticked, whatever the words turned out to be.
-            else -> cardSourcePin ?: "auto"
+            // auto shows Auto recognize ticked, whatever the words turned out to be.
+            else -> sourcePin() ?: "auto"
         }
 
         val panel = LanguagePicker.build(
@@ -2697,13 +2747,14 @@ class LensService : Service() {
             }
             if (!pickTarget) {
                 // Picking pins this card to that language; Auto hands the
-                // choice back to the detector.
-                cardSourcePin = if (lang.code == "auto") null else lang.code
+                // choice back to the detector, even when Settings pins one.
+                cardSourceAuto = lang.code == "auto"
+                cardSourcePin = if (cardSourceAuto) null else lang.code
             }
             val same = if (pickTarget) {
                 lang.code == cardTarget
             } else {
-                lang.code == (cardSourcePin ?: "auto")
+                lang.code == (sourcePin() ?: "auto")
             }
             if (pickTarget && lang.code != Prefs.targetFor(this, readPackage)) {
                 // Kept for the app under the lens: the next read here already
@@ -2715,11 +2766,9 @@ class LensService : Service() {
             if (!same) {
                 retranslate(
                     target = if (pickTarget) lang.code else cardTarget,
-                    sourceHint = when {
-                        pickTarget -> cardSourceLang
-                        lang.code == "auto" -> null
-                        else -> lang.code
-                    },
+                    // A target change keeps whatever source the card is reading
+                    // from; the source's own pick is the pin it just chose.
+                    sourceHint = if (pickTarget) sourcePin() ?: cardSourceLang else sourcePin(),
                 )
             }
         }
@@ -2779,7 +2828,7 @@ class LensService : Service() {
         cardDst?.text = "${Languages.label(target)}  ▾"
         cardFoot?.visibility = View.GONE
         showSpinner()
-        busy = true
+        setBusy(true)
         card?.post { positionCard() }
 
         val gen = ++readGen
@@ -2792,7 +2841,7 @@ class LensService : Service() {
             }
             // A press outside while the switch was running cancels it too.
             if (gen != readGen) return@launch
-            busy = false
+            setBusy(false)
 
             if (outcome.error != null) {
                 stopSpinner()
@@ -2814,6 +2863,7 @@ class LensService : Service() {
         // card before, not to these words, and anything being read aloud is
         // the old answer.
         cardSourcePin = null
+        cardSourceAuto = false
         setPinned(false, quiet = true)
         stopSpeaking()
         cardSpeechText = ""
@@ -2899,12 +2949,12 @@ class LensService : Service() {
         cardLangRow?.visibility = View.VISIBLE
         // The left chip says how the source was chosen, then what was heard:
         // it never silently becomes the language it guessed.
-        val pin = cardSourcePin
+        val pin = sourcePin()
         val heard = outcome.detected
         cardSrc?.text = when {
             pin != null -> "${Languages.short(pin)}  ▾"
-            heard != null -> "Auto select (${Languages.short(heard)})  ▾"
-            else -> "Auto select  ▾"
+            heard != null -> "Auto recognize (${Languages.short(heard)})  ▾"
+            else -> "Auto recognize  ▾"
         }
         cardDst?.text = "${Languages.label(target)}  ▾"
         // A muted chip marks a target that differs from the saved setting.
@@ -3075,7 +3125,7 @@ class LensService : Service() {
 
         val sentence = pageSentences[next]
         val target = cardTarget.ifBlank { Prefs.targetFor(this, readPackage) }
-        busy = true
+        setBusy(true)
         setScanning(true)
         renderScanning()
         // The scan state clears the foot; the count belongs to the page, not to
@@ -3085,13 +3135,17 @@ class LensService : Service() {
         val gen = ++readGen
         scope.launch {
             val outcome = try {
-                translator?.translate(sentence, target, screenContext = pageContext)
-                    ?: Outcome(error = "Translator unavailable.")
+                translator?.translate(
+                    sentence,
+                    target,
+                    sourceHint = sourcePin(),
+                    screenContext = pageContext,
+                ) ?: Outcome(error = "Translator unavailable.")
             } catch (err: Exception) {
                 Outcome(error = "Something went wrong while reading.")
             }
             if (gen != readGen) return@launch
-            busy = false
+            setBusy(false)
             setScanning(false)
             renderOutcome(outcome, target)
         }
@@ -3470,13 +3524,7 @@ class LensService : Service() {
      * is a window of its own and must not wait for the system to hand the whole
      * process a new configuration before it changes colour with the app.
      */
-    private fun lensContext(): Context {
-        val dark = ThemeChoice.isDark(this)
-        val config = Configuration(resources.configuration)
-        config.uiMode = (config.uiMode and Configuration.UI_MODE_NIGHT_MASK.inv()) or
-            (if (dark) Configuration.UI_MODE_NIGHT_YES else Configuration.UI_MODE_NIGHT_NO)
-        return createConfigurationContext(config)
-    }
+    private fun lensContext(): Context = ThemeChoice.themed(this)
 
     private fun lensColor(id: Int): Int = lensContext().getColor(id)
 

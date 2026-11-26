@@ -104,7 +104,16 @@
     <!-- The word of a permission that is granted: olive on paper, a light olive
          at night, where the deep olive would sink into the charcoal. -->
     <color name="screen_ok_ink">#55603F</color>
+    <!-- The line above the slide, while the lens is still missing a switch: rose,
+         not grey, so it is seen before the slide is dragged — and the muted rose
+         of the palette rather than a signal red, which would make a first run
+         look like something has gone wrong. 6.8:1 on paper; the night file holds
+         the same role for charcoal. -->
+    <color name="screen_warn_ink">#8C3B2F</color>
     <color name="screen_edge">#14191814</color>
+    <!-- A step stronger, for the one control that has to lift off a card rather
+         than sit inside it: the swap ring on the pair's seam. -->
+    <color name="screen_edge_strong">#24191814</color>
     <color name="screen_divider">#66C7B2A4</color>
     <color name="screen_ink">#191814</color>
     <color name="screen_muted">#6A6254</color>
@@ -122,6 +131,29 @@
          the darker accent ink still clears 6:1 on it. -->
     <color name="screen_accent_fill">#33A46E4B</color>
     <color name="screen_accent_edge">#59A46E4B</color>
+    <!-- One button system, and only one. The heavier answer is not a colour of
+         its own: it is the accent tint, one step deeper than a state chip's, with
+         the same rim and the same accent ink — the family the engine switch, the
+         chosen theme and the language chip already belong to. So a primary
+         button and an on-chip are the same surface in the same colours, and
+         nothing on a sheet is a slab of some palette step no other control uses.
+         Quiet buttons and the "off" state are the page's beige chip. 30% clay by
+         day, which is the step the accent ink clears 6:1 on; at night the tint
+         runs deeper and the label turns cream, which the night file explains. -->
+    <color name="btn_primary_fill">#4DA46E4B</color>
+    <color name="btn_primary_ink">@color/screen_accent_ink</color>
+    <color name="btn_primary_edge">@color/screen_accent_edge</color>
+    <!-- The quiet answer, as its own surface: the page's beige chip with its
+         hairline. It has roles of its own so the dark page can lift it a step
+         without moving every card that shares the beige. -->
+    <color name="btn_ghost_fill">@color/screen_button</color>
+    <color name="btn_ghost_edge">@color/screen_edge</color>
+    <!-- The half of the pair card under a thumb. It was a translucent beige at
+         74 %, which over paper came out at 1.15:1 — a press you could not see,
+         so the eye caught the hairline ring drawn inside the card's own edge
+         instead: a second box on the first. This is a solid step of the same
+         beige at 1.30:1, the surface itself pushed in, and it needs no ring. -->
+    <color name="screen_half_press">#FFE7DAC6</color>
     <color name="screen_shade">#191814</color>
     <color name="screen_well">#F8F2E7</color>
     <color name="screen_well_shade">#1A191814</color>
@@ -149,6 +181,11 @@
          paper with ink in it, at night it is the charcoal card it has always been. -->
     <color name="card_surface">#FCF8F1</color>
     <color name="card_edge">#14191814</color>
+    <!-- The band that heads the language sheet: one step of beige deeper than
+         the card, and the dots that make it paper rather than a strip of colour.
+         Both stay quieter than the words that sit on them. -->
+    <color name="card_band">#F5EEE2</color>
+    <color name="card_dot">#2A6A6254</color>
     <color name="card_ink">#191814</color>
     <color name="card_muted">#6A6254</color>
     <color name="card_faint">#857B6C</color>
@@ -162,5 +199,48 @@
     <color name="card_chip_edge">#1F191814</color>
     <color name="card_chip_accent_fill">#1FA46E4B</color>
     <color name="card_chip_accent_edge">#40A46E4B</color>
+
+    <!-- The picker sheet, as the deep-lift study drew it: the card's paper at
+         full strength at the top, thinning toward the bottom edge so the page
+         reads through it, with a hairline of its own. The depth is the sheet's
+         own elevation; these colours are only its body. -->
+    <color name="sheet_lift_top">#FFFCF8F1</color>
+    <color name="sheet_lift_mid">#FDFCF8F1</color>
+    <!-- The sheet is read, not looked through. Even a four-per-cent floor left
+         a second set of words ghosting under the last rows of the list, so the
+         body is paper all the way down: the shadow, the hairline and the margin
+         clear of the page are what say it floats, and the list stays clean. -->
+    <color name="sheet_lift_floor">#FFFCF8F1</color>
+    <color name="sheet_lift_edge">#1F191814</color>
+
+    <!-- The sheets that ask a question — one-time setup, the text-access
+         consent, the permission guide. They were drawn charcoal-only, which
+         made three popups dark over the day page. These roles are that same
+         charcoal voice at night and the page's own paper by day, so the sheet a
+         person answers is the surface they were already reading. -->
+    <color name="ask_surface">#FCF8F1</color>
+    <color name="ask_card_edge">#14191814</color>
+    <color name="ask_ink">#191814</color>
+    <color name="ask_body">#6A6254</color>
+    <color name="ask_faint">#857B6C</color>
+    <color name="ask_label">#8A5A3C</color>
+    <!-- The heavier answer: the page's own clay by day, paper at night. Ink on
+         paper was the loudest thing on the sheet — a black slab on cream — and
+         the accent already means "this is the one to press" everywhere else in
+         the app. -->
+    <color name="ask_primary_fill">@color/btn_primary_fill</color>
+    <color name="ask_primary_ink">@color/btn_primary_ink</color>
+    <color name="ask_secondary_fill">@color/screen_button</color>
+    <color name="ask_secondary_edge">@color/screen_edge</color>
+    <color name="ask_secondary_ink">@color/screen_ink</color>
+    <!-- The disclosure inset, and the drawing of Android's own screen inside
+         the permission guide: a step of cream under the paper by day, the
+         charcoal mock it has always been at night. -->
+    <color name="ask_inset">#0A191814</color>
+    <color name="ask_inset_edge">#1A191814</color>
+    <color name="ask_guide_screen">#F5EEE2</color>
+    <color name="ask_guide_screen_edge">#1F191814</color>
+    <color name="ask_guide_row">#24A46E4B</color>
+    <color name="ask_guide_ghost">#14191814</color>
 
 </resources>

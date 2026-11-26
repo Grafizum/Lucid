@@ -236,68 +236,6 @@
                         android:textSize="11sp" />
                 </LinearLayout>
 
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:background="@color/screen_divider" />
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal"
-                    android:paddingTop="11dp"
-                    android:paddingBottom="11dp">
-
-                    <ImageView
-                        android:layout_width="18dp"
-                        android:layout_height="18dp"
-                        android:layout_marginEnd="11dp"
-                        android:contentDescription="@null"
-                        android:importantForAccessibility="no"
-                        android:src="@drawable/ic_row_offline" />
-
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:fontFamily="@font/lucid_sans"
-                            android:text="Offline only"
-                            android:textColor="@color/screen_ink"
-                            android:textFontWeight="500"
-                            android:textSize="13sp" />
-
-                        <TextView
-                            android:id="@+id/offlineHint"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="1dp"
-                            android:fontFamily="@font/lucid_sans"
-                            android:text="No read ever leaves the phone"
-                            android:textColor="@color/screen_faint"
-                            android:textSize="10.5sp" />
-                    </LinearLayout>
-
-                    <TextView
-                        android:id="@+id/offlineBtn"
-                        android:layout_width="wrap_content"
-                        android:layout_height="28dp"
-                        android:layout_marginStart="8dp"
-                        android:background="@drawable/btn_ghost"
-                        android:fontFamily="@font/lucid_sans"
-                        android:gravity="center"
-                        android:paddingStart="15dp"
-                        android:paddingEnd="15dp"
-                        android:text="Off"
-                        android:textColor="@color/screen_ink"
-                        android:textSize="11sp" />
-                </LinearLayout>
-
             </LinearLayout>
 
             <!-- ── the pages ────────────────────────────────────────────── -->
@@ -435,6 +373,24 @@
         </LinearLayout>
 
     </androidx.core.widget.NestedScrollView>
+
+    <!-- The slide still works with a switch off — it opens the sheet that asks
+         for it — so the bar is not where the lens explains itself. One short
+         line above it says the lens is not usable yet; both switches on, it goes
+         and the bar sits as it always did. -->
+    <TextView
+        android:id="@+id/lensHint"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:fontFamily="@font/lucid_sans"
+        android:gravity="center"
+        android:paddingStart="24dp"
+        android:paddingEnd="24dp"
+        android:text="The lens still needs permission to be used"
+        android:textColor="@color/screen_warn_ink"
+        android:textSize="10sp"
+        android:visibility="gone" />
 
     <!-- the one CTA: a slide. Off, the well sits left and drags right; on, it
          sits right and drags left, with the cross beside it as the other way.

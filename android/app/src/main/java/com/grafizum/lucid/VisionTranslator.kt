@@ -21,10 +21,6 @@ import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import org.json.JSONArray
-import java.net.HttpURLConnection
-import java.net.URL
-import java.net.URLEncoder
-import java.util.concurrent.TimeUnit
 
 data class Outcome(
     val source: String = "",
@@ -151,8 +147,9 @@ class VisionTranslator(private val context: Context) {
         onStatus("Translating")
 
         // The offline models are fast but weak on languages like Japanese, so
-        // the online engine leads when the user allows it — and never when
-        // Offline only is on, which is a promise rather than a preference.
+        // the online engine leads when the user allows it — and never when the
+        // engine is set to On-device, which is a promise rather than a
+        // preference.
         if (onlineAllowed()) {
             // With neighbours in the query the engine would detect on the whole
             // screen instead of the line, so the line's own detected language
@@ -190,16 +187,18 @@ class VisionTranslator(private val context: Context) {
         }
 
         // No engine left. Say so instead of showing a rough machine guess.
+        // The order matters: a read that had the online engine and did not get
+        // an answer is a network or service failure, not an unreadable line.
+        // Saying "couldn't tell which language" there sent people looking for
+        // the wrong thing on their phone.
         return Outcome(
             source = text,
             detected = from,
             error = when {
-                from == null ->
-                    "Couldn't tell which language that is. Tap the left chip and pick it, or switch ENGINE to Online."
-                Prefs.offlineOnly(context) ->
-                    "Offline only is on and there is no offline model for this pair yet. Switch it off in Lucid to use the online engine."
                 Prefs.onlineEngine(context) ->
-                    "Couldn't reach the translation service. Check the connection, or switch ENGINE to On-device in Lucid."
+                    "The translation service didn't answer. Check the connection and try again in a moment, or switch ENGINE to On-device in Lucid."
+                from == null ->
+                    "The engine is on-device and there is no offline model for this pair yet. Tap the left chip and pick the language, or switch ENGINE to Online in Lucid."
                 else ->
                     "No offline model for this language pair yet. Switch ENGINE to Online in Lucid."
             },
@@ -211,9 +210,8 @@ class VisionTranslator(private val context: Context) {
      * A few words often come back undecided, so the ranked answer is taken
      * only when it is confident; an unknown line is never assumed English.
      */
-    /** Whether a read may leave the phone at all. */
-    private fun onlineAllowed(): Boolean =
-        Prefs.onlineEngine(context) && !Prefs.offlineOnly(context)
+    /** Whether a read may leave the phone at all: ENGINE is the one answer. */
+    private fun onlineAllowed(): Boolean = Prefs.onlineEngine(context)
 
     private suspend fun detect(text: String): String? {
         val primary = runCatching {
@@ -360,7 +358,13 @@ class VisionTranslator(private val context: Context) {
             ?: return Reading(failed = true)
 
         val result = try {
-            recognizer.process(InputImage.fromBitmap(bitmap, 0)).await()
+            // Bounded, because a recogniser that never calls back is a phone
+            // where the lens stops answering for good: the card waits on this
+            // and nothing behind it can start. A script that cannot read a
+            // frame in this long has failed at reading it.
+            withTimeoutOrNull(OCR_TIMEOUT_MS) {
+                recognizer.process(InputImage.fromBitmap(bitmap, 0)).await()
+            }
         } catch (err: Exception) {
             null
         }
@@ -450,6 +454,12 @@ class VisionTranslator(private val context: Context) {
          * is a fragment at best, so the other scripts are weighed against it.
          */
         const val SURE_READ_GLYPHS = 12
+
+        /** How long one script's recogniser gets before the frame is given up on. */
+        const val OCR_TIMEOUT_MS = 6_000L
+
+        /** How long the offline model gets, download included, on the fallback. */
+        const val OFFLINE_TIMEOUT_MS = 20_000L
     }
 
     /** The line the point is on — or nothing at all. */
@@ -470,7 +480,15 @@ class VisionTranslator(private val context: Context) {
      */
     fun tidy(raw: String): String = tidyRead(raw)
 
-    private suspend fun translateOnDevice(text: String, source: String, target: String): String =
+    /**
+     * The offline pair, or null when it is unavailable or did not finish in
+     * time. A first use downloads a model — thirty-odd megabytes on some pairs
+     * — and a download over a network that drops halfway can hang for minutes
+     * without ever failing. The bound is the same reason the recogniser has
+     * one: a read must always come back, even if the answer is "not now".
+     * ML Kit keeps what it has already fetched, so the next read carries on.
+     */
+    private suspend fun translateOnDevice(text: String, source: String, target: String): String? =
         withContext(Dispatchers.Default) {
             val options = TranslatorOptions.Builder()
                 .setSourceLanguage(source)
@@ -479,10 +497,12 @@ class VisionTranslator(private val context: Context) {
 
             val translator = Translation.getClient(options)
             try {
-                translator.downloadModelIfNeeded(DownloadConditions.Builder().build()).await()
-                translator.translate(text).await()
+                withTimeoutOrNull(OFFLINE_TIMEOUT_MS) {
+                    translator.downloadModelIfNeeded(DownloadConditions.Builder().build()).await()
+                    translator.translate(text).await()
+                }
             } finally {
-                translator.close()
+                runCatching { translator.close() }
             }
         }
 
@@ -653,7 +673,14 @@ class VisionTranslator(private val context: Context) {
         return out
     }
 
-    /** One request for a block of lines, whatever it holds. */
+    /**
+     * One request for a block of lines, whatever it holds.
+     *
+     * The request itself lives in [TranslateNet]: a POST to the endpoint that
+     * still answers it. The old GET went out with a hand-written user agent and
+     * four seconds to connect, and on a phone network it came back as Google's
+     * "Sorry…" page — which is the bug behind "translation does not work".
+     */
     private fun request(
         query: String,
         target: String,
@@ -661,54 +688,40 @@ class VisionTranslator(private val context: Context) {
         reading: Boolean,
     ): Fetched? =
         runCatching {
-            val url = "https://translate.googleapis.com/translate_a/single" +
-                "?client=gtx&sl=" + URLEncoder.encode(sl, "UTF-8") +
-                "&dt=t" + (if (reading) "&dt=rm" else "") +
-                "&tl=" + URLEncoder.encode(target, "UTF-8") +
-                "&q=" + URLEncoder.encode(query, "UTF-8")
+            val body = TranslateNet.ask(
+                TranslateNet.params(query, target, sl, reading),
+            ) ?: return@runCatching null
 
-            val connection = (URL(url).openConnection() as HttpURLConnection).apply {
-                requestMethod = "GET"
-                setRequestProperty("User-Agent", "Mozilla/5.0 (Android) Lucid")
-                connectTimeout = TimeUnit.SECONDS.toMillis(4).toInt()
-                readTimeout = TimeUnit.SECONDS.toMillis(6).toInt()
-            }
+            val root = JSONArray(body)
+            val segments = root.optJSONArray(0) ?: return@runCatching null
 
-            try {
-                val body = connection.inputStream.bufferedReader().use { it.readText() }
-                val root = JSONArray(body)
-                val segments = root.optJSONArray(0) ?: return@runCatching null
-
-                val out = StringBuilder()
-                val readings = ArrayList<String>()
-                for (index in 0 until segments.length()) {
-                    val segment = segments.optJSONArray(index) ?: continue
-                    // optString answers "null" for a JSON null, so the null
-                    // has to be checked for — otherwise it lands in the
-                    // translation as the word "null".
-                    if (!segment.isNull(0)) {
-                        val piece = segment.optString(0)
-                        if (piece.isNotEmpty()) {
-                            out.append(piece)
-                            continue
-                        }
+            val out = StringBuilder()
+            val readings = ArrayList<String>()
+            for (index in 0 until segments.length()) {
+                val segment = segments.optJSONArray(index) ?: continue
+                // optString answers "null" for a JSON null, so the null
+                // has to be checked for — otherwise it lands in the
+                // translation as the word "null".
+                if (!segment.isNull(0)) {
+                    val piece = segment.optString(0)
+                    if (piece.isNotEmpty()) {
+                        out.append(piece)
+                        continue
                     }
-                    // A reading row translates nothing: index 0 is empty and
-                    // index 3 holds the source spelled out in Latin letters.
-                    val spoken = if (segment.length() > 3 && !segment.isNull(3)) segment.optString(3) else ""
-                    if (spoken.isNotBlank()) readings += spoken
                 }
-
-                val detected = if (root.length() > 2 && !root.isNull(2)) {
-                    root.getString(2).substringBefore('-').ifBlank { null }
-                } else {
-                    null
-                }
-
-                Fetched(out.toString().trim(), detected, readings)
-            } finally {
-                connection.disconnect()
+                // A reading row translates nothing: index 0 is empty and
+                // index 3 holds the source spelled out in Latin letters.
+                val spoken = if (segment.length() > 3 && !segment.isNull(3)) segment.optString(3) else ""
+                if (spoken.isNotBlank()) readings += spoken
             }
+
+            val detected = if (root.length() > 2 && !root.isNull(2)) {
+                root.getString(2).substringBefore('-').ifBlank { null }
+            } else {
+                null
+            }
+
+            Fetched(out.toString().trim(), detected, readings)
         }.getOrNull()
 
     /**
@@ -721,26 +734,20 @@ class VisionTranslator(private val context: Context) {
         lang: String?,
         target: String,
     ): List<Words.Pair> = withContext(Dispatchers.IO) {
-        // The word list is a second request; Offline only refuses it too.
-        if (Prefs.offlineOnly(context)) return@withContext emptyList()
+        // The word list is a second request, so On-device refuses it too: the
+        // promise covers every word on the card, not just the line above them.
+        if (!Prefs.onlineEngine(context)) return@withContext emptyList()
         val terms = Words.terms(source, lang)
         if (terms.size < 2) return@withContext emptyList()
 
         runCatching {
-            val connection = (URL(Words.request(terms, target, lang)).openConnection() as HttpURLConnection).apply {
-                requestMethod = "GET"
-                setRequestProperty("User-Agent", "Mozilla/5.0 (Android) Lucid")
-                connectTimeout = TimeUnit.SECONDS.toMillis(4).toInt()
-                readTimeout = TimeUnit.SECONDS.toMillis(6).toInt()
-            }
-
-            try {
-                val body = connection.inputStream.bufferedReader().use { it.readText() }
-                val meanings = Words.parse(body, terms.size) ?: return@runCatching emptyList()
-                Words.pairs(terms, meanings)
-            } finally {
-                connection.disconnect()
-            }
+            // The same POST as a read: this is the second request of a card, so
+            // it cannot be the one that makes a phone look broken.
+            val body = TranslateNet.ask(
+                TranslateNet.params(terms.joinToString("\n"), target, Words.sourceOf(lang), reading = false),
+            ) ?: return@runCatching emptyList()
+            val meanings = Words.parse(body, terms.size) ?: return@runCatching emptyList()
+            Words.pairs(terms, meanings)
         }.getOrDefault(emptyList())
     }
 

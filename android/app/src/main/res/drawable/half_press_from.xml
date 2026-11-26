@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The press on the From half: not a box laid on the half, the half.
+
+     It used to be a rectangle rounded on all four corners with a 1dp ring of
+     its own, laid over the paper. At the seam that left two rounded corners
+     curling away from the split, and the ring drew a second hairline a half
+     pixel inside the card's own — the feedback read as a smaller box sitting on
+     the box you pressed, slightly off-centre, and the beige under it was too
+     faint to carry the state on its own.
+
+     So the shape is the half itself: the card's 16dp on the three sides that
+     are the card's edge, square on the side that is the seam, so the fill runs
+     into the split and is cut by the seam line rather than floating beside it.
+     No stroke: the card already has one, and a press does not need a second. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <solid android:color="@color/screen_half_press" />
+    <corners
+        android:bottomLeftRadius="16dp"
+        android:bottomRightRadius="0dp"
+        android:topLeftRadius="16dp"
+        android:topRightRadius="0dp" />
+</shape>

@@ -1,138 +1,29 @@
 package com.grafizum.lucid
 
 import android.content.Context
-import android.graphics.Typeface
-import android.graphics.drawable.GradientDrawable
 import android.os.Build
-import android.os.Handler
-import android.os.Looper
-import android.provider.Settings
-import android.util.TypedValue
-import android.view.Gravity
-import android.view.View
-import android.view.WindowInsets
-import android.view.WindowManager
-import android.widget.LinearLayout
-import android.widget.TextView
-import androidx.core.content.ContextCompat
-import androidx.core.content.res.ResourcesCompat
 
 /**
- * The pointer Android will not let an app give by opening the screen itself.
+ * Where Lucid's switch lives in this phone's own Settings.
  *
- * Settings' per-service page — the one with Lucid's own switch — is guarded by
- * a signature permission, so the best any app can do is open the list of
- * accessibility services. On that list the row is somewhere under a section
- * whose name is the phone's own: "Installed apps" on most Galaxies, "Installed
- * services" on their tablets, "Downloaded apps" on Pixel and most others, and
- * whatever the next skin decides. None of that can be navigated to, and the
- * order cannot be changed — so the guide is written, not driven: a small card
- * over the top of Settings that says the row's exact name and that it may be
- * further down.
+ * Accessibility's list is guarded so that no app may open the per-service page
+ * itself; the best anything can do is open the list of services. On that list
+ * the row is somewhere under a section whose name is the phone's own:
+ * "Installed apps" on most Galaxies, "Installed services" on their tablets,
+ * "Downloaded apps" on Pixel and most others, and whatever the next skin
+ * decides. None of that can be navigated to — so it is written down instead,
+ * in the guide card that stands in front of the list, in the words the list
+ * will actually be using.
  *
- * It is deliberately *not* a target. The window takes no touches at all, so
- * while the person is scrolling Android's own list, nothing of ours can swallow
- * a tap; the card leaves when the switch lands, when Lucid is back in front, or
- * when it has been up long enough to have been read. It needs the float-over
- * permission, which is the step before this one in every setup path.
+ * There used to be a floating card for this, drawn over Settings at the top of
+ * the screen. It could not be made opaque: Android composites application
+ * overlays at reduced alpha on this build — WindowManager reported alpha 0.8 on
+ * a window whose own LayoutParams said 1.0 — so Settings' title read straight
+ * through the words of the card, and the card sat over the back arrow and the
+ * menu while it did it. The sentence belongs in our own surface, which has no
+ * such treatment, so it lives in the guide now.
  */
 object SetupNudge {
-
-    /** Long enough to read the line after a scroll or two, short enough not to linger. */
-    private const val LINGER_MS = 75 * 1000L
-
-    private val handler = Handler(Looper.getMainLooper())
-    private var card: View? = null
-    private val expire = Runnable { hide() }
-
-    /**
-     * Puts the pointer up, unless the switch is already on or the card has no
-     * permission to sit over Settings. Safe to call on every press of Set up.
-     */
-    fun show(context: Context) {
-        val app = context.applicationContext
-        if (LensAccessibilityService.isEnabled(app)) {
-            hide()
-            return
-        }
-        // Without this the card would be refused by the window manager; the
-        // setup path asks for it first for exactly this reason.
-        if (!Settings.canDrawOverlays(app)) return
-        if (card?.isAttachedToWindow == true) return
-        hide()
-
-        val wm = app.getSystemService(WindowManager::class.java) ?: return
-        val density = app.resources.displayMetrics.density
-        fun dp(value: Int) = (value * density).toInt()
-
-        val sans = ResourcesCompat.getFont(app, R.font.lucid_sans) ?: Typeface.DEFAULT
-        val ink = ContextCompat.getColor(app, R.color.screen_ink)
-        val muted = ContextCompat.getColor(app, R.color.screen_muted)
-
-        val title = TextView(app).apply {
-            text = app.getString(R.string.nudge_title)
-            setTextSize(TypedValue.COMPLEX_UNIT_SP, 12.5f)
-            setTextColor(ink)
-            typeface = sans
-        }
-        val body = TextView(app).apply {
-            text = app.getString(R.string.nudge_body, sectionPhrase(app))
-            setTextSize(TypedValue.COMPLEX_UNIT_SP, 11f)
-            setTextColor(muted)
-            typeface = sans
-            setLineSpacing(0f, 1.12f)
-            setPadding(0, dp(3), 0, 0)
-        }
-        val column = LinearLayout(app).apply {
-            orientation = LinearLayout.VERTICAL
-            setPadding(dp(15), dp(11), dp(15), dp(12))
-            background = GradientDrawable().apply {
-                cornerRadius = dp(16).toFloat()
-                setColor(ContextCompat.getColor(app, R.color.card_surface))
-                setStroke(dp(1), ContextCompat.getColor(app, R.color.screen_band))
-            }
-            elevation = dp(8).toFloat()
-            addView(title)
-            addView(body)
-        }
-
-        val params = WindowManager.LayoutParams(
-            WindowManager.LayoutParams.WRAP_CONTENT,
-            WindowManager.LayoutParams.WRAP_CONTENT,
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY
-            } else {
-                @Suppress("DEPRECATION")
-                WindowManager.LayoutParams.TYPE_PHONE
-            },
-            // No touches, ever: the person is using Settings underneath this.
-            WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or
-                WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE or
-                WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN,
-            android.graphics.PixelFormat.TRANSLUCENT,
-        ).apply {
-            gravity = Gravity.TOP or Gravity.CENTER_HORIZONTAL
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                fitInsetsTypes = 0
-            }
-            y = statusBarHeight(app) + dp(10)
-        }
-
-        if (!runCatching { wm.addView(column, params) }.isSuccess) return
-        card = column
-        handler.removeCallbacks(expire)
-        handler.postDelayed(expire, LINGER_MS)
-    }
-
-    /** Takes the pointer down. Called on the grant, on coming back, and on its own clock. */
-    fun hide() {
-        handler.removeCallbacks(expire)
-        val view = card ?: return
-        card = null
-        val app = view.context
-        val wm = app.getSystemService(WindowManager::class.java) ?: return
-        runCatching { wm.removeView(view) }
-    }
 
     /**
      * The words the list actually uses on this phone, quoted for a sentence.
@@ -166,16 +57,4 @@ object SetupNudge {
 
     private fun tablet(context: Context): Boolean =
         context.resources.configuration.smallestScreenWidthDp >= 600
-
-    /** The status bar's height, so the card clears it on any phone. */
-    private fun statusBarHeight(context: Context): Int {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            val wm = context.getSystemService(WindowManager::class.java)
-            val inset = wm?.currentWindowMetrics?.windowInsets
-                ?.getInsets(WindowInsets.Type.statusBars())?.top ?: 0
-            if (inset > 0) return inset
-        }
-        val id = context.resources.getIdentifier("status_bar_height", "dimen", "android")
-        return if (id > 0) context.resources.getDimensionPixelSize(id) else 0
-    }
 }

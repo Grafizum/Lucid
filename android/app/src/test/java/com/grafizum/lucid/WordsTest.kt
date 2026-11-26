@@ -86,9 +86,16 @@ class WordsTest {
 
     @Test
     fun `the request carries every word on its own line`() {
-        val url = Words.request(listOf("日本語", "勉強"), "en", "ja")
-        assertTrue(url.contains("sl=ja"))
-        assertTrue(url.contains("tl=en"))
-        assertTrue(url.contains("%E6%97%A5%E6%9C%AC%E8%AA%9E%0A%E5%8B%89%E5%BC%B7"))
+        val body = Words.params(listOf("日本語", "勉強"), "en", "ja")
+        assertTrue(body.contains("sl=ja"))
+        assertTrue(body.contains("tl=en"))
+        assertTrue(body.contains("%E6%97%A5%E6%9C%AC%E8%AA%9E%0A%E5%8B%89%E5%BC%B7"))
+    }
+
+    @Test
+    fun `a line whose language is unknown is sent as auto`() {
+        assertTrue(Words.params(listOf("日本語"), "en", null).contains("sl=auto"))
+        // An English line has nothing to split, so it never names a source.
+        assertTrue(Words.params(listOf("日本語"), "en", "en").contains("sl=auto"))
     }
 }

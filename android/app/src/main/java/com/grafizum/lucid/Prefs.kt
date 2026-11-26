@@ -58,14 +58,50 @@ object Prefs {
     fun setAutoTranslate(context: Context, enabled: Boolean) =
         sp(context).edit().putBoolean("autoTranslate", enabled).apply()
 
-    /** Use the online engine for accuracy, not just the offline models. */
-    fun onlineEngine(context: Context): Boolean = sp(context).getBoolean("onlineEngine", true)
+    /**
+     * Where a read happens: the online engine when it is allowed, the phone's
+     * own models when it is not.
+     *
+     * On-device is a promise rather than a preference about quality: with it
+     * on, nothing leaves the phone — not the read, not the screen behind it as
+     * context, and not the word list under a tapped word.
+     *
+     * There used to be a second preference beside this one — Offline only —
+     * that overrode it. It is folded in here: a phone that had it on is moved
+     * onto On-device once, and the old key goes.
+     */
+    fun onlineEngine(context: Context): Boolean {
+        val prefs = sp(context)
+        if (prefs.contains("offlineOnly")) {
+            if (prefs.getBoolean("offlineOnly", false)) {
+                prefs.edit().putBoolean("onlineEngine", false).apply()
+            }
+            prefs.edit().remove("offlineOnly").apply()
+        }
+        return prefs.getBoolean("onlineEngine", true)
+    }
 
     fun setOnlineEngine(context: Context, enabled: Boolean) =
         sp(context).edit().putBoolean("onlineEngine", enabled).apply()
 
     fun setTargetLanguage(context: Context, code: String) =
         sp(context).edit().putString("target", code).apply()
+
+    /**
+     * The language every read is expected to start from, or null while the lens
+     * works it out line by line. Auto recognize is the default because it is right
+     * almost every time; a pin is for a screen too short or too mixed for the
+     * guess to be sure, and it is what Settings' Translate from row sets.
+     */
+    fun sourceLanguage(context: Context): String? =
+        sp(context).getString("source", null)?.takeIf { it.isNotBlank() }
+
+    /** Pin the source, or hand the choice back to the detector with null. */
+    fun setSourceLanguage(context: Context, code: String?) {
+        sp(context).edit().apply {
+            if (code.isNullOrBlank() || code == "auto") remove("source") else putString("source", code)
+        }.apply()
+    }
 
     /**
      * What one app is translated into, when it has its own answer: a chat read
@@ -102,16 +138,6 @@ object Prefs {
     fun clearTargetFor(context: Context, pkg: String) {
         sp(context).edit().remove("target.$pkg").apply()
     }
-
-    /**
-     * Refuse the network for every read. Unlike the ENGINE row this is not a
-     * preference about quality: with it on, a read that would have to leave the
-     * phone says so instead of quietly doing it.
-     */
-    fun offlineOnly(context: Context): Boolean = sp(context).getBoolean("offlineOnly", false)
-
-    fun setOfflineOnly(context: Context, on: Boolean) =
-        sp(context).edit().putBoolean("offlineOnly", on).apply()
 
     /** Reads that came back translated, whatever the engine — the review signal. */
     fun goodReads(context: Context): Int = sp(context).getInt("goodReads", 0)

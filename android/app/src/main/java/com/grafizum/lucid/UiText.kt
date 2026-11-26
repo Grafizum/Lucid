@@ -12,13 +12,9 @@ import kotlinx.coroutines.withContext
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File
-import java.net.HttpURLConnection
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.atomic.AtomicReference
-import java.net.URL
-import java.net.URLEncoder
-import java.util.concurrent.TimeUnit
 
 /**
  * The app's own words, in the language the person chose to read them in.
@@ -48,7 +44,7 @@ object UiText {
      * a pack translated from the old ones would be missing whatever is new. The
      * arrow comes back and the language is fetched again.
      */
-    internal const val VERSION = 2
+    internal const val VERSION = 5
 
     private val english = linkedMapOf(
         "tour.1.title" to "Swipe to start the lens",
@@ -104,8 +100,7 @@ object UiText {
         "Engine",
         "Best quality — sent online to translate",
         "Online",
-        "Offline only",
-        "No read ever leaves the phone",
+        "Nothing leaves the phone",
         "Off",
         "PAGES",
         "Offline models",
@@ -120,9 +115,21 @@ object UiText {
         "Settings",
         "APP LANGUAGE",
         "App language",
-        "See the tour in this language",
+
         "TRANSLATE INTO",
+        "TRANSLATE FROM",
+        "TRANSLATION",
+
+        // What the corner says when a language's words are not on the phone.
+        "No internet — connect to translate %s",
+        "Couldn't reach Google — try again",
+        "Not on this phone yet — tap to fetch %s",
+
         "Translate into",
+        "Translate from",
+        "Auto recognize",
+        "Detected on each read",
+        "Reads start from this language",
         "What every read comes out as — answered online, nothing to download",
         "APPEARANCE",
         "System",
@@ -174,6 +181,7 @@ object UiText {
         "Start now",
         "Settings › Accessibility › Lucid",
         "Greyed out? Open App info › ⋮ › Allow restricted settings first.",
+        "Under %s — scroll down if it isn't there.",
         "Open settings",
         "READ",
         "TRANSLATED",
@@ -243,7 +251,10 @@ object UiText {
         "The one read kept on this phone goes — the line, the answer, where and when. Nothing was uploaded, so there is no other copy and this cannot be undone.",
         "All %d reads kept on this phone go — the lines, the answers, where and when. Nothing was uploaded, so there is no other copy and this cannot be undone.",
         "Translating into %s",
-        "This is the default for every app. If you pick a language on the lens while it sits over an app, that app keeps its own choice — a chat read into German, a browser into English — and every other app still uses this one.",
+        "Translate from and into",
+        "A read has two sides. From is Auto recognize by default: the lens works out the language of each line as it reads it, which is right almost every time. Pick a language there and every read starts from it — the answer for a screen too short or too mixed for the guess to be sure. Into is the default for every app. If you pick a language on the lens while it sits over an app, that app keeps its own choice — a chat read into German, a browser into English — and every other app still uses this one.",
+        "Auto recognize — the language is worked out on every read",
+        "Reads start in %s",
         "Two languages, two jobs. This one is the app itself — its tour, its buttons, its own words. English is written in; every other language is translated once by the same online engine the lens uses and then kept on this phone, which is what the arrow downloads. The card below it is the other question: the language a read comes out as, answered online every time, so nothing is ever downloaded for it.",
         "The page's own light. System follows the phone, so the app changes when the phone does; Light and Dark hold the app where you put it. The lens, its card and the sheets it opens keep their own dressing either way — they have to read over whatever is underneath them.",
         "These live in Android's own screens; Lucid can open them but never flips them for you. Steps 1 and 2 are the ground translation stands on, and without both the lens cannot start: float over other apps lets it sit on top of what you are reading, and read text on screen is what lets it see the words under it. A step 3 appears only where the phone will not give a screenshot any other way, and lasts one session. Anything past the optional line can stay off — the quick button is only the tile in the shade.",
@@ -509,36 +520,23 @@ object UiText {
      * the source is said out loud as English so a short line is never mistaken
      * for something to detect.
      *
-     * The host is the one that answers a bare request without a key. Its older
-     * sibling names the same service but answers a plain GET with Google's
-     * "Sorry…" page from some networks, which is a download that fails for a
-     * reason no user could act on.
+     * The request is [TranslateNet]'s, the same POST a read makes. That is not
+     * tidiness: a GET to this endpoint answers with Google's "Sorry…" page
+     * (HTTP 429) from the shared addresses of a carrier network, so a language
+     * download could fail on a phone that was plainly online — and the page
+     * said the download could not be made for no reason the person could act on.
      */
     private fun ask(line: String, code: String): String? = runCatching {
-        val url = "https://clients5.google.com/translate_a/single" +
-            "?client=dict-chrome-ex&dt=t&sl=en&tl=" + URLEncoder.encode(code, "UTF-8") +
-            "&q=" + URLEncoder.encode(line, "UTF-8")
-        val connection = (URL(url).openConnection() as HttpURLConnection).apply {
-            requestMethod = "GET"
-            setRequestProperty(
-                "User-Agent",
-                "Mozilla/5.0 (Linux; Android) AppleWebKit/537.36 Chrome/130.0 Mobile Safari/537.36",
-            )
-            connectTimeout = TimeUnit.SECONDS.toMillis(6).toInt()
-            readTimeout = TimeUnit.SECONDS.toMillis(10).toInt()
+        val body = TranslateNet.ask(
+            TranslateNet.params(query = line, target = code, source = "en", reading = false),
+        ) ?: return@runCatching null
+        val segments = JSONArray(body).optJSONArray(0) ?: return@runCatching null
+        val text = StringBuilder()
+        for (index in 0 until segments.length()) {
+            val segment = segments.optJSONArray(index) ?: continue
+            if (segment.isNull(0)) continue
+            text.append(segment.optString(0))
         }
-        try {
-            val body = connection.inputStream.bufferedReader().use { it.readText() }
-            val segments = JSONArray(body).optJSONArray(0) ?: return@runCatching null
-            val text = StringBuilder()
-            for (index in 0 until segments.length()) {
-                val segment = segments.optJSONArray(index) ?: continue
-                if (segment.isNull(0)) continue
-                text.append(segment.optString(0))
-            }
-            text.toString().trim().ifEmpty { null }
-        } finally {
-            connection.disconnect()
-        }
+        text.toString().trim().ifEmpty { null }
     }.getOrNull()
 }

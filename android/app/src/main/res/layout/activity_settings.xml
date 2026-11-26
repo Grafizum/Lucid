@@ -13,7 +13,7 @@
     android:paddingStart="24dp"
     android:paddingTop="10dp"
     android:paddingEnd="24dp"
-    android:paddingBottom="18dp">
+    android:paddingBottom="22dp">
 
     <!-- One 44 dp row with the chevron drawn and centred, so the arrow and the
          page's name sit on the same line on every page that goes back. The
@@ -80,7 +80,7 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
+                android:layout_marginTop="16dp"
                 android:gravity="center_vertical"
                 android:orientation="horizontal">
 
@@ -90,7 +90,7 @@
                     android:layout_marginEnd="7dp"
                     android:contentDescription="@null"
                     android:importantForAccessibility="no"
-                    android:src="@drawable/ic_sec_app" />
+                    android:src="@drawable/ic_sec_language" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -110,16 +110,16 @@
                 android:id="@+id/settingsAppLang"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
+                android:layout_marginTop="8dp"
                 android:background="@drawable/card_bg"
                 android:clickable="true"
                 android:focusable="true"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
                 android:paddingStart="15dp"
-                android:paddingTop="13dp"
+                android:paddingTop="15dp"
                 android:paddingEnd="13dp"
-                android:paddingBottom="13dp">
+                android:paddingBottom="15dp">
 
                 <LinearLayout
                     android:layout_width="0dp"
@@ -180,47 +180,47 @@
                     android:src="@drawable/ic_download" />
             </LinearLayout>
 
-            <!-- The words only reach the tour today, so the tour is one tap from
-                 the switch that changes them: download, then look. -->
+            <!-- The small line under the row: what the pack is doing, and the
+                 one case that needs the person — a language that cannot be
+                 fetched without a connection. Gone whenever the words are
+                 already on the phone, so the page stays a page of rows. -->
             <TextView
-                android:id="@+id/settingsAppLangTour"
-                android:layout_width="wrap_content"
-                android:layout_height="30dp"
+                android:id="@+id/settingsAppLangState"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:background="@drawable/btn_ghost"
-                android:clickable="true"
-                android:focusable="true"
+                android:drawablePadding="6dp"
                 android:fontFamily="@font/lucid_sans"
-                android:gravity="center"
-                android:paddingStart="14dp"
-                android:paddingEnd="14dp"
-                android:text="See the tour in this language"
-                android:textColor="@color/screen_muted"
-                android:textSize="10.5sp" />
+                android:lineSpacingMultiplier="1.25"
+                android:paddingStart="4dp"
+                android:paddingEnd="4dp"
+                android:textColor="@color/screen_faint"
+                android:textSize="10sp"
+                android:visibility="gone" />
 
             <!-- ── translate into ─────────────────────────────────────── -->
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
+                android:layout_marginTop="18dp"
                 android:gravity="center_vertical"
                 android:orientation="horizontal">
 
                 <ImageView
-                    android:layout_width="15dp"
-                    android:layout_height="15dp"
+                    android:layout_width="17dp"
+                    android:layout_height="17dp"
                     android:layout_marginEnd="7dp"
                     android:contentDescription="@null"
                     android:importantForAccessibility="no"
-                    android:src="@drawable/ic_sec_language" />
+                    android:src="@drawable/ic_sec_translate" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/lucid_sans"
                     android:letterSpacing="0.18"
-                    android:text="TRANSLATE INTO"
+                    android:text="TRANSLATION"
                     android:textColor="@color/screen_faint"
                     android:textSize="8.5sp" />
 
@@ -229,68 +229,238 @@
                     style="@style/InfoMark" />
             </LinearLayout>
 
-            <LinearLayout
-                android:id="@+id/settingsTarget"
+            <!-- A read has two sides, so the card has two ends: the language it
+                 comes from and the language it goes to, each a tap target the
+                 full height of the card. From is Auto recognize unless the
+                 person pins one, which is what the phone does best by itself;
+                 Into is the default every app is answered in.
+
+                 One card, two ends — not two chips. The halves sit flush on the
+                 same paper, a single hairline crosses the seam where they meet,
+                 and the swap ring floats above that seam, so the pair reads as
+                 one decision with two ends instead of two settings. -->
+            <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
-                android:background="@drawable/card_bg"
-                android:clickable="true"
-                android:focusable="true"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:paddingStart="15dp"
-                android:paddingTop="13dp"
-                android:paddingEnd="13dp"
-                android:paddingBottom="13dp">
+                android:layout_marginTop="8dp"
+                android:background="@drawable/card_bg">
 
                 <LinearLayout
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical">
+                    android:orientation="horizontal">
 
-                    <TextView
-                        android:layout_width="wrap_content"
+                    <FrameLayout
+                        android:id="@+id/settingsSource"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:fontFamily="@font/lucid_sans"
-                        android:text="Translate into"
-                        android:textColor="@color/screen_ink"
-                        android:textFontWeight="500"
-                        android:textSize="13sp" />
+                        android:layout_weight="1"
+                        android:clickable="true"
+                        android:focusable="true">
 
-                    <TextView
-                        android:id="@+id/settingsTargetHint"
-                        android:layout_width="match_parent"
+                        <!-- The clay a half takes under a thumb. Its own view rather
+                             than the half's background: the fill has to come up and
+                             go down, and a background is swapped, not animated, on a
+                             canvas this quiet. It carries the card's own corners so
+                             the wash stays inside the paper. -->
+                        <View
+                            android:id="@+id/settingsSourceWash"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:alpha="0"
+                            android:background="@drawable/half_press_from"
+                            android:importantForAccessibility="no" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="start"
+                            android:orientation="vertical"
+                            android:paddingStart="14dp"
+                            android:paddingTop="14dp"
+                            android:paddingEnd="12dp"
+                            android:paddingBottom="15dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="@font/lucid_sans"
+                                android:includeFontPadding="false"
+                                android:letterSpacing="0.16"
+                                android:text="FROM"
+                                android:textColor="@color/screen_faint"
+                                android:textFontWeight="700"
+                                android:textSize="8.5sp" />
+
+                            <TextView
+                                android:id="@+id/settingsSourceCode"
+                                android:layout_width="40dp"
+                                android:layout_height="40dp"
+                                android:layout_marginTop="9dp"
+                                android:background="@drawable/medallion_from"
+                                android:fontFamily="@font/lucid_sans"
+                                android:gravity="center"
+                                android:includeFontPadding="false"
+                                android:maxLines="1"
+                                android:text="DE"
+                                android:textColor="@color/screen_ink"
+                                android:textFontWeight="650"
+                                android:textSize="11sp" />
+
+                            <TextView
+                                android:id="@+id/settingsSourceName"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="9dp"
+                                android:ellipsize="end"
+                                android:fontFamily="@font/lucid_sans"
+                                android:maxLines="1"
+                                android:text="Auto recognize"
+                                android:textColor="@color/screen_ink"
+                                android:textFontWeight="500"
+                                android:textSize="13sp" />
+                        </LinearLayout>
+                    </FrameLayout>
+
+                    <FrameLayout
+                        android:id="@+id/settingsTarget"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="1dp"
-                        android:fontFamily="@font/lucid_sans"
-                        android:text="What every read comes out as — answered online, nothing to download"
-                        android:textColor="@color/screen_faint"
-                        android:textSize="10.5sp" />
+                        android:layout_weight="1"
+                        android:clickable="true"
+                        android:focusable="true">
+
+                        <View
+                            android:id="@+id/settingsTargetWash"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:alpha="0"
+                            android:background="@drawable/half_press_into"
+                            android:importantForAccessibility="no" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="end"
+                            android:orientation="vertical"
+                            android:paddingStart="12dp"
+                            android:paddingTop="14dp"
+                            android:paddingEnd="14dp"
+                            android:paddingBottom="15dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="@font/lucid_sans"
+                                android:includeFontPadding="false"
+                                android:letterSpacing="0.16"
+                                android:text="INTO"
+                                android:textColor="@color/screen_faint"
+                                android:textFontWeight="700"
+                                android:textSize="8.5sp" />
+
+                            <TextView
+                                android:id="@+id/settingsTargetCode"
+                                android:layout_width="40dp"
+                                android:layout_height="40dp"
+                                android:layout_marginTop="9dp"
+                                android:background="@drawable/medallion_to"
+                                android:fontFamily="@font/lucid_sans"
+                                android:gravity="center"
+                                android:includeFontPadding="false"
+                                android:maxLines="1"
+                                android:text="EN"
+                                android:textColor="@color/screen_accent_ink"
+                                android:textFontWeight="650"
+                                android:textSize="11sp" />
+
+                            <TextView
+                                android:id="@+id/settingsTargetName"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="9dp"
+                                android:ellipsize="end"
+                                android:fontFamily="@font/lucid_sans"
+                                android:gravity="end"
+                                android:maxLines="1"
+                                android:text="English"
+                                android:textColor="@color/screen_ink"
+                                android:textFontWeight="500"
+                                android:textSize="13sp" />
+                        </LinearLayout>
+                    </FrameLayout>
                 </LinearLayout>
 
-                <TextView
-                    android:id="@+id/settingsTargetName"
-                    android:layout_width="wrap_content"
-                    android:layout_height="28dp"
-                    android:layout_marginStart="8dp"
-                    android:background="@drawable/chip_accent_bg"
-                    android:fontFamily="@font/lucid_sans"
-                    android:gravity="center"
-                    android:paddingStart="15dp"
-                    android:paddingEnd="15dp"
-                    android:text="English"
-                    android:textColor="@color/screen_accent_ink"
-                    android:textSize="11sp" />
-            </LinearLayout>
+                <!-- The seam: the edge of the second plate, filleted at both
+                     ends where it leaves the card. It spans the card so its
+                     centre line is the card's, but only the filleted path is
+                     drawn — see [SeamView]. -->
+                <com.grafizum.lucid.SeamView
+                    android:id="@+id/settingsSeam"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:importantForAccessibility="no" />
+
+                <!-- The ring floats on the seam, above both halves, so it belongs
+                     to the pair rather than to either end. Its arrows dim when
+                     From is Auto: there is no guess to exchange, but the card
+                     keeps its shape instead of losing a hole. -->
+                <FrameLayout
+                    android:id="@+id/settingsSwap"
+                    android:layout_width="34dp"
+                    android:layout_height="34dp"
+                    android:layout_gravity="center"
+                    android:clickable="true"
+                    android:contentDescription="Swap the two languages"
+                    android:focusable="true">
+
+                    <!-- The ring's face and its glyph, inside one lifted box:
+                         the face has to stay opaque so the seam runs behind it
+                         and is never read through it, while the glyph is what
+                         dims when there is no pinned language to swap. They
+                         share the box because elevation draws a sibling above
+                         everything at a lower Z — the face would cover the
+                         arrows. -->
+                    <FrameLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@drawable/swap_ring_bg"
+                        android:elevation="2dp"
+                        android:importantForAccessibility="no">
+
+                        <ImageView
+                            android:id="@+id/settingsSwapGlyph"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:contentDescription="@null"
+                            android:importantForAccessibility="no"
+                            android:padding="7dp"
+                            android:src="@drawable/ic_swap"
+                            android:tint="@color/screen_accent" />
+                    </FrameLayout>
+                </FrameLayout>
+            </FrameLayout>
+
+            <!-- Said under the card, where the two controls are looked at
+                 together, because the ring is a control nobody has met before. -->
+            <TextView
+                android:id="@+id/settingsPairHint"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="9dp"
+                android:fontFamily="@font/lucid_sans"
+                android:paddingStart="4dp"
+                android:paddingEnd="4dp"
+                android:text="Tap either half · the ring swaps them"
+                android:textColor="@color/screen_faint"
+                android:textSize="10sp" />
 
             <!-- ── the page's own light ───────────────────────────────── -->
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
+                android:layout_marginTop="28dp"
                 android:gravity="center_vertical"
                 android:orientation="horizontal">
 
@@ -318,37 +488,157 @@
 
             <!-- Three choices on one card: the surface is a property of the whole
                  app, so it is one decision, not a switch that sits beside things
-                 that only change when you tap them. -->
+                 that only change when you tap them.
+
+                 Each choice is a picture of itself — a page with lines of text on
+                 it, in the light that choice gives. Three words could only be
+                 understood by being tried; three pages are understood by being
+                 looked at, and System is the two halves side by side, which is
+                 exactly what it means. The words stay under each page, so the
+                 card is still read as well as seen. -->
             <LinearLayout
                 android:id="@+id/themePicker"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
+                android:layout_marginTop="8dp"
                 android:background="@drawable/card_bg"
-                android:orientation="vertical"
+                android:baselineAligned="false"
+                android:orientation="horizontal"
                 android:padding="4dp">
 
-                <TextView
+                <FrameLayout
                     android:id="@+id/themeSystem"
-                    style="@style/ThemeChoice"
-                    android:text="System" />
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="2dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/theme_choice_bg"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:padding="6dp">
 
-                <TextView
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <com.grafizum.lucid.ThemeSwatch
+                            android:id="@+id/themeSystemSwatch"
+                            android:layout_width="match_parent"
+                            android:layout_height="46dp"
+                            android:importantForAccessibility="no" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="7dp"
+                            android:gravity="center"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                android:id="@+id/themeSystemLabel"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="@font/lucid_sans"
+                                android:text="System"
+                                android:textColor="@color/theme_choice_text"
+                                android:textFontWeight="500"
+                                android:textSize="11sp" />
+                        </LinearLayout>
+                    </LinearLayout>
+                </FrameLayout>
+
+                <FrameLayout
                     android:id="@+id/themeLight"
-                    style="@style/ThemeChoice"
-                    android:text="Light" />
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="2dp"
+                    android:layout_marginEnd="2dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/theme_choice_bg"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:padding="6dp">
 
-                <TextView
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <com.grafizum.lucid.ThemeSwatch
+                            android:id="@+id/themeLightSwatch"
+                            android:layout_width="match_parent"
+                            android:layout_height="46dp"
+                            android:importantForAccessibility="no" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="7dp"
+                            android:gravity="center"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                android:id="@+id/themeLightLabel"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="@font/lucid_sans"
+                                android:text="Light"
+                                android:textColor="@color/theme_choice_text"
+                                android:textFontWeight="500"
+                                android:textSize="11sp" />
+                        </LinearLayout>
+                    </LinearLayout>
+                </FrameLayout>
+
+                <FrameLayout
                     android:id="@+id/themeDark"
-                    style="@style/ThemeChoice"
-                    android:text="Dark" />
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="2dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/theme_choice_bg"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:padding="6dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <com.grafizum.lucid.ThemeSwatch
+                            android:id="@+id/themeDarkSwatch"
+                            android:layout_width="match_parent"
+                            android:layout_height="46dp"
+                            android:importantForAccessibility="no" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="7dp"
+                            android:gravity="center"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                android:id="@+id/themeDarkLabel"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="@font/lucid_sans"
+                                android:text="Dark"
+                                android:textColor="@color/theme_choice_text"
+                                android:textFontWeight="500"
+                                android:textSize="11sp" />
+                        </LinearLayout>
+                    </LinearLayout>
+                </FrameLayout>
             </LinearLayout>
 
             <TextView
                 android:id="@+id/themeHint"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
+                android:layout_marginTop="8dp"
                 android:fontFamily="@font/lucid_sans"
                 android:text="Follows your phone's setting"
                 android:textColor="@color/screen_faint"
@@ -359,7 +649,7 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
+                android:layout_marginTop="28dp"
                 android:gravity="center_vertical"
                 android:orientation="horizontal">
 
@@ -391,7 +681,7 @@
                 android:id="@+id/permStatus"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
+                android:layout_marginTop="8dp"
                 android:fontFamily="@font/lucid_sans"
                 android:lineSpacingMultiplier="1.4"
                 android:text="Translation can't start yet — the first two below are what it runs on."
@@ -401,7 +691,7 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
+                android:layout_marginTop="12dp"
                 android:background="@drawable/card_bg"
                 android:orientation="vertical"
                 android:paddingStart="15dp"
@@ -414,7 +704,7 @@
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/lucid_sans"
                     android:letterSpacing="0.16"
-                    android:paddingTop="11dp"
+                    android:paddingTop="13dp"
                     android:text="ALL OF THESE ARE NEEDED TO TRANSLATE"
                     android:textColor="@color/screen_faint"
                     android:textSize="8sp" />
@@ -426,8 +716,8 @@
                     android:layout_height="wrap_content"
                     android:gravity="center_vertical"
                     android:orientation="horizontal"
-                    android:paddingTop="11dp"
-                    android:paddingBottom="11dp">
+                    android:paddingTop="13dp"
+                    android:paddingBottom="13dp">
 
                     <!-- Numbered, because the two of them are a list to work
                          through: 1 then 2. The filled numeral is a step that
@@ -501,8 +791,8 @@
                     android:layout_height="wrap_content"
                     android:gravity="center_vertical"
                     android:orientation="horizontal"
-                    android:paddingTop="11dp"
-                    android:paddingBottom="11dp">
+                    android:paddingTop="13dp"
+                    android:paddingBottom="13dp">
 
                     <TextView
                         android:id="@+id/dot2"
@@ -573,8 +863,8 @@
                     android:layout_height="wrap_content"
                     android:gravity="center_vertical"
                     android:orientation="horizontal"
-                    android:paddingTop="11dp"
-                    android:paddingBottom="11dp">
+                    android:paddingTop="13dp"
+                    android:paddingBottom="13dp">
 
                     <TextView
                         android:id="@+id/dot3"
@@ -647,7 +937,7 @@
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/lucid_sans"
                     android:letterSpacing="0.16"
-                    android:paddingTop="11dp"
+                    android:paddingTop="13dp"
                     android:text="OPTIONAL — THE LENS WORKS WITHOUT IT"
                     android:textColor="@color/screen_faint"
                     android:textSize="8sp" />
@@ -659,8 +949,8 @@
                     android:layout_height="wrap_content"
                     android:gravity="center_vertical"
                     android:orientation="horizontal"
-                    android:paddingTop="11dp"
-                    android:paddingBottom="11dp">
+                    android:paddingTop="13dp"
+                    android:paddingBottom="13dp">
 
                     <LinearLayout
                         android:layout_width="0dp"
@@ -712,7 +1002,7 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="22dp"
+                android:layout_marginTop="30dp"
                 android:gravity="center_vertical"
                 android:orientation="horizontal">
 
@@ -764,7 +1054,7 @@
                 android:id="@+id/appSearch"
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
-                android:layout_marginTop="12dp"
+                android:layout_marginTop="14dp"
                 android:background="@drawable/btn_ghost"
                 android:fontFamily="@font/lucid_sans"
                 android:hint="Search apps"
@@ -793,7 +1083,7 @@
                 android:id="@+id/settingsAppsList"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="14dp"
+                android:layout_marginTop="16dp"
                 android:background="@drawable/card_bg"
                 android:orientation="vertical"
                 android:paddingStart="13dp"

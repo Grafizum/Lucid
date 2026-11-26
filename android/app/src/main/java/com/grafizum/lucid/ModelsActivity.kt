@@ -257,7 +257,7 @@ class ModelsActivity : AppCompatActivity() {
                 color(
                     when {
                         busy -> R.color.screen_faint
-                        here -> R.color.screen_accent
+                        here -> R.color.screen_accent_ink
                         else -> R.color.screen_ink
                     },
                 ),
@@ -389,13 +389,16 @@ class ModelsActivity : AppCompatActivity() {
         gravity = Gravity.CENTER
         typeface = sans(600)
         textSize = 12.5f
-        setTextColor(color(if (solid) R.color.screen_canvas else R.color.screen_ink))
+        // The same two roles every other button in the app is drawn from: the
+        // primary fill with its own ink, or the page's beige step.
+        setTextColor(color(if (solid) R.color.btn_primary_ink else R.color.screen_ink))
         isClickable = true
         isFocusable = true
         background = GradientDrawable().apply {
             cornerRadius = dp(999).toFloat()
             if (solid) {
-                setColor(color(R.color.screen_accent))
+                setColor(color(R.color.btn_primary_fill))
+                setStroke(dp(1), color(R.color.btn_primary_edge))
             } else {
                 setColor(color(R.color.screen_button))
                 setStroke(dp(1), color(R.color.screen_edge))
