@@ -12,7 +12,7 @@
 [![Platform](https://img.shields.io/badge/platform-Android%207.0%2B-3ddc84)](#-install)
 [![Build](https://img.shields.io/badge/build-debug%20%C2%B7%20v1.3.2-e0a94f)](#-install)
 [![Engine](https://img.shields.io/badge/engine-online%20%2B%20on--device-6f9f86)](#-translation-engine)
-[![Licence](https://img.shields.io/badge/licence-source--available-8a8271)](#-licence)
+[![Licence](https://img.shields.io/badge/licence-GPLv3-6f9f86)](#-licence)
 
 [Install](#-install) · [Features](#-features) · [Screenshots](#-screenshots) · [How it reads your screen](#-how-it-reads-your-screen) · [Japanese](#-japanese-readings-and-words) · [Build from source](#-build-from-source) · [Limits](#-limits-worth-knowing)
 
@@ -204,7 +204,7 @@ The Play Store listing needs a public privacy policy, so the app's legal pages l
 - https://lucid.grafizum.com/privacy — what the lens reads, where text goes, what is kept
 - https://lucid.grafizum.com/terms — terms of use, Swiss law
 
-© 2026 Grafizum. The source is published so that you can read it, build it and install it for yourself; it is not released under an open-source licence and is not licensed for redistribution. The name, the design and the code stay ours — the full terms are at [lucid.grafizum.com/terms](https://lucid.grafizum.com/terms). Open-source components bundled with the app remain under their own licences.
+© 2026 Grafizum. Lucid is free software under the **[GNU General Public License, version 3](LICENSE)**. You can run it, read it, build it, change it and pass it on, as long as a version you distribute keeps the same licence and publishes its source — nobody can take it and close it. The name and the design are not part of that grant, so a fork carries its own name and icon; the terms of use are at [lucid.grafizum.com/terms](https://lucid.grafizum.com/terms). Third-party components bundled with the app remain under their own licences.
 
 ## 🤝 Working on this repository
 
