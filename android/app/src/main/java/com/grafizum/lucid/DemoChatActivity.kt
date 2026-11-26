@@ -4,6 +4,8 @@ import android.os.Bundle
 import android.view.ViewGroup
 import android.webkit.WebView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import android.widget.FrameLayout
 
 /**
@@ -40,5 +42,15 @@ class DemoChatActivity : AppCompatActivity() {
             ),
         )
         setContentView(root)
+
+        // Edge to edge is the default now, which would put the chat's own header
+        // under the clock and the battery. The demo surface stands in for a real
+        // app's screen, so it keeps its bar clear of the system bars the way a
+        // real app does.
+        ViewCompat.setOnApplyWindowInsetsListener(root) { view, insets ->
+            val bars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            view.setPadding(0, bars.top, 0, bars.bottom)
+            insets
+        }
     }
 }
